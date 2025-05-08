@@ -262,6 +262,20 @@
       remove(ref(db, 'tokens/' + id));
     };
 
+    // Transform ke huruf besar untuk subject dan token
+    document.getElementById('subject').addEventListener('input', function () {
+      this.value = this.value.toUpperCase();
+    });
+
+    document.getElementById('token').addEventListener('input', function () {
+      this.value = this.value.toUpperCase();
+    });
+
+    // Batasi input kelas hanya angka
+    document.getElementById('kelas').addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '');
+    });
+
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const subject = document.getElementById('subject').value.trim();
