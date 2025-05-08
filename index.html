@@ -48,7 +48,7 @@
       cursor: pointer;
     }
     .btn-small {
-      padding: 4px 8px;
+      padding: 5px 10px;
       font-size: 12px;
     }
     .form-group {
@@ -68,7 +68,6 @@
       border: 1px solid #ccc;
       padding: 8px;
       word-wrap: break-word;
-      text-align: center;
     }
     th {
       background-color: #f4f4f4;
@@ -116,7 +115,7 @@
     <h3>Tambah / Edit Token</h3>
     <form id="tokenForm">
       <div class="form-group"><input type="text" id="subject" placeholder="Mata Pelajaran" required /></div>
-      <div class="form-group"><input type="text" id="kelas" placeholder="Kelas (Angka saja)" required /></div>
+      <div class="form-group"><input type="text" id="kelas" placeholder="Kelas" required pattern="\\d+" title="Hanya angka" /></div>
       <div class="form-group"><input type="text" id="token" placeholder="Token Ujian" required /></div>
       <div class="form-group"><input type="url" id="url" placeholder="Link Ujian" required /></div>
       <div class="form-group">
@@ -145,8 +144,8 @@
           <th>Kelas</th>
           <th>Token</th>
           <th>Link</th>
-          <th>Mulai</th>
-          <th>Selesai</th>
+          <th>Token dibuka</th>
+          <th>Token ditutup</th>
           <th>Aksi</th>
         </tr>
       </thead>
@@ -262,7 +261,7 @@
     }
 
     window.hapusToken = function(id) {
-      if (confirm("Yakin ingin menghapus token ini?")) {
+      if (confirm("Apakah Anda yakin ingin menghapus token ini?")) {
         remove(ref(db, 'tokens/' + id));
       }
     };
@@ -275,12 +274,8 @@
       const url = document.getElementById('url').value.trim();
       const startTime = document.getElementById('startTime').value;
       const endTime = document.getElementById('endTime').value;
+      const createdAt = new Date().toISOString();
       const errorMsg = document.getElementById('errorMsg');
-
-      if (!/^\d+$/.test(kelas)) {
-        errorMsg.innerText = "Kelas hanya boleh diisi angka.";
-        return;
-      }
 
       const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
       const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
@@ -290,7 +285,7 @@
         checkDuplicateInputs(); return;
       }
 
-      const tokenData = { subject, kelas, token, url, startTime, endTime };
+      const tokenData = { subject, kelas, token, url, startTime, endTime, createdAt };
       if (currentTokenId) {
         update(ref(db, 'tokens/' + currentTokenId), tokenData);
         currentTokenId = null;
