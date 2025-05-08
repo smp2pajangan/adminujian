@@ -84,9 +84,27 @@
     }
     .footer {
       text-align: center;
-      margin-top: 30px;
+      margin-top: 15px;
       color: #555;
       font-size: 14px;
+    }
+    #popupConfirm {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    #popupConfirm .popup-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 300px;
+      margin: auto;
     }
     @media (max-width: 600px) {
       table, th, td {
@@ -107,9 +125,9 @@
     <input type="password" id="password" placeholder="Masukan Password" />
     <button onclick="login()">Login</button>
     <p id="loginError" class="error"></p>
-    <div style="text-align: center; color: #555; margin-top: 20px;">
+    <div class="footer">
       <div>@Admin SMPN 2 Pajangan</div>
-      <div id="realtimeClock"></div>
+      <div id="clockLogin"></div>
     </div>
   </div>
 
@@ -155,9 +173,13 @@
     </table>
   </div>
 
-  <div class="footer">
-    <div>@Admin SMPN 2 Pajangan</div>
-    <div id="clock"></div>
+  <!-- Popup Konfirmasi Hapus -->
+  <div id="popupConfirm">
+    <div class="popup-content">
+      <p>Apakah Anda yakin ingin menghapus token ini?</p>
+      <button id="btnYes" style="margin-right:10px;">Ya</button>
+      <button onclick="closePopup()">Batal</button>
+    </div>
   </div>
 
   <script type="module">
@@ -257,11 +279,23 @@
       renderTokens(filtered);
     }
 
+    let tokenToDelete = null;
     window.hapusToken = function(id) {
-      if (confirm("Apakah Anda yakin ingin menghapus token ini?")) {
-        remove(ref(db, 'tokens/' + id));
-      }
+      tokenToDelete = id;
+      document.getElementById('popupConfirm').style.display = 'flex';
     };
+
+    window.closePopup = function() {
+      tokenToDelete = null;
+      document.getElementById('popupConfirm').style.display = 'none';
+    };
+
+    document.getElementById('btnYes').addEventListener('click', function() {
+      if (tokenToDelete) {
+        remove(ref(db, 'tokens/' + tokenToDelete));
+        closePopup();
+      }
+    });
 
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -317,11 +351,7 @@
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       const dateStr = now.toLocaleDateString('id-ID', options);
       const timeStr = now.toLocaleTimeString('id-ID');
-      document.getElementById('clock').innerText = `${dateStr} - ${timeStr}`;
-      const realtimeClock = document.getElementById('realtimeClock');
-      if (realtimeClock) {
-        realtimeClock.innerText = `${dateStr} - ${timeStr}`;
-      }
+      document.getElementById('clockLogin').innerText = `${dateStr} - ${timeStr}`;
     }
     setInterval(updateClock, 1000);
     updateClock();
