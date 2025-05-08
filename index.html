@@ -69,7 +69,6 @@
       <div class="form-container">
         <h3>Tambah/Edit Token</h3>
         <form id="tokenForm">
-          <!-- Urutan form yang baru -->
           <input type="text" id="subject" placeholder="Mata Pelajaran" required />
           <input type="text" id="kelas" placeholder="Kelas" required />
           <input type="text" id="token" placeholder="Token Ujian" required />
@@ -163,6 +162,7 @@
       });
     }
 
+    // Fungsi edit untuk mengisi form dengan data token
     function editToken(id) {
       currentTokenId = id;
       const tokenRef = ref(db, 'tokens/' + id);
