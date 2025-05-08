@@ -6,99 +6,175 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f9f9f9;
+      margin: 0;
+      background-color: #fff;
     }
-    input, button, select {
-      padding: 8px;
-      margin: 8px 0;
-      width: 100%;
+
+    .login-box {
+      width: 400px;
+      margin: 80px auto;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      padding: 0;
     }
-    input[type="datetime-local"] {
-      width: 49%;
-      display: inline-block;
-    }
-    .form-container {
-      background: #fff;
+
+    .login-header {
+      background-color: #0066cc;
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px 10px 0 0;
     }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
+
+    .login-header img {
+      width: 80px;
+      margin-bottom: 10px;
     }
+
+    .login-header h2 {
+      font-size: 20px;
+      color: white;
+      margin: 0;
+    }
+
+    .login-box h3 {
+      color: orange;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+
+    .login-box p {
+      margin: 10px 0;
+    }
+
+    .login-box input[type="text"],
+    .login-box input[type="password"] {
+      padding: 10px;
+      width: 80%;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .login-box button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 30px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
     .error {
       color: red;
       font-size: 14px;
     }
-    .token-list {
-      margin-top: 20px;
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
     }
+
+    .form-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input, button, select {
+      padding: 10px;
+      margin: 8px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    input[type="datetime-local"] {
+      width: 48%;
+      display: inline-block;
+    }
+
+    .token-list {
+      margin-top: 30px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
       background-color: #fff;
     }
+
     th, td {
       padding: 10px;
       text-align: left;
       border: 1px solid #ddd;
     }
+
     th {
       background-color: #f4f4f4;
     }
+
     .token-item button {
       margin-right: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div id="loginSection">
-      <h2>Login Admin</h2>
-      <input type="text" id="username" placeholder="Username" />
-      <input type="password" id="password" placeholder="Password" />
-      <button onclick="login()">Login</button>
-      <p id="loginError" class="error"></p>
+  <!-- Login Section -->
+  <div id="loginSection" class="login-box">
+    <div class="login-header">
+      <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" alt="Logo">
+      <h2>SMPN 2 PAJANGAN</h2>
+    </div>
+    <h3>UJIAN BERBASIS ONLINE</h3>
+    <p><strong>LOGIN ADMINISTRATOR</strong></p>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="loginError" class="error"></p>
+    <p style="font-size: 12px; color: gray;">©Admin SMPN 2 Pajangan<br>Kamis, 8 Mei 2025 pukul 11.13.07</p>
+  </div>
+
+  <!-- Admin Panel -->
+  <div class="container" id="adminPanel" style="display:none;">
+    <h2>Panel Admin</h2>
+    <div class="form-container">
+      <h3>Tambah/Edit Token</h3>
+      <form id="tokenForm">
+        <input type="text" id="subject" placeholder="Mata Pelajaran" required />
+        <input type="text" id="kelas" placeholder="Kelas" required />
+        <input type="text" id="token" placeholder="Token Ujian" required />
+        <input type="url" id="url" placeholder="Link Ujian" required />
+        <input type="datetime-local" id="startTime" required />
+        <input type="datetime-local" id="endTime" required />
+        <button type="submit">Simpan</button>
+      </form>
+      <p id="errorMsg" class="error"></p>
     </div>
 
-    <div id="adminPanel" style="display:none;">
-      <h2>Panel Admin</h2>
-      <div class="form-container">
-        <h3>Tambah/Edit Token</h3>
-        <form id="tokenForm">
-          <input type="text" id="subject" placeholder="Mata Pelajaran" required />
-          <input type="text" id="kelas" placeholder="Kelas" required />
-          <input type="text" id="token" placeholder="Token Ujian" required />
-          <input type="url" id="url" placeholder="Link Ujian" required />
-          <input type="datetime-local" id="startTime" required />
-          <input type="datetime-local" id="endTime" required />
-          <button type="submit">Simpan</button>
-        </form>
-        <p id="errorMsg" class="error"></p>
-      </div>
-
-      <div class="token-list" id="tokenList">
-        <h3>Daftar Token</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Mata Pelajaran</th>
-              <th>Kelas</th>
-              <th>Link/URL</th>
-              <th>Tanggal Waktu Dibuka</th>
-              <th>Tanggal Waktu Ditutup</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tokenTableBody">
-            <!-- Daftar token akan ditampilkan di sini -->
-          </tbody>
-        </table>
-      </div>
+    <div class="token-list" id="tokenList">
+      <h3>Daftar Token</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Mata Pelajaran</th>
+            <th>Kelas</th>
+            <th>Link/URL</th>
+            <th>Tanggal Waktu Dibuka</th>
+            <th>Tanggal Waktu Ditutup</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tokenTableBody">
+          <!-- Daftar token akan ditampilkan di sini -->
+        </tbody>
+      </table>
     </div>
   </div>
 
@@ -122,7 +198,6 @@
 
     const ADMIN_USER = "admin";
     const ADMIN_PASS = "12345";
-
     let currentTokenId = null;
 
     window.login = function () {
@@ -162,7 +237,6 @@
       });
     }
 
-    // Fungsi edit untuk mengisi form dengan data token
     function editToken(id) {
       currentTokenId = id;
       const tokenRef = ref(db, 'tokens/' + id);
@@ -183,7 +257,6 @@
 
     document.getElementById('tokenForm').addEventListener('submit', function (e) {
       e.preventDefault();
-
       const subject = document.getElementById('subject').value.trim();
       const kelas = document.getElementById('kelas').value.trim();
       const token = document.getElementById('token').value.trim();
@@ -191,16 +264,13 @@
       const start = document.getElementById('startTime').value;
       const end = document.getElementById('endTime').value;
       const createdAt = new Date().toISOString();
-
       const newTokenData = { subject, kelas, token, url, startTime: start, endTime: end, createdAt };
-
       if (currentTokenId) {
         update(ref(db, 'tokens/' + currentTokenId), newTokenData);
         currentTokenId = null;
       } else {
         push(ref(db, 'tokens'), newTokenData);
       }
-
       this.reset();
       loadTokens();
     });
