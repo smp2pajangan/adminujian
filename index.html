@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel Admin Ujian</title>
+</head>
+<body>
+  <div id="loginSection">
+    <h2>Login Admin</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="loginError" style="color:red;"></p>
+  </div>
+
+  <div id="adminPanel" style="display:none;">
+    <h2>Panel Admin</h2>
+    <form id="tokenForm">
+      <input type="text" id="token" placeholder="Token" required />
+      <input type="url" id="url" placeholder="Link Ujian" required />
+      <input type="datetime-local" id="startTime" required />
+      <input type="datetime-local" id="endTime" required />
+      <button type="submit">Simpan</button>
+    </form>
+    <h3>Daftar Token</h3>
+    <div id="tokenList"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
+      authDomain: "ujian-online-berbasis-android.firebaseapp.com",
+      databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
+      projectId: "ujian-online-berbasis-android",
+      storageBucket: "ujian-online-berbasis-android.appspot.com",
+      messagingSenderId: "923446282537",
+      appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const ADMIN_USER = "admin";
+    const ADMIN_PASS = "12345";
+
+    window.login = function () {
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      if (u === ADMIN_USER && p === ADMIN_PASS) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+      } else {
+        document.getElementById('loginError').innerText = "Username atau password salah.";
+      }
+    };
+
+    document.getElementById('tokenForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const token = document.getElementById('token').value.trim();
+      const url = document.getElementById('url').value.trim();
+      const start = document.getElementById('startTime').value;
+      const end = document.getElementById('endTime').value;
+      const createdAt = new Date().toISOString();
+
+      push(ref(db, 'tokens'), {
+        token, url, startTime: start, endTime: end, createdAt
+      });
+
+      this.reset();
+    });
+
+    const list = document.getElementById('tokenList');
+    onValue(ref(db, 'tokens'), snapshot => {
+      list.innerHTML = '';
+      snapshot.forEach(child => {
+        const data = child.val();
+        const el = document.createElement('div');
+        el.innerHTML = `
+          <p><strong>${data.token}</strong></p>
+          <p><a href="${data.url}" target="_blank">${data.url}</a></p>
+          <p>Mulai: ${data.startTime}</p>
+          <p>Selesai: ${data.endTime}</p>
+          <button onclick="hapusToken('${child.key}')">Hapus</button>
+          <hr/>
+        `;
+        list.appendChild(el);
+      });
+    });
+
+    window.hapusToken = function (id) {
+      remove(ref(db, 'tokens/' + id));
+    };
+  </script>
+</body>
+</html>
