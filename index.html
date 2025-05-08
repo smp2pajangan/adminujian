@@ -2,136 +2,208 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login Admin Ujian</title>
+  <title>Panel Admin Ujian</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow-x: hidden;
-      background-color: white;
-      box-sizing: border-box;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
     }
-
-    *, *::before, *::after {
-      box-sizing: inherit;
-    }
-
-    .container {
+    input, button, select {
+      padding: 8px;
+      margin: 8px 0;
       width: 100%;
-      max-width: 400px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      overflow: hidden;
-      margin: 30px auto 0 auto;
     }
-
-    .header {
-      background-color: #0a57c3;
-      color: white;
-      text-align: center;
+    input[type="datetime-local"] {
+      width: 49%;
+      display: inline-block;
+    }
+    .form-container {
+      background: #fff;
       padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-
-    .header img {
-      height: 100px;
-      margin-bottom: 10px;
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
     }
-
-    .header h2 {
-      margin: 0;
-    }
-
-    .content {
-      padding: 25px;
-      text-align: center;
-    }
-
-    .content h3 {
-      color: #f48600;
-      margin: 0 0 10px;
-    }
-
-    input[type="text"], input[type="password"] {
-      width: 100%;
-      padding: 12px;
-      margin: 15px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-
-    button {
-      background: #007bff;
-      color: white;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 20px;
-      font-size: 16px;
-      cursor: pointer;
-      width: 100%;
-      transition: transform 0.1s ease, background 0.2s;
-    }
-
-    button:active {
-      transform: scale(0.97);
-      background: #0069d9;
-    }
-
     .error {
       color: red;
       font-size: 14px;
-      margin-top: 10px;
     }
-
-    .footer {
-      background-color: #f9f9f9;
-      text-align: center;
-      font-size: 12px;
+    .token-list {
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #fff;
+    }
+    th, td {
       padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    .token-item button {
+      margin-right: 10px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <img src="https://disdikbud.banyuasinkab.go.id/wp-content/uploads/sites/269/2022/11/Logo-Tut-Wuri-Handayani-PNG-Warna.png" alt="Logo" />
-      <h2>SMPN 2 PAJANGAN</h2>
+    <div id="loginSection">
+      <h2>Login Admin</h2>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+      <p id="loginError" class="error"></p>
     </div>
-    <div class="content">
-      <h3>LOGIN ADMIN</h3>
-      <form onsubmit="return loginAdmin();">
-        <input type="text" id="username" placeholder="Username" required />
-        <input type="password" id="password" placeholder="Password" required />
-        <button type="submit">Login</button>
-        <div id="errorMsg" class="error" style="display: none;">Username atau password salah!</div>
-      </form>
-    </div>
-    <div class="footer">
-      ©Admin SMPN 2 Pajangan
+
+    <div id="adminPanel" style="display:none;">
+      <h2>Panel Admin</h2>
+      <div class="form-container">
+        <h3>Tambah/Edit Token</h3>
+        <form id="tokenForm">
+          <input type="text" id="subject" placeholder="Mata Pelajaran" required />
+          <input type="text" id="kelas" placeholder="Kelas" required />
+          <input type="text" id="token" placeholder="Token Ujian" required />
+          <input type="url" id="url" placeholder="Link Ujian" required />
+          <input type="datetime-local" id="startTime" required />
+          <input type="datetime-local" id="endTime" required />
+          <button type="submit">Simpan</button>
+        </form>
+        <p id="errorMsg" class="error"></p>
+      </div>
+
+      <div class="token-list" id="tokenList">
+        <h3>Daftar Token</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Mata Pelajaran</th>
+              <th>Kelas</th>
+              <th>Link/URL</th>
+              <th>Tanggal Waktu Dibuka</th>
+              <th>Tanggal Waktu Ditutup</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tokenTableBody">
+            <!-- Daftar token akan ditampilkan di sini -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <script>
-    function loginAdmin() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const errorMsg = document.getElementById('errorMsg');
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
-      // Ganti dengan username dan password yang Anda inginkan
-      const validUsername = "admin";
-      const validPassword = "admin123";
+    const firebaseConfig = {
+      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
+      authDomain: "ujian-online-berbasis-android.firebaseapp.com",
+      databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
+      projectId: "ujian-online-berbasis-android",
+      storageBucket: "ujian-online-berbasis-android.appspot.com",
+      messagingSenderId: "923446282537",
+      appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
+    };
 
-      if (username === validUsername && password === validPassword) {
-        window.location.href = "admin.html";
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const ADMIN_USER = "admin";
+    const ADMIN_PASS = "12345";
+
+    let currentTokenId = null;
+
+    window.login = function () {
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      if (u === ADMIN_USER && p === ADMIN_PASS) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadTokens();
       } else {
-        errorMsg.style.display = "block";
+        document.getElementById('loginError').innerText = "Username atau password salah.";
+      }
+    };
+
+    function loadTokens() {
+      const tokenTableBody = document.getElementById('tokenTableBody');
+      onValue(ref(db, 'tokens'), snapshot => {
+        tokenTableBody.innerHTML = '';
+        let count = 1;
+        snapshot.forEach(child => {
+          const data = child.val();
+          const el = document.createElement('tr');
+          el.innerHTML = `
+            <td>${count++}</td>
+            <td>${data.subject}</td>
+            <td>${data.kelas}</td>
+            <td><a href="${data.url}" target="_blank">${data.url}</a></td>
+            <td>${data.startTime}</td>
+            <td>${data.endTime}</td>
+            <td>
+              <button onclick="editToken('${child.key}')">Edit</button>
+              <button onclick="hapusToken('${child.key}')">Hapus</button>
+            </td>
+          `;
+          tokenTableBody.appendChild(el);
+        });
+      });
+    }
+
+    // Fungsi edit untuk mengisi form dengan data token
+    function editToken(id) {
+      currentTokenId = id;
+      const tokenRef = ref(db, 'tokens/' + id);
+      onValue(tokenRef, snapshot => {
+        const data = snapshot.val();
+        document.getElementById('subject').value = data.subject;
+        document.getElementById('kelas').value = data.kelas;
+        document.getElementById('token').value = data.token;
+        document.getElementById('url').value = data.url;
+        document.getElementById('startTime').value = data.startTime;
+        document.getElementById('endTime').value = data.endTime;
+      }, { onlyOnce: true });
+    }
+
+    window.hapusToken = function (id) {
+      remove(ref(db, 'tokens/' + id));
+    };
+
+    document.getElementById('tokenForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const subject = document.getElementById('subject').value.trim();
+      const kelas = document.getElementById('kelas').value.trim();
+      const token = document.getElementById('token').value.trim();
+      const url = document.getElementById('url').value.trim();
+      const start = document.getElementById('startTime').value;
+      const end = document.getElementById('endTime').value;
+      const createdAt = new Date().toISOString();
+
+      const newTokenData = { subject, kelas, token, url, startTime: start, endTime: end, createdAt };
+
+      if (currentTokenId) {
+        update(ref(db, 'tokens/' + currentTokenId), newTokenData);
+        currentTokenId = null;
+      } else {
+        push(ref(db, 'tokens'), newTokenData);
       }
 
-      return false;
-    }
+      this.reset();
+      loadTokens();
+    });
   </script>
 </body>
 </html>
