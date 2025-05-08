@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
   <title>Panel Admin Ujian</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -59,6 +61,7 @@
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
+      word-wrap: break-word;
     }
     th {
       background-color: #f4f4f4;
@@ -79,15 +82,21 @@
       color: #555;
       font-size: 14px;
     }
+    @media (max-width: 600px) {
+      table, th, td {
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="header">
     <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo">
-    <h2>LOGIN ADMINISTRATOR</h2>
+    <h2>SMP NEGERI 2 PAJANGAN</h2>
   </div>
 
   <div class="container" id="loginSection">
+    <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
     <input type="text" id="username" placeholder="Masukan Username (admin)" />
     <input type="password" id="password" placeholder="Masukan Password" />
     <button onclick="login()">Login</button>
@@ -132,6 +141,7 @@
           <th>No</th>
           <th>Mapel</th>
           <th>Kelas</th>
+          <th>Token</th>
           <th>Link</th>
           <th>Mulai</th>
           <th>Selesai</th>
@@ -218,6 +228,7 @@
           <td>${count++}</td>
           <td>${data.subject}</td>
           <td>${data.kelas}</td>
+          <td>${data.token}</td>
           <td><a href="${data.url}" target="_blank">Link</a></td>
           <td>${data.startTime}</td>
           <td>${data.endTime}</td>
@@ -283,7 +294,7 @@
 
       let y = 20;
       tokenCache.forEach((t, index) => {
-        doc.text(`${index + 1}. ${t.subject} | ${t.kelas} | ${t.url} | ${t.startTime} - ${t.endTime}`, 10, y);
+        doc.text(`${index + 1}. ${t.subject} | ${t.kelas} | ${t.token} | ${t.url} | ${t.startTime} - ${t.endTime}`, 10, y);
         y += 8;
         if (y > 270) {
           doc.addPage();
