@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -37,6 +36,10 @@
       width: 100%;
       box-sizing: border-box;
       font-size: 16px;
+    }
+    input.duplicate {
+      border: 2px solid red;
+      background-color: #ffe6e6;
     }
     button {
       padding: 10px 20px;
@@ -125,12 +128,8 @@
     </form>
 
     <div class="filter-row">
-      <select id="filterKelas">
-        <option value="">Semua Kelas</option>
-      </select>
-      <select id="filterMapel">
-        <option value="">Semua Mapel</option>
-      </select>
+      <select id="filterKelas"><option value="">Semua Kelas</option></select>
+      <select id="filterMapel"><option value="">Semua Mapel</option></select>
       <button onclick="exportPDF()">Export PDF</button>
     </div>
 
@@ -272,9 +271,17 @@
       const startTime = document.getElementById('startTime').value;
       const endTime = document.getElementById('endTime').value;
       const createdAt = new Date().toISOString();
+      const errorMsg = document.getElementById('errorMsg');
+
+      const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
+      const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
+
+      if (isTokenDup || isUrlDup) {
+        errorMsg.innerText = "Token atau URL sudah digunakan. Silakan ganti.";
+        checkDuplicateInputs(); return;
+      }
 
       const tokenData = { subject, kelas, token, url, startTime, endTime, createdAt };
-
       if (currentTokenId) {
         update(ref(db, 'tokens/' + currentTokenId), tokenData);
         currentTokenId = null;
@@ -283,8 +290,26 @@
       }
 
       this.reset();
+      errorMsg.innerText = "";
+      checkDuplicateInputs();
       loadTokens();
     });
+
+    function checkDuplicateInputs() {
+      const tokenInput = document.getElementById('token');
+      const urlInput = document.getElementById('url');
+      const tokenVal = tokenInput.value.trim();
+      const urlVal = urlInput.value.trim();
+
+      const tokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === tokenVal);
+      const urlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === urlVal);
+
+      tokenInput.classList.toggle('duplicate', tokenDup);
+      urlInput.classList.toggle('duplicate', urlDup);
+    }
+
+    document.getElementById('token').addEventListener('input', checkDuplicateInputs);
+    document.getElementById('url').addEventListener('input', checkDuplicateInputs);
 
     window.exportPDF = function () {
       const { jsPDF } = window.jspdf;
