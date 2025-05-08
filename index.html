@@ -3,33 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <title>Panel Admin Ujian</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    input, button, select {
+      padding: 8px;
+      margin: 8px 0;
+      width: 100%;
+    }
+    input[type="datetime-local"] {
+      width: 49%;
+      display: inline-block;
+    }
+    .form-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+    .token-list {
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #fff;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    .token-item button {
+      margin-right: 10px;
+    }
+  </style>
 </head>
 <body>
-  <div id="loginSection">
-    <h2>Login Admin</h2>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <p id="loginError" style="color:red;"></p>
-  </div>
+  <div class="container">
+    <div id="loginSection">
+      <h2>Login Admin</h2>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+      <p id="loginError" class="error"></p>
+    </div>
 
-  <div id="adminPanel" style="display:none;">
-    <h2>Panel Admin</h2>
-    <form id="tokenForm">
-      <input type="text" id="token" placeholder="Token" required />
-      <input type="url" id="url" placeholder="Link Ujian" required />
-      <input type="datetime-local" id="startTime" required />
-      <input type="datetime-local" id="endTime" required />
-      <button type="submit">Simpan</button>
-    </form>
-    <h3>Daftar Token</h3>
-    <div id="tokenList"></div>
+    <div id="adminPanel" style="display:none;">
+      <h2>Panel Admin</h2>
+      <div class="form-container">
+        <h3>Tambah/Edit Token</h3>
+        <form id="tokenForm">
+          <!-- Urutan form yang baru -->
+          <input type="text" id="subject" placeholder="Mata Pelajaran" required />
+          <input type="text" id="kelas" placeholder="Kelas" required />
+          <input type="text" id="token" placeholder="Token Ujian" required />
+          <input type="url" id="url" placeholder="Link Ujian" required />
+          <input type="datetime-local" id="startTime" required />
+          <input type="datetime-local" id="endTime" required />
+          <button type="submit">Simpan</button>
+        </form>
+        <p id="errorMsg" class="error"></p>
+      </div>
+
+      <div class="token-list" id="tokenList">
+        <h3>Daftar Token</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Mata Pelajaran</th>
+              <th>Kelas</th>
+              <th>Link/URL</th>
+              <th>Tanggal Waktu Dibuka</th>
+              <th>Tanggal Waktu Ditutup</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tokenTableBody">
+            <!-- Daftar token akan ditampilkan di sini -->
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
@@ -47,53 +124,86 @@
     const ADMIN_USER = "admin";
     const ADMIN_PASS = "12345";
 
+    let currentTokenId = null;
+
     window.login = function () {
       const u = document.getElementById('username').value;
       const p = document.getElementById('password').value;
       if (u === ADMIN_USER && p === ADMIN_PASS) {
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
+        loadTokens();
       } else {
         document.getElementById('loginError').innerText = "Username atau password salah.";
       }
     };
 
+    function loadTokens() {
+      const tokenTableBody = document.getElementById('tokenTableBody');
+      onValue(ref(db, 'tokens'), snapshot => {
+        tokenTableBody.innerHTML = '';
+        let count = 1;
+        snapshot.forEach(child => {
+          const data = child.val();
+          const el = document.createElement('tr');
+          el.innerHTML = `
+            <td>${count++}</td>
+            <td>${data.subject}</td>
+            <td>${data.kelas}</td>
+            <td><a href="${data.url}" target="_blank">${data.url}</a></td>
+            <td>${data.startTime}</td>
+            <td>${data.endTime}</td>
+            <td>
+              <button onclick="editToken('${child.key}')">Edit</button>
+              <button onclick="hapusToken('${child.key}')">Hapus</button>
+            </td>
+          `;
+          tokenTableBody.appendChild(el);
+        });
+      });
+    }
+
+    function editToken(id) {
+      currentTokenId = id;
+      const tokenRef = ref(db, 'tokens/' + id);
+      onValue(tokenRef, snapshot => {
+        const data = snapshot.val();
+        document.getElementById('subject').value = data.subject;
+        document.getElementById('kelas').value = data.kelas;
+        document.getElementById('token').value = data.token;
+        document.getElementById('url').value = data.url;
+        document.getElementById('startTime').value = data.startTime;
+        document.getElementById('endTime').value = data.endTime;
+      }, { onlyOnce: true });
+    }
+
+    window.hapusToken = function (id) {
+      remove(ref(db, 'tokens/' + id));
+    };
+
     document.getElementById('tokenForm').addEventListener('submit', function (e) {
       e.preventDefault();
+
+      const subject = document.getElementById('subject').value.trim();
+      const kelas = document.getElementById('kelas').value.trim();
       const token = document.getElementById('token').value.trim();
       const url = document.getElementById('url').value.trim();
       const start = document.getElementById('startTime').value;
       const end = document.getElementById('endTime').value;
       const createdAt = new Date().toISOString();
 
-      push(ref(db, 'tokens'), {
-        token, url, startTime: start, endTime: end, createdAt
-      });
+      const newTokenData = { subject, kelas, token, url, startTime: start, endTime: end, createdAt };
+
+      if (currentTokenId) {
+        update(ref(db, 'tokens/' + currentTokenId), newTokenData);
+        currentTokenId = null;
+      } else {
+        push(ref(db, 'tokens'), newTokenData);
+      }
 
       this.reset();
+      loadTokens();
     });
-
-    const list = document.getElementById('tokenList');
-    onValue(ref(db, 'tokens'), snapshot => {
-      list.innerHTML = '';
-      snapshot.forEach(child => {
-        const data = child.val();
-        const el = document.createElement('div');
-        el.innerHTML = `
-          <p><strong>${data.token}</strong></p>
-          <p><a href="${data.url}" target="_blank">${data.url}</a></p>
-          <p>Mulai: ${data.startTime}</p>
-          <p>Selesai: ${data.endTime}</p>
-          <button onclick="hapusToken('${child.key}')">Hapus</button>
-          <hr/>
-        `;
-        list.appendChild(el);
-      });
-    });
-
-    window.hapusToken = function (id) {
-      remove(ref(db, 'tokens/' + id));
-    };
   </script>
 </body>
 </html>
