@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel Ujian</title>
+  <title>Login Admin Ujian</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
+      overflow-x: hidden;
       background-color: white;
       box-sizing: border-box;
     }
@@ -19,12 +20,12 @@
 
     .container {
       width: 100%;
-      max-width: 600px;
+      max-width: 400px;
       background: white;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       overflow: hidden;
-      margin: 30px auto;
+      margin: 30px auto 0 auto;
     }
 
     .header {
@@ -45,18 +46,18 @@
 
     .content {
       padding: 25px;
+      text-align: center;
     }
 
     .content h3 {
       color: #f48600;
       margin: 0 0 10px;
-      text-align: center;
     }
 
-    input, button {
+    input[type="text"], input[type="password"] {
       width: 100%;
       padding: 12px;
-      margin: 10px 0;
+      margin: 15px 0;
       border: 1px solid #ccc;
       border-radius: 5px;
       font-size: 16px;
@@ -65,10 +66,12 @@
     button {
       background: #007bff;
       color: white;
+      padding: 12px 24px;
       border: none;
       border-radius: 20px;
       font-size: 16px;
       cursor: pointer;
+      width: 100%;
       transition: transform 0.1s ease, background 0.2s;
     }
 
@@ -77,21 +80,10 @@
       background: #0069d9;
     }
 
-    table {
-      width: 100%;
-      margin-top: 20px;
-      border-collapse: collapse;
+    .error {
+      color: red;
       font-size: 14px;
-    }
-
-    th, td {
-      padding: 8px;
-      text-align: center;
-      border: 1px solid #ddd;
-    }
-
-    th {
-      background-color: #f2f2f2;
+      margin-top: 10px;
     }
 
     .footer {
@@ -100,128 +92,45 @@
       font-size: 12px;
       padding: 10px;
     }
-
-    @media (max-width: 600px) {
-      .container {
-        transform: scale(0.95);
-      }
-
-      table, th, td {
-        font-size: 12px;
-      }
-    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <img src="https://disdikbud.banyuasinkab.go.id/wp-content/uploads/sites/269/2022/11/Logo-Tut-Wuri-Handayani-PNG-Warna.png" alt="Logo" />
-      <h2>ADMIN UJIAN ONLINE</h2>
+      <h2>SMPN 2 PAJANGAN</h2>
     </div>
-
     <div class="content">
-      <h3>Input Token Ujian</h3>
-      <form id="tokenForm">
-        <input type="text" id="mapel" placeholder="Mata Pelajaran" required />
-        <input type="text" id="kelas" placeholder="Kelas" required />
-        <input type="text" id="token" placeholder="Token" required />
-        <input type="text" id="url" placeholder="Link/URL Ujian" required />
-        <label>Waktu Dibuka</label>
-        <input type="datetime-local" id="startTime" required />
-        <label>Waktu Ditutup</label>
-        <input type="datetime-local" id="endTime" required />
-        <button type="submit">Simpan Token</button>
+      <h3>LOGIN ADMIN</h3>
+      <form onsubmit="return loginAdmin();">
+        <input type="text" id="username" placeholder="Username" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+        <div id="errorMsg" class="error" style="display: none;">Username atau password salah!</div>
       </form>
-
-      <table id="tokenTable">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Mata Pelajaran</th>
-            <th>Kelas</th>
-            <th>Token</th>
-            <th>Link</th>
-            <th>Waktu Mulai</th>
-            <th>Waktu Selesai</th>
-            <th>Hapus</th>
-          </tr>
-        </thead>
-        <tbody id="tokenList">
-          <!-- Token akan ditambahkan di sini -->
-        </tbody>
-      </table>
     </div>
-
     <div class="footer">
       ©Admin SMPN 2 Pajangan
-      <br />
-      <div id="clockWIB">Memuat waktu...</div>
     </div>
   </div>
 
   <script>
-    const form = document.getElementById('tokenForm');
-    const tokenList = document.getElementById('tokenList');
-    let dataToken = [];
+    function loginAdmin() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
 
-    function updateWIBClock() {
-      const clockElement = document.getElementById('clockWIB');
-      const now = new Date();
-      const options = {
-        timeZone: 'Asia/Bangkok',
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      };
-      const formatter = new Intl.DateTimeFormat('id-ID', options);
-      clockElement.innerText = `${formatter.format(now)}`;
-    }
-    setInterval(updateWIBClock, 1000);
-    updateWIBClock();
+      // Ganti dengan username dan password yang Anda inginkan
+      const validUsername = "admin";
+      const validPassword = "admin123";
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const mapel = document.getElementById('mapel').value;
-      const kelas = document.getElementById('kelas').value;
-      const token = document.getElementById('token').value;
-      const url = document.getElementById('url').value;
-      const startTime = document.getElementById('startTime').value;
-      const endTime = document.getElementById('endTime').value;
-
-      const newToken = { mapel, kelas, token, url, startTime, endTime };
-      dataToken.push(newToken);
-      renderTable();
-      form.reset();
-    });
-
-    function renderTable() {
-      tokenList.innerHTML = "";
-      dataToken.forEach((item, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${item.mapel}</td>
-          <td>${item.kelas}</td>
-          <td>${item.token}</td>
-          <td><a href="${item.url}" target="_blank">Lihat</a></td>
-          <td>${item.startTime}</td>
-          <td>${item.endTime}</td>
-          <td><button onclick="hapusToken(${index})">Hapus</button></td>
-        `;
-        tokenList.appendChild(row);
-      });
-    }
-
-    function hapusToken(index) {
-      if (confirm("Yakin ingin menghapus token ini?")) {
-        dataToken.splice(index, 1);
-        renderTable();
+      if (username === validUsername && password === validPassword) {
+        window.location.href = "admin.html";
+      } else {
+        errorMsg.style.display = "block";
       }
+
+      return false;
     }
   </script>
 </body>
