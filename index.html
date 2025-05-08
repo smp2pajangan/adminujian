@@ -8,14 +8,14 @@
     .header { background-color: #0066cc; color: white; padding: 15px; text-align: center; }
     .logo { display: block; margin: 0 auto; width: 100px; }
     .container { max-width: 800px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    input, select { padding: 10px; margin: 8px 0; width: 100%; box-sizing: border-box; font-size: 14px; }
+    input, select { padding: 10px; margin: 8px 0; width: 100%; box-sizing: border-box; font-size: 16px; }
     input.duplicate { border: 2px solid red; background-color: #ffe6e6; }
-    button { padding: 6px 12px; margin: 5px auto; display: block; font-size: 14px; cursor: pointer; }
-    .btn-small { padding: 3px 6px; font-size: 11px; margin: 2px; border: 1px solid #888; background-color: #f0f0f0; border-radius: 4px; }
+    button { padding: 10px 20px; margin: 10px auto; display: block; font-size: 16px; cursor: pointer; }
+    .btn-small { padding: 5px 10px; font-size: 12px; margin-right: 5px; }
     .form-group { margin-bottom: 15px; }
     .error { color: red; font-size: 14px; text-align: center; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
-    th, td { border: 1px solid #ccc; padding: 6px; word-break: break-word; text-align: left; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { border: 1px solid #ccc; padding: 8px; word-wrap: break-word; }
     th { background-color: #f4f4f4; }
     .filter-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
     .filter-row select { flex: 1; min-width: 150px; }
@@ -29,9 +29,7 @@
   <div class="header">
     <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo">
     <h2>SMP NEGERI 2 PAJANGAN</h2>
-  </div>
-
-  <div class="container" id="adminPanel">
+  </div>  <div class="container" id="adminPanel">
     <h3>Tambah / Edit Token</h3>
     <form id="tokenForm">
       <div class="form-group"><input type="text" id="subject" placeholder="Mata Pelajaran" required /></div>
@@ -48,34 +46,29 @@
       </div>
       <button type="submit">Simpan</button>
       <p id="errorMsg" class="error"></p>
-    </form>
+    </form><div class="filter-row">
+  <select id="filterKelas"><option value="">Semua Kelas</option></select>
+  <select id="filterMapel"><option value="">Semua Mapel</option></select>
+</div>
 
-    <div class="filter-row">
-      <select id="filterKelas"><option value="">Semua Kelas</option></select>
-      <select id="filterMapel"><option value="">Semua Mapel</option></select>
-    </div>
+<h3>Daftar Token</h3>
+<table>
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Mapel</th>
+      <th>Kelas</th>
+      <th>Token</th>
+      <th>Link</th>
+      <th>Token dibuka</th>
+      <th>Token ditutup</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody id="tokenTableBody"></tbody>
+</table>
 
-    <h3>Daftar Token</h3>
-    <div style="overflow-x:auto;">
-      <table>
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Mapel</th>
-            <th>Kelas</th>
-            <th>Token</th>
-            <th>Link</th>
-            <th>Token dibuka</th>
-            <th>Token ditutup</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="tokenTableBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div id="editPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
+  </div>  <div id="editPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
     <div style="background:#fff; max-width:400px; margin:100px auto; padding:20px; border-radius:10px;">
       <h3>Edit Token</h3>
       <form id="editForm">
@@ -93,13 +86,192 @@
         <p id="editErrorMsg" class="error"></p>
       </form>
     </div>
-  </div>
-
-  <div class="footer">
-    <div>@Admin SMPN 2 Pajangan</div>
+  </div>  <div class="footer">
+    <div>@admin smpn 2 pajangan</div>
     <div id="clock"></div>
-  </div>
+  </div>  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
-  <!-- Firebase + Script sama persis seperti versi sebelumnya (tidak perlu diubah) -->
-</body>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
+      authDomain: "ujian-online-berbasis-android.firebaseapp.com",
+      databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
+      projectId: "ujian-online-berbasis-android",
+      storageBucket: "ujian-online-berbasis-android.appspot.com",
+      messagingSenderId: "923446282537",
+      appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let tokenCache = [];
+    let currentTokenId = null;
+    let editingKey = null;
+
+    function loadTokens() {
+      onValue(ref(db, 'tokens'), snapshot => {
+        const tokenTableBody = document.getElementById('tokenTableBody');
+        tokenTableBody.innerHTML = '';
+        tokenCache = [];
+        const kelasSet = new Set();
+        const mapelSet = new Set();
+        let count = 1;
+
+        snapshot.forEach(child => {
+          const data = child.val();
+          data.key = child.key;
+          tokenCache.push(data);
+          kelasSet.add(data.kelas);
+          mapelSet.add(data.subject);
+        });
+
+        updateFilterOptions(kelasSet, mapelSet);
+        renderTokens(tokenCache);
+      });
+    }
+
+    function renderTokens(data) {
+      const tokenTableBody = document.getElementById('tokenTableBody');
+      tokenTableBody.innerHTML = '';
+      let count = 1;
+      data.forEach(data => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${count++}</td>
+          <td>${data.subject}</td>
+          <td>${data.kelas}</td>
+          <td>${data.token}</td>
+          <td><a href="${data.url}" target="_blank">Link</a></td>
+          <td>${data.startTime}</td>
+          <td>${data.endTime}</td>
+          <td>
+            <button class="btn-small" onclick="hapusToken('${data.key}')">Hapus</button>
+            <button class="btn-small" onclick="editToken('${data.key}')">Edit</button>
+          </td>
+        `;
+        tokenTableBody.appendChild(row);
+      });
+    }
+
+    function updateFilterOptions(kelasSet, mapelSet) {
+      const kelasSelect = document.getElementById('filterKelas');
+      const mapelSelect = document.getElementById('filterMapel');
+      kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
+      mapelSelect.innerHTML = `<option value="">Semua Mapel</option>`;
+      kelasSet.forEach(k => kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
+      mapelSet.forEach(m => mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
+    }
+
+    document.getElementById('filterKelas').addEventListener('change', filterTokens);
+    document.getElementById('filterMapel').addEventListener('change', filterTokens);
+
+    function filterTokens() {
+      const kelas = document.getElementById('filterKelas').value;
+      const mapel = document.getElementById('filterMapel').value;
+      let filtered = tokenCache;
+      if (kelas) filtered = filtered.filter(t => t.kelas === kelas);
+      if (mapel) filtered = filtered.filter(t => t.subject === mapel);
+      renderTokens(filtered);
+    }
+
+    window.hapusToken = function(id) {
+      if (confirm("Apakah Anda yakin ingin menghapus token ini?")) {
+        remove(ref(db, 'tokens/' + id));
+      }
+    };
+
+    window.editToken = function(key) {
+      const data = tokenCache.find(t => t.key === key);
+      if (!data) return;
+      editingKey = key;
+      document.getElementById('editSubject').value = data.subject;
+      document.getElementById('editKelas').value = data.kelas;
+      document.getElementById('editToken').value = data.token;
+      document.getElementById('editUrl').value = data.url;
+      document.getElementById('editStart').value = data.startTime;
+      document.getElementById('editEnd').value = data.endTime;
+      document.getElementById('editErrorMsg').innerText = '';
+      document.getElementById('editPopup').style.display = 'block';
+    };
+
+    function closeEditPopup() {
+      document.getElementById('editPopup').style.display = 'none';
+      editingKey = null;
+    }
+
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const subject = document.getElementById('editSubject').value.trim().toUpperCase();
+      const kelas = document.getElementById('editKelas').value.trim();
+      const token = document.getElementById('editToken').value.trim().toUpperCase();
+      const url = document.getElementById('editUrl').value.trim();
+      const startTime = document.getElementById('editStart').value;
+      const endTime = document.getElementById('editEnd').value;
+      const errorMsg = document.getElementById('editErrorMsg');
+
+      const isTokenDup = tokenCache.some(t => t.key !== editingKey && t.token === token);
+      const isUrlDup = tokenCache.some(t => t.key !== editingKey && t.url === url);
+
+      if (isTokenDup || isUrlDup) {
+        errorMsg.innerText = "Token atau URL sudah digunakan. Silakan ganti.";
+        return;
+      }
+
+      const updatedData = { subject, kelas, token, url, startTime, endTime, createdAt: new Date().toISOString() };
+      update(ref(db, 'tokens/' + editingKey), updatedData);
+      closeEditPopup();
+    });
+
+    document.getElementById('tokenForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const subject = document.getElementById('subject').value.trim().toUpperCase();
+      const kelas = document.getElementById('kelas').value.trim();
+      const token = document.getElementById('token').value.trim().toUpperCase();
+      const url = document.getElementById('url').value.trim();
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
+      const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
+
+      if (isTokenDup || isUrlDup) {
+        errorMsg.innerText = "Token atau URL sudah digunakan. Silakan ganti.";
+        checkDuplicateInputs(); return;
+      }
+
+      const tokenData = { subject, kelas, token, url, startTime, endTime, createdAt: new Date().toISOString() };
+      push(ref(db, 'tokens'), tokenData);
+      this.reset();
+      errorMsg.innerText = "";
+      checkDuplicateInputs();
+    });
+
+    function checkDuplicateInputs() {
+      const tokenInput = document.getElementById('token');
+      const urlInput = document.getElementById('url');
+      const tokenVal = tokenInput.value.trim().toUpperCase();
+      const urlVal = urlInput.value.trim();
+      const tokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === tokenVal);
+      const urlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === urlVal);
+      tokenInput.classList.toggle('duplicate', tokenDup);
+      urlInput.classList.toggle('duplicate', urlDup);
+    }
+
+    document.getElementById('token').addEventListener('input', checkDuplicateInputs);
+    document.getElementById('url').addEventListener('input', checkDuplicateInputs);
+
+    function updateClock() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateStr = now.toLocaleDateString('id-ID', options);
+      const timeStr = now.toLocaleTimeString('id-ID');
+      document.getElementById('clock').innerText = `${dateStr} - ${timeStr}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+    loadTokens();
+  </script></body>
 </html>
