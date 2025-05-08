@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel Admin Ujian</title>
   <style>
     body {
@@ -9,116 +10,155 @@
       margin: 0;
       background-color: #f9f9f9;
     }
-    .header {
-      background-color: #0066cc;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    .header img {
-      height: 80px;
-      margin-bottom: 10px;
-    }
     .container {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 10px;
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+    }
+    .form-container, .token-list {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     input, button, select {
-      padding: 8px;
+      padding: 10px;
       margin: 8px 0;
+      font-size: 16px;
       width: 100%;
-      font-size: 14px;
+      box-sizing: border-box;
     }
     input[type="datetime-local"] {
       width: 49%;
       display: inline-block;
     }
-    .form-container, .token-list {
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
+    button {
+      cursor: pointer;
+      font-size: 16px;
+      padding: 10px 20px;
+      max-width: 200px;
+      width: auto;
+    }
+    .logo {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .logo img {
+      width: 100px;
+    }
+    h2, h3 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .error {
+      color: red;
+      text-align: center;
     }
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 20px;
       background-color: #fff;
-      font-size: 14px;
     }
     th, td {
       padding: 8px;
       text-align: left;
       border: 1px solid #ddd;
+      font-size: 14px;
     }
     th {
       background-color: #f4f4f4;
     }
-    .error {
-      color: red;
-      font-size: 14px;
-    }
-    .logout-btn {
-      background-color: red;
-      color: white;
-      padding: 8px 12px;
-      border: none;
-      cursor: pointer;
-      float: right;
-    }
-    .filters {
+    .filter-row {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 14px;
+    }
+    #clock {
+      font-weight: bold;
+      display: block;
+      margin-top: 5px;
+    }
+    @media (max-width: 600px) {
+      input, select, button {
+        font-size: 14px;
+      }
+      .filter-row {
+        flex-direction: column;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      th, td {
+        font-size: 12px;
+      }
     }
   </style>
 </head>
 <body>
-
-  <div class="header">
-    <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" alt="Logo Sekolah" />
-    <h2>LOGIN ADMINISTRATOR</h2>
-  </div>
-
   <div class="container">
+    <div class="logo">
+      <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" alt="Logo SMPN 2 Pajangan" />
+    </div>
+
     <div id="loginSection">
-      <input type="text" id="username" placeholder="Masukan Token Ujian" />
-      <input type="password" id="password" placeholder="Masukkan Password" />
-      <button onclick="login()">Login</button>
+      <h2>LOGIN ADMINISTRATOR</h2>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <div style="text-align:center">
+        <button onclick="login()">Login</button>
+      </div>
       <p id="loginError" class="error"></p>
     </div>
 
     <div id="adminPanel" style="display:none;">
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <div style="text-align:right">
+        <button onclick="logout()">Logout</button>
+      </div>
+
       <h2>Panel Admin</h2>
 
       <div class="form-container">
-        <h3>Form Tambah/Edit Token</h3>
+        <h3>Tambah/Edit Token</h3>
         <form id="tokenForm">
-          <input type="text" id="subject" placeholder="Mata Pelajaran" required />
-          <input type="text" id="kelas" placeholder="Kelas" required />
-          <input type="text" id="token" placeholder="Token Ujian" required />
-          <input type="url" id="url" placeholder="Link Ujian" required />
+          <label>Mata Pelajaran</label>
+          <input type="text" id="subject" required />
+          <label>Kelas</label>
+          <input type="text" id="kelas" required />
+          <label>Token Ujian</label>
+          <input type="text" id="token" required />
+          <label>Link Ujian</label>
+          <input type="url" id="url" required />
+          <label>Waktu Mulai & Selesai</label><br />
           <input type="datetime-local" id="startTime" required />
           <input type="datetime-local" id="endTime" required />
+          <br />
           <button type="submit">Simpan</button>
         </form>
         <p id="errorMsg" class="error"></p>
       </div>
 
-      <div class="filters">
-        <select id="filterKelas" onchange="filterTokens()">
-          <option value="">Semua Kelas</option>
-        </select>
-        <select id="filterMapel" onchange="filterTokens()">
-          <option value="">Semua Mapel</option>
-        </select>
-        <button onclick="exportPDF()">Export PDF</button>
-      </div>
-
-      <div class="token-list" id="tokenList">
+      <div class="token-list">
         <h3>Daftar Token</h3>
+        <div class="filter-row">
+          <select id="filterKelas">
+            <option value="">Filter Kelas</option>
+          </select>
+          <select id="filterMapel">
+            <option value="">Filter Mapel</option>
+          </select>
+          <button onclick="exportPDF()">Export PDF</button>
+        </div>
+
         <table>
           <thead>
             <tr>
@@ -126,8 +166,8 @@
               <th>Mata Pelajaran</th>
               <th>Kelas</th>
               <th>Link/URL</th>
-              <th>Dibuka</th>
-              <th>Ditutup</th>
+              <th>Waktu Dibuka</th>
+              <th>Waktu Ditutup</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -135,13 +175,17 @@
         </table>
       </div>
     </div>
+
+    <div class="footer">
+      &copy; @admin SMPN 2 Pajangan
+      <span id="clock"></span>
+    </div>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase & Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
-    import jsPDF from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
@@ -160,11 +204,11 @@
     const ADMIN_PASS = "12345";
 
     let currentTokenId = null;
-    let tokensCache = [];
+    let allData = [];
 
     window.login = function () {
-      const u = document.getElementById('username').value;
-      const p = document.getElementById('password').value;
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value.trim();
       if (u === ADMIN_USER && p === ADMIN_PASS) {
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
@@ -177,52 +221,53 @@
     window.logout = function () {
       document.getElementById('loginSection').style.display = 'block';
       document.getElementById('adminPanel').style.display = 'none';
-      document.getElementById('username').value = '';
-      document.getElementById('password').value = '';
     };
 
     function loadTokens() {
       const tokenTableBody = document.getElementById('tokenTableBody');
-      const kelasSet = new Set();
-      const mapelSet = new Set();
-
+      const kelasFilter = document.getElementById('filterKelas');
+      const mapelFilter = document.getElementById('filterMapel');
       onValue(ref(db, 'tokens'), snapshot => {
         tokenTableBody.innerHTML = '';
-        tokensCache = [];
+        allData = [];
+        let kelasSet = new Set();
+        let mapelSet = new Set();
         let count = 1;
         snapshot.forEach(child => {
-          const data = { ...child.val(), id: child.key };
-          tokensCache.push(data);
+          const data = child.val();
+          data.id = child.key;
+          allData.push(data);
           kelasSet.add(data.kelas);
           mapelSet.add(data.subject);
         });
 
-        populateFilters(kelasSet, mapelSet);
-        renderTable(tokensCache);
+        // Populate filter dropdowns
+        kelasFilter.innerHTML = '<option value="">Filter Kelas</option>';
+        mapelFilter.innerHTML = '<option value="">Filter Mapel</option>';
+        kelasSet.forEach(k => kelasFilter.innerHTML += `<option value="${k}">${k}</option>`);
+        mapelSet.forEach(m => mapelFilter.innerHTML += `<option value="${m}">${m}</option>`);
+
+        displayTokens();
       });
+
+      kelasFilter.addEventListener('change', displayTokens);
+      mapelFilter.addEventListener('change', displayTokens);
     }
 
-    function populateFilters(kelasSet, mapelSet) {
-      const kelasFilter = document.getElementById('filterKelas');
-      const mapelFilter = document.getElementById('filterMapel');
-
-      kelasFilter.innerHTML = '<option value="">Semua Kelas</option>';
-      mapelFilter.innerHTML = '<option value="">Semua Mapel</option>';
-
-      kelasSet.forEach(k => kelasFilter.innerHTML += `<option value="${k}">${k}</option>`);
-      mapelSet.forEach(m => mapelFilter.innerHTML += `<option value="${m}">${m}</option>`);
-    }
-
-    function renderTable(tokens) {
+    function displayTokens() {
       const tbody = document.getElementById('tokenTableBody');
       tbody.innerHTML = '';
-      tokens.forEach((data, i) => {
+      const kelas = document.getElementById('filterKelas').value;
+      const mapel = document.getElementById('filterMapel').value;
+      let count = 1;
+      allData.forEach(data => {
+        if ((kelas && data.kelas !== kelas) || (mapel && data.subject !== mapel)) return;
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${i + 1}</td>
+          <td>${count++}</td>
           <td>${data.subject}</td>
           <td>${data.kelas}</td>
-          <td><a href="${data.url}" target="_blank">${data.url}</a></td>
+          <td><a href="${data.url}" target="_blank">Link</a></td>
           <td>${data.startTime}</td>
           <td>${data.endTime}</td>
           <td><button onclick="hapusToken('${data.id}')">Hapus</button></td>
@@ -231,7 +276,7 @@
       });
     }
 
-    window.hapusToken = function (id) {
+    window.hapusToken = function(id) {
       remove(ref(db, 'tokens/' + id));
     };
 
@@ -244,49 +289,39 @@
       const start = document.getElementById('startTime').value;
       const end = document.getElementById('endTime').value;
       const createdAt = new Date().toISOString();
-
-      const newTokenData = { subject, kelas, token, url, startTime: start, endTime: end, createdAt };
+      const newToken = { subject, kelas, token, url, startTime: start, endTime: end, createdAt };
 
       if (currentTokenId) {
-        update(ref(db, 'tokens/' + currentTokenId), newTokenData);
+        update(ref(db, 'tokens/' + currentTokenId), newToken);
         currentTokenId = null;
       } else {
-        push(ref(db, 'tokens'), newTokenData);
+        push(ref(db, 'tokens'), newToken);
       }
 
       this.reset();
       loadTokens();
     });
 
-    window.filterTokens = function () {
-      const kelas = document.getElementById('filterKelas').value;
-      const mapel = document.getElementById('filterMapel').value;
-
-      const filtered = tokensCache.filter(token =>
-        (!kelas || token.kelas === kelas) &&
-        (!mapel || token.subject === mapel)
-      );
-
-      renderTable(filtered);
-    };
-
+    // Export to PDF
     window.exportPDF = function () {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text("Daftar Token Ujian", 10, 10);
-
-      let y = 20;
-      tokensCache.forEach((t, i) => {
-        doc.text(`${i + 1}. ${t.subject} - ${t.kelas} (${t.token})`, 10, y);
-        y += 10;
-        if (y > 270) {
-          doc.addPage();
-          y = 20;
-        }
+      import("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js").then(jsPDFModule => {
+        const { jsPDF } = jsPDFModule;
+        const doc = new jsPDF();
+        doc.text("Daftar Token Ujian", 14, 15);
+        let y = 25;
+        allData.forEach((d, i) => {
+          doc.text(`${i+1}. ${d.subject} - ${d.kelas} - ${d.startTime} s.d ${d.endTime}`, 14, y);
+          y += 10;
+        });
+        doc.save("daftar-token.pdf");
       });
-
-      doc.save("daftar-token.pdf");
     };
+
+    // Clock
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById("clock").innerText = now.toLocaleString("id-ID");
+    }, 1000);
   </script>
 </body>
 </html>
