@@ -3,25 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <title>Panel Admin Ujian</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background-color: #f0f4f8; }
-    .header { background-color: #0066cc; color: white; padding: 15px; text-align: center; }
-    .logo { display: block; margin: 0 auto; width: 100px; }
-    .container { max-width: 800px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    input, select { padding: 10px; margin: 8px 0; width: 100%; box-sizing: border-box; font-size: 16px; }
-    input.duplicate { border: 2px solid red; background-color: #ffe6e6; }
-    button { padding: 10px 20px; margin: 10px auto; display: block; font-size: 16px; cursor: pointer; }
-    .form-group { margin-bottom: 15px; }
-    .error { color: red; font-size: 14px; text-align: center; }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { border: 1px solid #ccc; padding: 8px; word-wrap: break-word; }
-    th { background-color: #f4f4f4; }
-    .filter-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-    .filter-row select, .filter-row button { flex: 1; min-width: 150px; }
-    .footer { text-align: center; margin-top: 30px; color: #555; font-size: 14px; }
-    @media (max-width: 600px) { table, th, td { font-size: 12px; } }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f0f4f8;
+    }
+    .header {
+      background-color: #0066cc;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto;
+      width: 100px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, select {
+      padding: 10px;
+      margin: 8px 0;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    input.duplicate {
+      border: 2px solid red;
+      background-color: #ffe6e6;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px auto;
+      display: block;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      word-wrap: break-word;
+      text-align: center;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-row select {
+      flex: 1;
+      min-width: 150px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #555;
+      font-size: 14px;
+    }
+    @media (max-width: 600px) {
+      table, th, td {
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -40,10 +112,11 @@
 
   <div class="container" id="adminPanel" style="display:none;">
     <button onclick="logout()">Logout</button>
+
     <h3>Tambah / Edit Token</h3>
     <form id="tokenForm">
       <div class="form-group"><input type="text" id="subject" placeholder="Mata Pelajaran" required /></div>
-      <div class="form-group"><input type="text" id="kelas" placeholder="Kelas" required pattern="\\d+" title="Hanya angka" /></div>
+      <div class="form-group"><input type="text" id="kelas" placeholder="Kelas (Angka saja)" required /></div>
       <div class="form-group"><input type="text" id="token" placeholder="Token Ujian" required /></div>
       <div class="form-group"><input type="url" id="url" placeholder="Link Ujian" required /></div>
       <div class="form-group">
@@ -61,14 +134,20 @@
     <div class="filter-row">
       <select id="filterKelas"><option value="">Semua Kelas</option></select>
       <select id="filterMapel"><option value="">Semua Mapel</option></select>
-      <button onclick="exportPDF()">Export PDF</button>
     </div>
 
     <h3>Daftar Token</h3>
     <table>
       <thead>
         <tr>
-          <th>No</th><th>Mapel</th><th>Kelas</th><th>Token</th><th>Link</th><th>Mulai</th><th>Selesai</th><th>Aksi</th>
+          <th>No</th>
+          <th>Mapel</th>
+          <th>Kelas</th>
+          <th>Token</th>
+          <th>Link</th>
+          <th>Mulai</th>
+          <th>Selesai</th>
+          <th>Aksi</th>
         </tr>
       </thead>
       <tbody id="tokenTableBody"></tbody>
@@ -84,7 +163,16 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
-    const firebaseConfig = { /* ... your firebase config ... */ };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
+      authDomain: "ujian-online-berbasis-android.firebaseapp.com",
+      databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
+      projectId: "ujian-online-berbasis-android",
+      storageBucket: "ujian-online-berbasis-android.appspot.com",
+      messagingSenderId: "923446282537",
+      appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
+    };
+
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
@@ -93,82 +181,144 @@
     let currentTokenId = null;
     let tokenCache = [];
 
-    window.login = function () { /* ... login logic ... */ };
-    window.logout = function () { /* ... logout logic ... */ };
+    window.login = function () {
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value.trim();
+      if (u === ADMIN_USER && p === ADMIN_PASS) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadTokens();
+      } else {
+        document.getElementById('loginError').innerText = "Username atau password salah.";
+      }
+    };
 
-    function loadTokens() { /* ... load token from Firebase ... */ }
-    function renderTokens(data) { /* ... render tokens to table ... */ }
-    function updateFilterOptions(kelasSet, mapelSet) { /* ... filter logic ... */ }
+    window.logout = function () {
+      document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('adminPanel').style.display = 'none';
+    };
+
+    function loadTokens() {
+      onValue(ref(db, 'tokens'), snapshot => {
+        const tokenTableBody = document.getElementById('tokenTableBody');
+        tokenTableBody.innerHTML = '';
+        tokenCache = [];
+        const kelasSet = new Set();
+        const mapelSet = new Set();
+        let count = 1;
+
+        snapshot.forEach(child => {
+          const data = child.val();
+          data.key = child.key;
+          tokenCache.push(data);
+          kelasSet.add(data.kelas);
+          mapelSet.add(data.subject);
+        });
+
+        updateFilterOptions(kelasSet, mapelSet);
+        renderTokens(tokenCache);
+      });
+    }
+
+    function renderTokens(data) {
+      const tokenTableBody = document.getElementById('tokenTableBody');
+      tokenTableBody.innerHTML = '';
+      let count = 1;
+      data.forEach(data => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${count++}</td>
+          <td>${data.subject}</td>
+          <td>${data.kelas}</td>
+          <td>${data.token}</td>
+          <td><a href="${data.url}" target="_blank">Link</a></td>
+          <td>${data.startTime}</td>
+          <td>${data.endTime}</td>
+          <td><button class="btn-small" onclick="hapusToken('${data.key}')">Hapus</button></td>
+        `;
+        tokenTableBody.appendChild(row);
+      });
+    }
+
+    function updateFilterOptions(kelasSet, mapelSet) {
+      const kelasSelect = document.getElementById('filterKelas');
+      const mapelSelect = document.getElementById('filterMapel');
+      kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
+      mapelSelect.innerHTML = `<option value="">Semua Mapel</option>`;
+      kelasSet.forEach(k => kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
+      mapelSet.forEach(m => mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
+    }
 
     document.getElementById('filterKelas').addEventListener('change', filterTokens);
     document.getElementById('filterMapel').addEventListener('change', filterTokens);
 
-    function filterTokens() { /* ... filtering tokens ... */ }
-    window.hapusToken = function(id) { /* ... hapus token logic ... */ };
+    function filterTokens() {
+      const kelas = document.getElementById('filterKelas').value;
+      const mapel = document.getElementById('filterMapel').value;
+      let filtered = tokenCache;
+      if (kelas) filtered = filtered.filter(t => t.kelas === kelas);
+      if (mapel) filtered = filtered.filter(t => t.subject === mapel);
+      renderTokens(filtered);
+    }
 
-    document.getElementById('subject').addEventListener('input', e => {
-      e.target.value = e.target.value.toUpperCase();
-    });
-    document.getElementById('token').addEventListener('input', e => {
-      e.target.value = e.target.value.toUpperCase();
-    });
+    window.hapusToken = function(id) {
+      if (confirm("Yakin ingin menghapus token ini?")) {
+        remove(ref(db, 'tokens/' + id));
+      }
+    };
 
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      // ... ambil value dan simpan ke Firebase ...
+      const subject = document.getElementById('subject').value.trim().toUpperCase();
+      const kelas = document.getElementById('kelas').value.trim();
+      const token = document.getElementById('token').value.trim().toUpperCase();
+      const url = document.getElementById('url').value.trim();
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (!/^\d+$/.test(kelas)) {
+        errorMsg.innerText = "Kelas hanya boleh diisi angka.";
+        return;
+      }
+
+      const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
+      const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
+
+      if (isTokenDup || isUrlDup) {
+        errorMsg.innerText = "Token atau URL sudah digunakan. Silakan ganti.";
+        checkDuplicateInputs(); return;
+      }
+
+      const tokenData = { subject, kelas, token, url, startTime, endTime };
+      if (currentTokenId) {
+        update(ref(db, 'tokens/' + currentTokenId), tokenData);
+        currentTokenId = null;
+      } else {
+        push(ref(db, 'tokens'), tokenData);
+      }
+
+      this.reset();
+      errorMsg.innerText = "";
+      checkDuplicateInputs();
+      loadTokens();
     });
 
-    window.exportPDF = function () {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-      const marginLeft = 10;
-      let y = 20;
+    function checkDuplicateInputs() {
+      const tokenInput = document.getElementById('token');
+      const urlInput = document.getElementById('url');
+      const tokenVal = tokenInput.value.trim().toUpperCase();
+      const urlVal = urlInput.value.trim();
 
-      doc.setFontSize(14);
-      doc.text("Daftar Token Ujian", marginLeft, y);
-      y += 10;
+      const tokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === tokenVal);
+      const urlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === urlVal);
 
-      const headers = ["No", "Mapel", "Kelas", "Token", "Link", "Mulai", "Selesai"];
-      const colWidths = [10, 30, 15, 25, 40, 35, 35];
-      const cellHeight = 8;
+      tokenInput.classList.toggle('duplicate', tokenDup);
+      urlInput.classList.toggle('duplicate', urlDup);
+    }
 
-      let x = marginLeft;
-      doc.setFontSize(10);
-      headers.forEach((header, i) => {
-        doc.rect(x, y, colWidths[i], cellHeight);
-        doc.text(header, x + 1.5, y + 5);
-        x += colWidths[i];
-      });
-      y += cellHeight;
-
-      tokenCache.forEach((t, i) => {
-        if (y + cellHeight > 287) {
-          doc.addPage();
-          y = 20;
-          x = marginLeft;
-          headers.forEach((header, i) => {
-            doc.rect(x, y, colWidths[i], cellHeight);
-            doc.text(header, x + 1.5, y + 5);
-            x += colWidths[i];
-          });
-          y += cellHeight;
-        }
-
-        const row = [
-          (i + 1).toString(), t.subject, t.kelas, t.token, t.url, t.startTime, t.endTime
-        ];
-        x = marginLeft;
-        row.forEach((cell, j) => {
-          doc.rect(x, y, colWidths[j], cellHeight);
-          const cellText = doc.splitTextToSize(cell, colWidths[j] - 2);
-          doc.text(cellText, x + 1.5, y + 5);
-          x += colWidths[j];
-        });
-        y += cellHeight;
-      });
-
-      doc.save("daftar_token.pdf");
-    };
+    document.getElementById('token').addEventListener('input', checkDuplicateInputs);
+    document.getElementById('url').addEventListener('input', checkDuplicateInputs);
 
     function updateClock() {
       const now = new Date();
