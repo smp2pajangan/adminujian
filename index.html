@@ -2,70 +2,63 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel Admin Ujian</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      background-color: #f9f9f9;
+      background-color: #f0f4f8;
     }
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 20px;
-    }
-    .form-container, .token-list {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      margin-top: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    input, button, select {
-      padding: 10px;
-      margin: 8px 0;
-      font-size: 16px;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    input[type="datetime-local"] {
-      width: 49%;
-      display: inline-block;
-    }
-    button {
-      cursor: pointer;
-      font-size: 16px;
-      padding: 10px 20px;
-      max-width: 200px;
-      width: auto;
+    .header {
+      background-color: #0066cc;
+      color: white;
+      padding: 15px;
+      text-align: center;
     }
     .logo {
-      text-align: center;
-      margin-top: 30px;
-    }
-    .logo img {
+      display: block;
+      margin: 0 auto;
       width: 100px;
     }
-    h2, h3 {
-      text-align: center;
-      margin-bottom: 10px;
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, select {
+      padding: 10px;
+      margin: 8px 0;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px auto;
+      display: block;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .form-group {
+      margin-bottom: 15px;
     }
     .error {
       color: red;
+      font-size: 14px;
       text-align: center;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      background-color: #fff;
+      font-size: 14px;
     }
     th, td {
+      border: 1px solid #ccc;
       padding: 8px;
-      text-align: left;
-      border: 1px solid #ddd;
-      font-size: 14px;
     }
     th {
       background-color: #f4f4f4;
@@ -73,116 +66,87 @@
     .filter-row {
       display: flex;
       gap: 10px;
-      flex-wrap: wrap;
       margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-row select, .filter-row button {
+      flex: 1;
+      min-width: 150px;
     }
     .footer {
       text-align: center;
       margin-top: 30px;
+      color: #555;
       font-size: 14px;
-    }
-    #clock {
-      font-weight: bold;
-      display: block;
-      margin-top: 5px;
-    }
-    @media (max-width: 600px) {
-      input, select, button {
-        font-size: 14px;
-      }
-      .filter-row {
-        flex-direction: column;
-      }
-      table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-      th, td {
-        font-size: 12px;
-      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="logo">
-      <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" alt="Logo SMPN 2 Pajangan" />
-    </div>
-
-    <div id="loginSection">
-      <h2>LOGIN ADMINISTRATOR</h2>
-      <input type="text" id="username" placeholder="Username" />
-      <input type="password" id="password" placeholder="Password" />
-      <div style="text-align:center">
-        <button onclick="login()">Login</button>
-      </div>
-      <p id="loginError" class="error"></p>
-    </div>
-
-    <div id="adminPanel" style="display:none;">
-      <div style="text-align:right">
-        <button onclick="logout()">Logout</button>
-      </div>
-
-      <h2>Panel Admin</h2>
-
-      <div class="form-container">
-        <h3>Tambah/Edit Token</h3>
-        <form id="tokenForm">
-          <label>Mata Pelajaran</label>
-          <input type="text" id="subject" required />
-          <label>Kelas</label>
-          <input type="text" id="kelas" required />
-          <label>Token Ujian</label>
-          <input type="text" id="token" required />
-          <label>Link Ujian</label>
-          <input type="url" id="url" required />
-          <label>Waktu Mulai & Selesai</label><br />
-          <input type="datetime-local" id="startTime" required />
-          <input type="datetime-local" id="endTime" required />
-          <br />
-          <button type="submit">Simpan</button>
-        </form>
-        <p id="errorMsg" class="error"></p>
-      </div>
-
-      <div class="token-list">
-        <h3>Daftar Token</h3>
-        <div class="filter-row">
-          <select id="filterKelas">
-            <option value="">Filter Kelas</option>
-          </select>
-          <select id="filterMapel">
-            <option value="">Filter Mapel</option>
-          </select>
-          <button onclick="exportPDF()">Export PDF</button>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Mata Pelajaran</th>
-              <th>Kelas</th>
-              <th>Link/URL</th>
-              <th>Waktu Dibuka</th>
-              <th>Waktu Ditutup</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tokenTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="footer">
-      &copy; @admin SMPN 2 Pajangan
-      <span id="clock"></span>
-    </div>
+  <div class="header">
+    <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo">
+    <h2>LOGIN ADMINISTRATOR</h2>
   </div>
 
-  <!-- Firebase & Script -->
+  <div class="container" id="loginSection">
+    <input type="text" id="username" placeholder="Masukan Username (admin)" />
+    <input type="password" id="password" placeholder="Masukan Password" />
+    <button onclick="login()">Login</button>
+    <p id="loginError" class="error"></p>
+  </div>
+
+  <div class="container" id="adminPanel" style="display:none;">
+    <button onclick="logout()">Logout</button>
+
+    <h3>Tambah / Edit Token</h3>
+    <form id="tokenForm">
+      <div class="form-group"><input type="text" id="subject" placeholder="Mata Pelajaran" required /></div>
+      <div class="form-group"><input type="text" id="kelas" placeholder="Kelas" required /></div>
+      <div class="form-group"><input type="text" id="token" placeholder="Token Ujian" required /></div>
+      <div class="form-group"><input type="url" id="url" placeholder="Link Ujian" required /></div>
+      <div class="form-group">
+        <label>Tanggal Mulai</label>
+        <input type="datetime-local" id="startTime" required />
+      </div>
+      <div class="form-group">
+        <label>Tanggal Selesai</label>
+        <input type="datetime-local" id="endTime" required />
+      </div>
+      <button type="submit">Simpan</button>
+      <p id="errorMsg" class="error"></p>
+    </form>
+
+    <div class="filter-row">
+      <select id="filterKelas">
+        <option value="">Semua Kelas</option>
+      </select>
+      <select id="filterMapel">
+        <option value="">Semua Mapel</option>
+      </select>
+      <button onclick="exportPDF()">Export PDF</button>
+    </div>
+
+    <h3>Daftar Token</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Mapel</th>
+          <th>Kelas</th>
+          <th>Link</th>
+          <th>Mulai</th>
+          <th>Selesai</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tokenTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <div>@admin smpn 2 pajangan</div>
+    <div id="clock"></div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
@@ -202,9 +166,8 @@
 
     const ADMIN_USER = "admin";
     const ADMIN_PASS = "12345";
-
     let currentTokenId = null;
-    let allData = [];
+    let tokenCache = [];
 
     window.login = function () {
       const u = document.getElementById('username').value.trim();
@@ -224,44 +187,32 @@
     };
 
     function loadTokens() {
-      const tokenTableBody = document.getElementById('tokenTableBody');
-      const kelasFilter = document.getElementById('filterKelas');
-      const mapelFilter = document.getElementById('filterMapel');
       onValue(ref(db, 'tokens'), snapshot => {
+        const tokenTableBody = document.getElementById('tokenTableBody');
         tokenTableBody.innerHTML = '';
-        allData = [];
-        let kelasSet = new Set();
-        let mapelSet = new Set();
+        tokenCache = [];
+        const kelasSet = new Set();
+        const mapelSet = new Set();
         let count = 1;
+
         snapshot.forEach(child => {
           const data = child.val();
-          data.id = child.key;
-          allData.push(data);
+          data.key = child.key;
+          tokenCache.push(data);
           kelasSet.add(data.kelas);
           mapelSet.add(data.subject);
         });
 
-        // Populate filter dropdowns
-        kelasFilter.innerHTML = '<option value="">Filter Kelas</option>';
-        mapelFilter.innerHTML = '<option value="">Filter Mapel</option>';
-        kelasSet.forEach(k => kelasFilter.innerHTML += `<option value="${k}">${k}</option>`);
-        mapelSet.forEach(m => mapelFilter.innerHTML += `<option value="${m}">${m}</option>`);
-
-        displayTokens();
+        updateFilterOptions(kelasSet, mapelSet);
+        renderTokens(tokenCache);
       });
-
-      kelasFilter.addEventListener('change', displayTokens);
-      mapelFilter.addEventListener('change', displayTokens);
     }
 
-    function displayTokens() {
-      const tbody = document.getElementById('tokenTableBody');
-      tbody.innerHTML = '';
-      const kelas = document.getElementById('filterKelas').value;
-      const mapel = document.getElementById('filterMapel').value;
+    function renderTokens(data) {
+      const tokenTableBody = document.getElementById('tokenTableBody');
+      tokenTableBody.innerHTML = '';
       let count = 1;
-      allData.forEach(data => {
-        if ((kelas && data.kelas !== kelas) || (mapel && data.subject !== mapel)) return;
+      data.forEach(data => {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${count++}</td>
@@ -270,58 +221,88 @@
           <td><a href="${data.url}" target="_blank">Link</a></td>
           <td>${data.startTime}</td>
           <td>${data.endTime}</td>
-          <td><button onclick="hapusToken('${data.id}')">Hapus</button></td>
+          <td><button onclick="hapusToken('${data.key}')">Hapus</button></td>
         `;
-        tbody.appendChild(row);
+        tokenTableBody.appendChild(row);
       });
+    }
+
+    function updateFilterOptions(kelasSet, mapelSet) {
+      const kelasSelect = document.getElementById('filterKelas');
+      const mapelSelect = document.getElementById('filterMapel');
+      kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
+      mapelSelect.innerHTML = `<option value="">Semua Mapel</option>`;
+      kelasSet.forEach(k => kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
+      mapelSet.forEach(m => mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
+    }
+
+    document.getElementById('filterKelas').addEventListener('change', filterTokens);
+    document.getElementById('filterMapel').addEventListener('change', filterTokens);
+
+    function filterTokens() {
+      const kelas = document.getElementById('filterKelas').value;
+      const mapel = document.getElementById('filterMapel').value;
+      let filtered = tokenCache;
+      if (kelas) filtered = filtered.filter(t => t.kelas === kelas);
+      if (mapel) filtered = filtered.filter(t => t.subject === mapel);
+      renderTokens(filtered);
     }
 
     window.hapusToken = function(id) {
       remove(ref(db, 'tokens/' + id));
     };
 
-    document.getElementById('tokenForm').addEventListener('submit', function (e) {
+    document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const subject = document.getElementById('subject').value.trim();
       const kelas = document.getElementById('kelas').value.trim();
       const token = document.getElementById('token').value.trim();
       const url = document.getElementById('url').value.trim();
-      const start = document.getElementById('startTime').value;
-      const end = document.getElementById('endTime').value;
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
       const createdAt = new Date().toISOString();
-      const newToken = { subject, kelas, token, url, startTime: start, endTime: end, createdAt };
+
+      const tokenData = { subject, kelas, token, url, startTime, endTime, createdAt };
 
       if (currentTokenId) {
-        update(ref(db, 'tokens/' + currentTokenId), newToken);
+        update(ref(db, 'tokens/' + currentTokenId), tokenData);
         currentTokenId = null;
       } else {
-        push(ref(db, 'tokens'), newToken);
+        push(ref(db, 'tokens'), tokenData);
       }
 
       this.reset();
       loadTokens();
     });
 
-    // Export to PDF
     window.exportPDF = function () {
-      import("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js").then(jsPDFModule => {
-        const { jsPDF } = jsPDFModule;
-        const doc = new jsPDF();
-        doc.text("Daftar Token Ujian", 14, 15);
-        let y = 25;
-        allData.forEach((d, i) => {
-          doc.text(`${i+1}. ${d.subject} - ${d.kelas} - ${d.startTime} s.d ${d.endTime}`, 14, y);
-          y += 10;
-        });
-        doc.save("daftar-token.pdf");
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(12);
+      doc.text("Daftar Token Ujian", 14, 10);
+
+      let y = 20;
+      tokenCache.forEach((t, index) => {
+        doc.text(`${index + 1}. ${t.subject} | ${t.kelas} | ${t.url} | ${t.startTime} - ${t.endTime}`, 10, y);
+        y += 8;
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
       });
+
+      doc.save("daftar_token.pdf");
     };
 
-    // Clock
-    setInterval(() => {
+    function updateClock() {
       const now = new Date();
-      document.getElementById("clock").innerText = now.toLocaleString("id-ID");
-    }, 1000);
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateStr = now.toLocaleDateString('id-ID', options);
+      const timeStr = now.toLocaleTimeString('id-ID');
+      document.getElementById('clock').innerText = `${dateStr} - ${timeStr}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
   </script>
 </body>
 </html>
