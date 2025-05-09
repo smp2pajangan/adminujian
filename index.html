@@ -2,359 +2,207 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Panel Admin Ujian</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    :root {
+      --primary: #0066cc;
+      --light-bg: #f4f7fc;
+      --card-bg: #fff;
+      --border-color: #ddd;
+    }
+
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      background-color: #f0f4f8;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--light-bg);
+      color: #333;
     }
+
     .header {
-      background-color: #0066cc;
-      color: white;
-      padding: 15px;
+      background-color: white;
       text-align: center;
+      padding: 20px 10px 10px;
+      border-bottom: 5px solid var(--primary);
     }
-    .logo {
-      display: block;
-      margin: 0 auto;
-      width: 100px;
-    }
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
+
+    .header img {
+      width: 90px;
       background: white;
-      padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
     }
-    input, select {
-      padding: 10px;
-      margin: 8px 0;
-      width: 100%;
-      box-sizing: border-box;
-      font-size: 16px;
+
+    .header h2 {
+      color: var(--primary);
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 1px;
     }
-    input.duplicate {
-      border: 2px solid red;
-      background-color: #ffe6e6;
+
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
-    button {
-      padding: 10px 20px;
-      margin: 10px auto;
-      display: block;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .btn-small {
-      padding: 5px 10px;
-      font-size: 12px;
-    }
+
     .form-group {
       margin-bottom: 15px;
     }
-    .error {
-      color: red;
-      font-size: 14px;
-      text-align: center;
+
+    label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      display: block;
     }
+
+    input, select, button {
+      font-size: 15px;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #004ea1;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 25px;
       font-size: 14px;
     }
+
     th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      word-wrap: break-word;
+      padding: 10px;
+      text-align: left;
+      border: 1px solid var(--border-color);
     }
+
     th {
-      background-color: #f4f4f4;
+      background-color: #eaf3fc;
+      font-weight: 600;
     }
+
     .filter-row {
       display: flex;
       gap: 10px;
-      margin-bottom: 10px;
+      margin: 15px 0;
       flex-wrap: wrap;
     }
+
     .filter-row select {
       flex: 1;
-      min-width: 150px;
+      min-width: 140px;
     }
+
     .footer {
       text-align: center;
-      margin-top: 15px;
-      color: #555;
-      font-size: 14px;
+      font-size: 13px;
+      color: #777;
+      margin: 30px 0;
     }
-    #popupConfirm {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      align-items: center;
-      justify-content: center;
-    }
-    #popupConfirm .popup-content {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      max-width: 300px;
-      margin: auto;
-    }
+
     @media (max-width: 600px) {
+      .container {
+        margin: 15px;
+        padding: 15px;
+      }
+
       table, th, td {
         font-size: 12px;
+      }
+
+      .header h2 {
+        font-size: 18px;
+      }
+
+      .header img {
+        width: 70px;
       }
     }
   </style>
 </head>
 <body>
+
   <div class="header">
-    <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo">
+    <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" alt="Logo SMPN 2 Pajangan">
     <h2>SMP NEGERI 2 PAJANGAN</h2>
   </div>
 
-  <div class="container" id="loginSection">
-    <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
-    <input type="text" id="username" placeholder="Masukan Username (admin)" />
-    <input type="password" id="password" placeholder="Masukan Password" />
-    <button onclick="login()">Login</button>
-    <p id="loginError" class="error"></p>
-    <div class="footer">
-      <div>@Admin SMPN 2 Pajangan</div>
-      <div id="clockLogin"></div>
+  <div class="container">
+    <div class="form-group">
+      <label for="token">Token</label>
+      <input type="text" id="token" placeholder="Masukkan token ujian">
     </div>
-  </div>
 
-  <div class="container" id="adminPanel" style="display:none;">
-    <h3>Tambah / Edit Token</h3>
-    <form id="tokenForm">
-      <div class="form-group"><input type="text" id="subject" placeholder="Mata Pelajaran" required /></div>
-      <div class="form-group"><input type="text" id="kelas" placeholder="Kelas" required /></div>
-      <div class="form-group"><input type="text" id="token" placeholder="Token Ujian" required /></div>
-      <div class="form-group"><input type="url" id="url" placeholder="Link Ujian" required /></div>
-      <div class="form-group">
-        <label>Tanggal Mulai</label>
-        <input type="datetime-local" id="startTime" required />
-      </div>
-      <div class="form-group">
-        <label>Tanggal Selesai</label>
-        <input type="datetime-local" id="endTime" required />
-      </div>
-      <button type="submit">Simpan</button>
-      <p id="errorMsg" class="error"></p>
-    </form>
+    <div class="form-group">
+      <label for="kelas">Kelas</label>
+      <select id="kelas">
+        <option value="">Pilih kelas</option>
+        <option value="7A">7A</option>
+        <option value="8B">8B</option>
+        <!-- Tambahkan sesuai kebutuhan -->
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="mapel">Mata Pelajaran</label>
+      <select id="mapel">
+        <option value="">Pilih mapel</option>
+        <option value="Matematika">Matematika</option>
+        <option value="IPS">IPS</option>
+        <!-- Tambahkan sesuai kebutuhan -->
+      </select>
+    </div>
+
+    <button>Simpan Token</button>
 
     <div class="filter-row">
-      <select id="filterKelas"><option value="">Semua Kelas</option></select>
-      <select id="filterMapel"><option value="">Semua Mapel</option></select>
+      <select><option>Filter Kelas</option></select>
+      <select><option>Filter Mapel</option></select>
     </div>
 
-    <h3>Daftar Token</h3>
     <table>
       <thead>
         <tr>
           <th>No</th>
-          <th>Mapel</th>
           <th>Kelas</th>
+          <th>Mapel</th>
           <th>Token</th>
           <th>Link</th>
-          <th>Token dibuka</th>
-          <th>Token ditutup</th>
           <th>Aksi</th>
         </tr>
       </thead>
-      <tbody id="tokenTableBody"></tbody>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>7A</td>
+          <td>Matematika</td>
+          <td>ABC123</td>
+          <td><a href="#">Lihat</a></td>
+          <td><button class="btn-small">Edit</button></td>
+        </tr>
+        <!-- Tambahkan data lainnya -->
+      </tbody>
     </table>
   </div>
 
-  <!-- Popup Konfirmasi Hapus -->
-  <div id="popupConfirm">
-    <div class="popup-content">
-      <p>Apakah Anda yakin ingin menghapus token ini?</p>
-      <button id="btnYes" style="margin-right:10px;">Ya</button>
-      <button onclick="closePopup()">Batal</button>
-    </div>
-  </div>
+  <div class="footer">© 2025 SMPN 2 Pajangan</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
-      authDomain: "ujian-online-berbasis-android.firebaseapp.com",
-      databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
-      projectId: "ujian-online-berbasis-android",
-      storageBucket: "ujian-online-berbasis-android.appspot.com",
-      messagingSenderId: "923446282537",
-      appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    const ADMIN_USER = "admin";
-    const ADMIN_PASS = "12345";
-    let currentTokenId = null;
-    let tokenCache = [];
-
-    window.login = function () {
-      const u = document.getElementById('username').value.trim();
-      const p = document.getElementById('password').value.trim();
-      if (u === ADMIN_USER && p === ADMIN_PASS) {
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        loadTokens();
-      } else {
-        document.getElementById('loginError').innerText = "Username atau password salah.";
-      }
-    };
-
-    function loadTokens() {
-      onValue(ref(db, 'tokens'), snapshot => {
-        const tokenTableBody = document.getElementById('tokenTableBody');
-        tokenTableBody.innerHTML = '';
-        tokenCache = [];
-        const kelasSet = new Set();
-        const mapelSet = new Set();
-        let count = 1;
-
-        snapshot.forEach(child => {
-          const data = child.val();
-          data.key = child.key;
-          tokenCache.push(data);
-          kelasSet.add(data.kelas);
-          mapelSet.add(data.subject);
-        });
-
-        updateFilterOptions(kelasSet, mapelSet);
-        renderTokens(tokenCache);
-      });
-    }
-
-    function renderTokens(data) {
-      const tokenTableBody = document.getElementById('tokenTableBody');
-      tokenTableBody.innerHTML = '';
-      let count = 1;
-      data.forEach(data => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${count++}</td>
-          <td>${data.subject}</td>
-          <td>${data.kelas}</td>
-          <td>${data.token}</td>
-          <td><a href="${data.url}" target="_blank">Link</a></td>
-          <td>${data.startTime}</td>
-          <td>${data.endTime}</td>
-          <td><button class="btn-small" onclick="hapusToken('${data.key}')">Hapus</button></td>
-        `;
-        tokenTableBody.appendChild(row);
-      });
-    }
-
-    function updateFilterOptions(kelasSet, mapelSet) {
-      const kelasSelect = document.getElementById('filterKelas');
-      const mapelSelect = document.getElementById('filterMapel');
-      kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
-      mapelSelect.innerHTML = `<option value="">Semua Mapel</option>`;
-      kelasSet.forEach(k => kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
-      mapelSet.forEach(m => mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
-    }
-
-    document.getElementById('filterKelas').addEventListener('change', filterTokens);
-    document.getElementById('filterMapel').addEventListener('change', filterTokens);
-
-    function filterTokens() {
-      const kelas = document.getElementById('filterKelas').value;
-      const mapel = document.getElementById('filterMapel').value;
-      let filtered = tokenCache;
-      if (kelas) filtered = filtered.filter(t => t.kelas === kelas);
-      if (mapel) filtered = filtered.filter(t => t.subject === mapel);
-      renderTokens(filtered);
-    }
-
-    let tokenToDelete = null;
-    window.hapusToken = function(id) {
-      tokenToDelete = id;
-      document.getElementById('popupConfirm').style.display = 'flex';
-    };
-
-    window.closePopup = function() {
-      tokenToDelete = null;
-      document.getElementById('popupConfirm').style.display = 'none';
-    };
-
-    document.getElementById('btnYes').addEventListener('click', function() {
-      if (tokenToDelete) {
-        remove(ref(db, 'tokens/' + tokenToDelete));
-        closePopup();
-      }
-    });
-
-    document.getElementById('tokenForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const subject = document.getElementById('subject').value.trim().toUpperCase();
-      const kelas = document.getElementById('kelas').value.trim();
-      const token = document.getElementById('token').value.trim().toUpperCase();
-      const url = document.getElementById('url').value.trim();
-      const startTime = document.getElementById('startTime').value;
-      const endTime = document.getElementById('endTime').value;
-      const createdAt = new Date().toISOString();
-      const errorMsg = document.getElementById('errorMsg');
-
-      const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
-      const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
-
-      if (isTokenDup || isUrlDup) {
-        errorMsg.innerText = "Token atau URL sudah digunakan. Silakan ganti.";
-        checkDuplicateInputs(); return;
-      }
-
-      const tokenData = { subject, kelas, token, url, startTime, endTime, createdAt };
-      if (currentTokenId) {
-        update(ref(db, 'tokens/' + currentTokenId), tokenData);
-        currentTokenId = null;
-      } else {
-        push(ref(db, 'tokens'), tokenData);
-      }
-
-      this.reset();
-      errorMsg.innerText = "";
-      checkDuplicateInputs();
-      loadTokens();
-    });
-
-    function checkDuplicateInputs() {
-      const tokenInput = document.getElementById('token');
-      const urlInput = document.getElementById('url');
-      const tokenVal = tokenInput.value.trim().toUpperCase();
-      const urlVal = urlInput.value.trim();
-
-      const tokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === tokenVal);
-      const urlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === urlVal);
-
-      tokenInput.classList.toggle('duplicate', tokenDup);
-      urlInput.classList.toggle('duplicate', urlDup);
-    }
-
-    document.getElementById('token').addEventListener('input', checkDuplicateInputs);
-    document.getElementById('url').addEventListener('input', checkDuplicateInputs);
-
-    function updateClock() {
-      const now = new Date();
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      const dateStr = now.toLocaleDateString('id-ID', options);
-      const timeStr = now.toLocaleTimeString('id-ID');
-      document.getElementById('clockLogin').innerText = `${dateStr} - ${timeStr}`;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-  </script>
 </body>
 </html>
