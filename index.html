@@ -270,10 +270,9 @@
     // Tambah atau update token
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const subject = document.getElementById('subject').value.trim();
-      const kelas = document.getElementById('kelas').value.trim();
-      const token = document.getElementById('token').value.trim();
-      const url = document.getElementById('url').value.trim();
+      const subject = document.getElementById('subject').value.trim().toUpperCase(); // UPPERCASE
+const kelas = document.getElementById('kelas').value.trim(); // tetap seperti biasa
+const token = document.getElementById('token').value.trim().toUpperCase(); // UPPERCASE document.getElementById('url').value.trim();
       const startTime = document.getElementById('startTime').value;
       const endTime = document.getElementById('endTime').value;
       const errorMsg = document.getElementById('errorMsg');
@@ -321,13 +320,13 @@ document.getElementById('modalForm').addEventListener('submit', function(e) {
   e.preventDefault();
   
   const updated = {
-    subject: document.getElementById('editSubject').value.trim(),
-    kelas: document.getElementById('editKelas').value.trim(),
-    token: document.getElementById('editToken').value.trim(),
-    url: document.getElementById('editUrl').value.trim(),
-    startTime: document.getElementById('editStartTime').value,
-    endTime: document.getElementById('editEndTime').value
-  };
+  subject: document.getElementById('editSubject').value.trim().toUpperCase(), // UPPERCASE
+  kelas: document.getElementById('editKelas').value.trim(),
+  token: document.getElementById('editToken').value.trim().toUpperCase(), // UPPERCASE
+  url: document.getElementById('editUrl').value.trim(),
+  startTime: document.getElementById('editStartTime').value,
+  endTime: document.getElementById('editEndTime').value
+};
 
   const errorEl = document.getElementById('editErrorMsg');
 
