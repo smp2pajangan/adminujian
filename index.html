@@ -1,9 +1,9 @@
-"<!DOCTYPE html>
-<html lang=""id"">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset=""UTF-8"" />
+  <meta charset="UTF-8" />
   <title>Panel Admin Ujian</title>
-  <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -84,27 +84,9 @@
     }
     .footer {
       text-align: center;
-      margin-top: 15px;
+      margin-top: 30px;
       color: #555;
       font-size: 14px;
-    }
-    #popupConfirm {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      align-items: center;
-      justify-content: center;
-    }
-    #popupConfirm .popup-content {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      max-width: 300px;
-      margin: auto;
     }
     @media (max-width: 600px) {
       table, th, td {
@@ -114,45 +96,45 @@
   </style>
 </head>
 <body>
-  <div class=""header"">
-    <img src=""https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true"" class=""logo"" alt=""Logo"">
+  <div class="header">
+    <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo">
     <h2>SMP NEGERI 2 PAJANGAN</h2>
   </div>
 
-  <div class=""container"" id=""loginSection"">
-    <h3 style=""text-align: center;"">LOGIN ADMINISTRASI</h3>
-    <input type=""text"" id=""username"" placeholder=""Masukan Username (admin)"" />
-    <input type=""password"" id=""password"" placeholder=""Masukan Password"" />
-    <button onclick=""login()"">Login</button>
-    <p id=""loginError"" class=""error""></p>
-    <div class=""footer"">
+  <div class="container" id="loginSection">
+    <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
+    <input type="text" id="username" placeholder="Masukan Username (admin)" />
+    <input type="password" id="password" placeholder="Masukan Password" />
+    <button onclick="login()">Login</button>
+    <p id="loginError" class="error"></p>
+    <div style="text-align: center; color: #555; margin-top: 20px;">
       <div>@Admin SMPN 2 Pajangan</div>
-      <div id=""clockLogin""></div>
+      <div id="realtimeClock"></div>
     </div>
   </div>
 
-  <div class=""container"" id=""adminPanel"" style=""display:none;"">
+  <div class="container" id="adminPanel" style="display:none;">
     <h3>Tambah / Edit Token</h3>
-    <form id=""tokenForm"">
-      <div class=""form-group""><input type=""text"" id=""subject"" placeholder=""Mata Pelajaran"" required /></div>
-      <div class=""form-group""><input type=""text"" id=""kelas"" placeholder=""Kelas"" required /></div>
-      <div class=""form-group""><input type=""text"" id=""token"" placeholder=""Token Ujian"" required /></div>
-      <div class=""form-group""><input type=""url"" id=""url"" placeholder=""Link Ujian"" required /></div>
-      <div class=""form-group"">
+    <form id="tokenForm">
+      <div class="form-group"><input type="text" id="subject" placeholder="Mata Pelajaran" required /></div>
+      <div class="form-group"><input type="text" id="kelas" placeholder="Kelas" required /></div>
+      <div class="form-group"><input type="text" id="token" placeholder="Token Ujian" required /></div>
+      <div class="form-group"><input type="url" id="url" placeholder="Link Ujian" required /></div>
+      <div class="form-group">
         <label>Tanggal Mulai</label>
-        <input type=""datetime-local"" id=""startTime"" required />
+        <input type="datetime-local" id="startTime" required />
       </div>
-      <div class=""form-group"">
+      <div class="form-group">
         <label>Tanggal Selesai</label>
-        <input type=""datetime-local"" id=""endTime"" required />
+        <input type="datetime-local" id="endTime" required />
       </div>
-      <button type=""submit"">Simpan</button>
-      <p id=""errorMsg"" class=""error""></p>
+      <button type="submit">Simpan</button>
+      <p id="errorMsg" class="error"></p>
     </form>
 
-    <div class=""filter-row"">
-      <select id=""filterKelas""><option value="""">Semua Kelas</option></select>
-      <select id=""filterMapel""><option value="""">Semua Mapel</option></select>
+    <div class="filter-row">
+      <select id="filterKelas"><option value="">Semua Kelas</option></select>
+      <select id="filterMapel"><option value="">Semua Mapel</option></select>
     </div>
 
     <h3>Daftar Token</h3>
@@ -169,38 +151,34 @@
           <th>Aksi</th>
         </tr>
       </thead>
-      <tbody id=""tokenTableBody""></tbody>
+      <tbody id="tokenTableBody"></tbody>
     </table>
   </div>
 
-  <!-- Popup Konfirmasi Hapus -->
-  <div id=""popupConfirm"">
-    <div class=""popup-content"">
-      <p>Apakah Anda yakin ingin menghapus token ini?</p>
-      <button id=""btnYes"" style=""margin-right:10px;"">Ya</button>
-      <button onclick=""closePopup()"">Batal</button>
-    </div>
+  <div class="footer">
+    <div>@Admin SMPN 2 Pajangan</div>
+    <div id="clock"></div>
   </div>
 
-  <script type=""module"">
-    import { initializeApp } from ""https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js"";
-    import { getDatabase, ref, push, onValue, update, remove } from ""https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js"";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
     const firebaseConfig = {
-      apiKey: ""AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE"",
-      authDomain: ""ujian-online-berbasis-android.firebaseapp.com"",
-      databaseURL: ""https://ujian-online-berbasis-android-default-rtdb.firebaseio.com"",
-      projectId: ""ujian-online-berbasis-android"",
-      storageBucket: ""ujian-online-berbasis-android.appspot.com"",
-      messagingSenderId: ""923446282537"",
-      appId: ""1:923446282537:web:60d374dde8aca61f6a0f38""
+      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
+      authDomain: "ujian-online-berbasis-android.firebaseapp.com",
+      databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
+      projectId: "ujian-online-berbasis-android",
+      storageBucket: "ujian-online-berbasis-android.appspot.com",
+      messagingSenderId: "923446282537",
+      appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const ADMIN_USER = ""admin"";
-    const ADMIN_PASS = ""12345"";
+    const ADMIN_USER = "admin";
+    const ADMIN_PASS = "12345";
     let currentTokenId = null;
     let tokenCache = [];
 
@@ -212,7 +190,7 @@
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();
       } else {
-        document.getElementById('loginError').innerText = ""Username atau password salah."";
+        document.getElementById('loginError').innerText = "Username atau password salah.";
       }
     };
 
@@ -249,10 +227,10 @@
           <td>${data.subject}</td>
           <td>${data.kelas}</td>
           <td>${data.token}</td>
-          <td><a href=""${data.url}"" target=""_blank"">Link</a></td>
+          <td><a href="${data.url}" target="_blank">Link</a></td>
           <td>${data.startTime}</td>
           <td>${data.endTime}</td>
-          <td><button class=""btn-small"" onclick=""hapusToken('${data.key}')"">Hapus</button></td>
+          <td><button class="btn-small" onclick="hapusToken('${data.key}')">Hapus</button></td>
         `;
         tokenTableBody.appendChild(row);
       });
@@ -261,10 +239,10 @@
     function updateFilterOptions(kelasSet, mapelSet) {
       const kelasSelect = document.getElementById('filterKelas');
       const mapelSelect = document.getElementById('filterMapel');
-      kelasSelect.innerHTML = `<option value="""">Semua Kelas</option>`;
-      mapelSelect.innerHTML = `<option value="""">Semua Mapel</option>`;
-      kelasSet.forEach(k => kelasSelect.innerHTML += `<option value=""${k}"">${k}</option>`);
-      mapelSet.forEach(m => mapelSelect.innerHTML += `<option value=""${m}"">${m}</option>`);
+      kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
+      mapelSelect.innerHTML = `<option value="">Semua Mapel</option>`;
+      kelasSet.forEach(k => kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
+      mapelSet.forEach(m => mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
     }
 
     document.getElementById('filterKelas').addEventListener('change', filterTokens);
@@ -279,23 +257,11 @@
       renderTokens(filtered);
     }
 
-    let tokenToDelete = null;
     window.hapusToken = function(id) {
-      tokenToDelete = id;
-      document.getElementById('popupConfirm').style.display = 'flex';
-    };
-
-    window.closePopup = function() {
-      tokenToDelete = null;
-      document.getElementById('popupConfirm').style.display = 'none';
-    };
-
-    document.getElementById('btnYes').addEventListener('click', function() {
-      if (tokenToDelete) {
-        remove(ref(db, 'tokens/' + tokenToDelete));
-        closePopup();
+      if (confirm("Apakah Anda yakin ingin menghapus token ini?")) {
+        remove(ref(db, 'tokens/' + id));
       }
-    });
+    };
 
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -312,7 +278,7 @@
       const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
 
       if (isTokenDup || isUrlDup) {
-        errorMsg.innerText = ""Token atau URL sudah digunakan. Silakan ganti."";
+        errorMsg.innerText = "Token atau URL sudah digunakan. Silakan ganti.";
         checkDuplicateInputs(); return;
       }
 
@@ -325,7 +291,7 @@
       }
 
       this.reset();
-      errorMsg.innerText = """";
+      errorMsg.innerText = "";
       checkDuplicateInputs();
       loadTokens();
     });
@@ -351,10 +317,14 @@
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       const dateStr = now.toLocaleDateString('id-ID', options);
       const timeStr = now.toLocaleTimeString('id-ID');
-      document.getElementById('clockLogin').innerText = `${dateStr} - ${timeStr}`;
+      document.getElementById('clock').innerText = `${dateStr} - ${timeStr}`;
+      const realtimeClock = document.getElementById('realtimeClock');
+      if (realtimeClock) {
+        realtimeClock.innerText = `${dateStr} - ${timeStr}`;
+      }
     }
     setInterval(updateClock, 1000);
     updateClock();
   </script>
 </body>
-</html>"
+</html>
