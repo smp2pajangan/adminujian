@@ -38,6 +38,8 @@
     }
     button {
       padding: 10px 20px;
+      margin: 10px auto;
+      display: block;
       font-size: 16px;
       cursor: pointer;
     }
@@ -62,44 +64,32 @@
     .footer {
       text-align: center;
       margin-top: 20px;
+      color: #555;
+      font-size: 14px;
+    }
+    .date-time {
       font-size: 14px;
       color: #555;
-    }
-    .center-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
     }
     .modal {
       display: none;
       position: fixed;
-      z-index: 100;
+      z-index: 10;
       left: 0; top: 0;
       width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
     }
     .modal-content {
-      background-color: white;
-      margin: 10% auto;
+      background: #fff;
       padding: 20px;
       border-radius: 8px;
+      width: 90%;
       max-width: 400px;
-      text-align: center;
-    }
-    .modal input {
-      width: 100%;
     }
     .modal button {
-      padding: 8px 16px;
-    }
-    @media (max-width: 600px) {
-      .container, .modal-content {
-        margin: 10px;
-      }
-      .logo {
-        width: 80px;
-      }
+      margin: 5px;
     }
   </style>
 </head>
@@ -109,15 +99,22 @@
     <h2>SMP NEGERI 2 PAJANGAN</h2>
   </div>
 
+  <!-- Section Login -->
   <div class="container" id="loginSection">
     <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
     <input type="text" id="username" placeholder="Masukan Username (admin)" />
     <input type="password" id="password" placeholder="Masukan Password" />
     <button onclick="login()">Login</button>
+
+    <div class="footer">
+      <div>@Admin SMPN 2 Pajangan</div>
+      <div id="currentTime" class="date-time"></div>
+    </div>
+
     <p id="loginError" class="error"></p>
-    <div class="footer" id="adminDateTimeLogin"></div>
   </div>
 
+  <!-- Section Admin Panel -->
   <div class="container" id="adminPanel" style="display:none;">
     <h3>Tambah / Edit Token</h3>
     <form id="tokenForm">
@@ -149,13 +146,16 @@
       </thead>
       <tbody id="tokenTableBody"></tbody>
     </table>
-    <div class="footer" id="adminDateTime"></div>
-  </div>
 
+    <div class="footer">
+      <div>@Admin SMPN 2 Pajangan</div>
+      <div id="adminDateTime" class="date-time"></div>
+    </div>
+  </div>
   <!-- Modal Edit -->
   <div id="editModal" class="modal">
     <div class="modal-content">
-      <h3>Edit Token</h3>
+      <h4>Edit Token</h4>
       <form id="modalForm">
         <input type="text" id="editSubject" required />
         <input type="text" id="editKelas" required />
@@ -165,10 +165,8 @@
         <input type="datetime-local" id="editStartTime" required />
         <label>Tanggal Selesai</label>
         <input type="datetime-local" id="editEndTime" required />
-        <div class="center-buttons">
-          <button type="submit">Simpan</button>
-          <button type="button" onclick="closeEditModal()">Batal</button>
-        </div>
+        <button type="submit">Simpan</button>
+        <button type="button" onclick="closeEditModal()">Batal</button>
       </form>
     </div>
   </div>
@@ -176,18 +174,16 @@
   <!-- Modal Hapus -->
   <div id="deleteModal" class="modal">
     <div class="modal-content">
-      <h3>Yakin ingin menghapus token ini?</h3>
-      <div class="center-buttons">
-        <button onclick="confirmDelete()">Hapus</button>
-        <button onclick="closeDeleteModal()">Batal</button>
-      </div>
+      <p>Yakin ingin menghapus token ini?</p>
+      <button onclick="confirmDelete()">Hapus</button>
+      <button onclick="closeDeleteModal()">Batal</button>
     </div>
   </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
       authDomain: "ujian-online-berbasis-android.firebaseapp.com",
@@ -198,39 +194,33 @@
       appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Username & Password
     const ADMIN_USER = "admin";
     const ADMIN_PASS = "12345";
     let currentTokenId = null;
     let tokenCache = [];
 
-    // Login function
     window.login = function() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
-
       if (username === ADMIN_USER && password === ADMIN_PASS) {
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
-        loadTokens();  // Load data after login
-        updateDateTime();
+        loadTokens();
       } else {
         document.getElementById("loginError").innerText = "Username atau password salah.";
       }
     };
 
-    // Load tokens from Firebase
     function loadTokens() {
       onValue(ref(db, 'tokens'), (snapshot) => {
-        const tokenTableBody = document.getElementById('tokenTableBody');
-        tokenTableBody.innerHTML = '';
+        const tbody = document.getElementById('tokenTableBody');
+        tbody.innerHTML = '';
         tokenCache = [];
 
-        snapshot.forEach((child) => {
+        snapshot.forEach(child => {
           const data = child.val();
           data.key = child.key;
           tokenCache.push(data);
@@ -245,189 +235,129 @@
             <td>${data.startTime}</td>
             <td>${data.endTime}</td>
             <td>
-              <button onclick="openEditModal('${data.key}')">Edit</button>
-              <button onclick="openDeleteModal('${data.key}')">Hapus</button>
+              <button onclick="editToken('${data.key}')">Edit</button>
+              <button onclick="promptDelete('${data.key}')">Hapus</button>
             </td>
           `;
-          tokenTableBody.appendChild(row);
+          tbody.appendChild(row);
         });
       });
     }
 
-    // Open edit modal and populate fields
-    window.openEditModal = function(id) {
-      currentTokenId = id;
-      const token = tokenCache.find(t => t.key === id);
-
-      document.getElementById("editSubject").value = token.subject;
-      document.getElementById("editKelas").value = token.kelas;
-      document.getElementById("editToken").value = token.token;
-      document.getElementById("editUrl").value = token.url;
-      document.getElementById("editStartTime").value = token.startTime;
-      document.getElementById("editEndTime").value = token.endTime;
-
-      document.getElementById("editModal").style.display = "block";
-    };
-
-    // Close edit modal
-    window.closeEditModal = function() {
-      document.getElementById("editModal").style.display = "none";
-    };
-
-    // Open delete modal
-    window.openDeleteModal = function(id) {
-      currentTokenId = id;
-      document.getElementById("deleteModal").style.display = "block";
-    };
-
-    // Close delete modal
-    window.closeDeleteModal = function() {
-      document.getElementById("deleteModal").style.display = "none";
-    };
-
-    // Confirm delete token
-    window.confirmDelete = function() {
-      if (currentTokenId) {
-        remove(ref(db, 'tokens/' + currentTokenId));
-        loadTokens(); // Reload token list after deletion
-      }
-      closeDeleteModal();
-    };
-
-    // Save or update token
-    document.getElementById('modalForm').addEventListener('submit', function(e) {
+    // Tambah atau update token
+    document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      const subject = document.getElementById('subject').value.trim();
+      const kelas = document.getElementById('kelas').value.trim();
+      const token = document.getElementById('token').value.trim();
+      const url = document.getElementById('url').value.trim();
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const errorMsg = document.getElementById('errorMsg');
 
-      const subject = document.getElementById('editSubject').value.trim();
-      const kelas = document.getElementById('editKelas').value.trim();
-      const token = document.getElementById('editToken').value.trim();
-      const url = document.getElementById('editUrl').value.trim();
-      const startTime = document.getElementById('editStartTime').value;
-      const endTime = document.getElementById('editEndTime').value;
-
-      // Validasi input kosong
       if (!subject || !kelas || !token || !url || !startTime || !endTime) {
-        alert("Semua field harus diisi!");
+        errorMsg.innerText = "Semua field harus diisi!";
         return;
       }
 
-      // Data token
-      const tokenData = { subject, kelas, token, url, startTime, endTime };
+      const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
+      const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
+      if (isTokenDup || isUrlDup) {
+        errorMsg.innerText = "Token atau URL sudah ada!";
+        return;
+      }
 
+      errorMsg.innerText = "";
+      const tokenData = { subject, kelas, token, url, startTime, endTime };
       if (currentTokenId) {
-        // Update token
         update(ref(db, 'tokens/' + currentTokenId), tokenData);
         currentTokenId = null;
       } else {
-        // Tambahkan token baru
         push(ref(db, 'tokens'), tokenData);
       }
 
-      // Reset form setelah berhasil menyimpan
-      document.getElementById("modalForm").reset();
-      loadTokens(); // Reload token list
-      closeEditModal(); // Close the modal after saving
+      this.reset();
+      loadTokens();
     });
 
-    // Display current date & time
-    function updateDateTime() {
-      const dateTimeElement = document.getElementById("adminDateTime");
+    // Edit Token
+    window.editToken = function(id) {
+      const token = tokenCache.find(t => t.key === id);
+      currentTokenId = id;
+      document.getElementById('editSubject').value = token.subject;
+      document.getElementById('editKelas').value = token.kelas;
+      document.getElementById('editToken').value = token.token;
+      document.getElementById('editUrl').value = token.url;
+      document.getElementById('editStartTime').value = token.startTime;
+      document.getElementById('editEndTime').value = token.endTime;
+      document.getElementById('editModal').style.display = 'flex';
+    };
 
-      setInterval(() => {
-        const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const formattedDate = now.toLocaleDateString('id-ID', options);
-        const formattedTime = now.toLocaleTimeString('id-ID');
+    document.getElementById('modalForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const updated = {
+        subject: document.getElementById('editSubject').value.trim(),
+        kelas: document.getElementById('editKelas').value.trim(),
+        token: document.getElementById('editToken').value.trim(),
+        url: document.getElementById('editUrl').value.trim(),
+        startTime: document.getElementById('editStartTime').value,
+        endTime: document.getElementById('editEndTime').value
+      };
+      update(ref(db, 'tokens/' + currentTokenId), updated);
+      closeEditModal();
+      loadTokens();
+    });
 
-        dateTimeElement.innerHTML = `${formattedDate} | ${formattedTime}`;
-      }, 1000);
-    }
+    window.closeEditModal = function() {
+      document.getElementById('editModal').style.display = 'none';
+      currentTokenId = null;
+    };
+
+    // Delete Popup
+    let deleteId = null;
+    window.promptDelete = function(id) {
+      deleteId = id;
+      document.getElementById('deleteModal').style.display = 'flex';
+    };
+
+    window.confirmDelete = function() {
+      if (deleteId) {
+        remove(ref(db, 'tokens/' + deleteId));
+        deleteId = null;
+        closeDeleteModal();
+        loadTokens();
+      }
+    };
+
+    window.closeDeleteModal = function() {
+      document.getElementById('deleteModal').style.display = 'none';
+      deleteId = null;
+    };
+
+    // Realtime Jam & Tanggal
+    function updateTime() {
+  const now = new Date();
+  
+  const tanggal = now.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  const waktu = now.toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+
+  const display = `${tanggal} | ${waktu}`;
+  document.getElementById("currentTime").innerText = display;
+  document.getElementById("adminDateTime").innerText = display;
+}
+
+setInterval(updateTime, 1000);
+updateTime();
   </script>
-  <div class="footer">
-    <div>@Admin SMPN 2 Pajangan</div>
-    <div id="adminDateTime"></div>
-  </div>
-
-  <!-- Modal Edit -->
-  <div id="editModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeEditModal()">&times;</span>
-      <h3>Edit Token</h3>
-      <form id="modalForm">
-        <input type="text" id="editSubject" placeholder="Mata Pelajaran" required />
-        <input type="text" id="editKelas" placeholder="Kelas" required />
-        <input type="text" id="editToken" placeholder="Token Ujian" required />
-        <input type="url" id="editUrl" placeholder="Link Ujian" required />
-        <input type="datetime-local" id="editStartTime" required />
-        <input type="datetime-local" id="editEndTime" required />
-        <div class="modal-buttons">
-          <button type="submit">Simpan</button>
-          <button type="button" onclick="closeEditModal()">Batal</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Hapus -->
-  <div id="deleteModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeDeleteModal()">&times;</span>
-      <h3>Apakah Anda yakin ingin menghapus token ini?</h3>
-      <div class="modal-buttons">
-        <button onclick="confirmDelete()">Hapus</button>
-        <button onclick="closeDeleteModal()">Batal</button>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.5);
-      padding-top: 60px;
-    }
-    .modal-content {
-      background-color: white;
-      margin: 5% auto;
-      padding: 20px;
-      border-radius: 10px;
-      width: 70%;
-      max-width: 500px;
-    }
-    .modal-buttons {
-      text-align: center;
-      margin-top: 20px;
-    }
-    .modal-buttons button {
-      padding: 10px 20px;
-      margin: 0 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .modal .close {
-      color: #aaa;
-      font-size: 28px;
-      font-weight: bold;
-      position: absolute;
-      top: 10px;
-      right: 25px;
-      font-size: 30px;
-      font-weight: bold;
-    }
-    .modal .close:hover,
-    .modal .close:focus {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
-    }
-  </style>
 </body>
 </html>
