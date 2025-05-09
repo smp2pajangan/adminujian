@@ -152,24 +152,29 @@
       <div id="adminDateTime" class="date-time"></div>
     </div>
   </div>
+
   <!-- Modal Edit -->
-  <div id="editModal" class="modal">
-    <div class="modal-content">
-      <h4>Edit Token</h4>
-      <form id="modalForm">
-        <input type="text" id="editSubject" required />
-        <input type="text" id="editKelas" required />
-        <input type="text" id="editToken" required />
-        <input type="url" id="editUrl" required />
-        <label>Tanggal Mulai</label>
-        <input type="datetime-local" id="editStartTime" required />
-        <label>Tanggal Selesai</label>
-        <input type="datetime-local" id="editEndTime" required />
-        <button type="submit">Simpan</button>
-        <button type="button" onclick="closeEditModal()">Batal</button>
-      </form>
-    </div>
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <h4>Edit Token</h4>
+    <form id="modalForm">
+      <input type="text" id="editSubject" required />
+      <input type="text" id="editKelas" required />
+      <input type="text" id="editToken" required />
+      <input type="url" id="editUrl" required />
+      <label>Tanggal Mulai</label>
+      <input type="datetime-local" id="editStartTime" required />
+      <label>Tanggal Selesai</label>
+      <input type="datetime-local" id="editEndTime" required />
+      
+      <!-- Pesan error di sini -->
+      <p id="editErrorMsg" class="error"></p>
+      
+      <button type="submit">Simpan</button>
+      <button type="button" onclick="closeEditModal()">Batal</button>
+    </form>
   </div>
+</div>
 
   <!-- Modal Hapus -->
   <div id="deleteModal" class="modal">
@@ -281,19 +286,20 @@
     });
 
     // Edit Token
-    window.editToken = function(id) {
-      const token = tokenCache.find(t => t.key === id);
-      currentTokenId = id;
-      document.getElementById('editSubject').value = token.subject;
-      document.getElementById('editKelas').value = token.kelas;
-      document.getElementById('editToken').value = token.token;
-      document.getElementById('editUrl').value = token.url;
-      document.getElementById('editStartTime').value = token.startTime;
-      document.getElementById('editEndTime').value = token.endTime;
-      document.getElementById('editModal').style.display = 'flex';
-    };
+window.editToken = function(id) {
+  const token = tokenCache.find(t => t.key === id);
+  currentTokenId = id;
+  document.getElementById('editSubject').value = token.subject;
+  document.getElementById('editKelas').value = token.kelas;
+  document.getElementById('editToken').value = token.token;
+  document.getElementById('editUrl').value = token.url;
+  document.getElementById('editStartTime').value = token.startTime;
+  document.getElementById('editEndTime').value = token.endTime;
+  document.getElementById('editErrorMsg').innerText = ""; // Reset error saat buka modal
+  document.getElementById('editModal').style.display = 'flex';
+};
 
-    document.getElementById('modalForm').addEventListener('submit', function(e) {
+document.getElementById('modalForm').addEventListener('submit', function(e) {
   e.preventDefault();
   
   const updated = {
@@ -305,17 +311,18 @@
     endTime: document.getElementById('editEndTime').value
   };
 
-  // Validasi duplikasi token dan URL
-  const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === updated.token);
-  const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === updated.url);
+  const errorEl = document.getElementById('editErrorMsg');
 
   if (!updated.subject || !updated.kelas || !updated.token || !updated.url || !updated.startTime || !updated.endTime) {
-    alert("Semua field harus diisi!");
+    errorEl.innerText = "Semua field harus diisi!";
     return;
   }
 
+  const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === updated.token);
+  const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === updated.url);
+
   if (isTokenDup || isUrlDup) {
-    alert("Token atau URL sudah digunakan!");
+    errorEl.innerText = "Token atau URL sudah digunakan!";
     return;
   }
 
@@ -324,10 +331,11 @@
   loadTokens();
 });
 
-    window.closeEditModal = function() {
-      document.getElementById('editModal').style.display = 'none';
-      currentTokenId = null;
-    };
+window.closeEditModal = function() {
+  document.getElementById('editModal').style.display = 'none';
+  document.getElementById('editErrorMsg').innerText = ""; // Reset pesan error
+  currentTokenId = null;
+};
 
     // Delete Popup
     let deleteId = null;
