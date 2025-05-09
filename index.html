@@ -222,12 +222,28 @@
       const url = document.getElementById('url').value.trim();
       const startTime = document.getElementById('startTime').value;
       const endTime = document.getElementById('endTime').value;
-      const createdAt = new Date().toISOString();
+      const errorMsg = document.getElementById('errorMsg');
 
-      const tokenData = { subject, kelas, token, url, startTime, endTime, createdAt };
+      // Validation checks
+      if (!subject || !kelas || !token || !url || !startTime || !endTime) {
+        errorMsg.innerText = "Semua field harus diisi!";
+        return;
+      }
+
+      // Check for duplicate token or URL
+      const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
+      const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
+
+      if (isTokenDup || isUrlDup) {
+        errorMsg.innerText = "Token atau URL sudah ada, silakan gunakan yang berbeda!";
+        return;
+      }
+
+      // Token data
+      const tokenData = { subject, kelas, token, url, startTime, endTime };
 
       if (currentTokenId) {
-        // Update token if editing existing token
+        // Update token
         update(ref(db, 'tokens/' + currentTokenId), tokenData);
         currentTokenId = null;
       } else {
@@ -235,8 +251,9 @@
         push(ref(db, 'tokens'), tokenData);
       }
 
+      // Reset form and load updated data
       this.reset();
-      loadTokens(); // Reload token list after saving
+      loadTokens();
     });
   </script>
 </body>
