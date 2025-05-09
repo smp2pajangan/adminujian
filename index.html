@@ -1,190 +1,363 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-  import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
-    authDomain: "ujian-online-berbasis-android.firebaseapp.com",
-    databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
-    projectId: "ujian-online-berbasis-android",
-    storageBucket: "ujian-online-berbasis-android.appspot.com",
-    messagingSenderId: "923446282537",
-    appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-
-  const ADMIN_USER = "admin";
-  const ADMIN_PASS = "12345";
-  let currentTokenId = null;
-  let tokenCache = [];
-
-  window.login = function() {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-    if (username === ADMIN_USER && password === ADMIN_PASS) {
-      document.getElementById('loginSection').style.display = 'none';
-      document.getElementById('adminPanel').style.display = 'block';
-      loadTokens();
-    } else {
-      document.getElementById("loginError").innerText = "Username atau password salah.";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel Admin Ujian</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f0f4f8;
     }
-  };
-function loadTokens() {
-    onValue(ref(db, 'tokens'), (snapshot) => {
-      const tbody = document.getElementById('tokenTableBody');
-      tbody.innerHTML = '';
-      tokenCache = [];
-
-      snapshot.forEach(child => {
-        const data = child.val();
-        data.key = child.key;
-        tokenCache.push(data);
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${tokenCache.length}</td>
-          <td>${data.subject}</td>
-          <td>${data.kelas}</td>
-          <td>${data.token}</td>
-          <td><a href="${data.url}" target="_blank">Link</a></td>
-          <td>${data.startTime}</td>
-          <td>${data.endTime}</td>
-          <td>
-            <button onclick="editToken('${data.key}')">Edit</button>
-            <button onclick="promptDelete('${data.key}')">Hapus</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-    });
-  }
-
-  document.getElementById('tokenForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const subject = document.getElementById('subject').value.trim();
-    const kelas = document.getElementById('kelas').value.trim();
-    const token = document.getElementById('token').value.trim();
-    const url = document.getElementById('url').value.trim();
-    const startTime = document.getElementById('startTime').value;
-    const endTime = document.getElementById('endTime').value;
-    const errorMsg = document.getElementById('errorMsg');
-
-    if (!subject || !kelas || !token || !url || !startTime || !endTime) {
-      errorMsg.innerText = "Semua field harus diisi!";
-      return;
+    .header {
+      background-color: #0066cc;
+      color: white;
+      padding: 15px;
+      text-align: center;
     }
-
-    const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
-    const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
-    if (isTokenDup || isUrlDup) {
-      errorMsg.innerText = "Token atau URL sudah ada!";
-      return;
+    .logo {
+      display: block;
+      margin: 0 auto;
+      width: 100px;
     }
-
-    errorMsg.innerText = "";
-    const tokenData = { subject, kelas, token, url, startTime, endTime };
-    if (currentTokenId) {
-      update(ref(db, 'tokens/' + currentTokenId), tokenData);
-      currentTokenId = null;
-    } else {
-      push(ref(db, 'tokens'), tokenData);
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-    this.reset();
-    loadTokens();
-  });
-
-// Buka Modal Edit
-  window.editToken = function(id) {
-    const token = tokenCache.find(t => t.key === id);
-    currentTokenId = id;
-    document.getElementById('editSubject').value = token.subject;
-    document.getElementById('editKelas').value = token.kelas;
-    document.getElementById('editToken').value = token.token;
-    document.getElementById('editUrl').value = token.url;
-    document.getElementById('editStartTime').value = token.startTime;
-    document.getElementById('editEndTime').value = token.endTime;
-    document.getElementById('editModal').style.display = 'flex';
-  };
-
-  // Simpan Edit Token dengan Validasi Unik
-  document.getElementById('modalForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const updatedToken = document.getElementById('editToken').value.trim();
-    const updatedUrl = document.getElementById('editUrl').value.trim();
-
-    const isDupToken = tokenCache.some(t => t.key !== currentTokenId && t.token === updatedToken);
-    const isDupUrl = tokenCache.some(t => t.key !== currentTokenId && t.url === updatedUrl);
-
-    if (isDupToken || isDupUrl) {
-      alert("Token atau URL sudah digunakan oleh data lain.");
-      return;
+    input, select {
+      padding: 10px;
+      margin: 8px 0;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 16px;
     }
+    button {
+      padding: 10px 20px;
+      margin: 10px auto;
+      display: block;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      word-wrap: break-word;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #555;
+      font-size: 14px;
+    }
+    .date-time {
+      font-size: 14px;
+      color: #555;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+    }
+    .modal button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo SMPN 2 Pajangan">
+    <h2>SMP NEGERI 2 PAJANGAN</h2>
+  </div>
 
-    const updated = {
-      subject: document.getElementById('editSubject').value.trim(),
-      kelas: document.getElementById('editKelas').value.trim(),
-      token: updatedToken,
-      url: updatedUrl,
-      startTime: document.getElementById('editStartTime').value,
-      endTime: document.getElementById('editEndTime').value
+  <!-- Section Login -->
+  <div class="container" id="loginSection">
+    <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
+    <input type="text" id="username" placeholder="Masukan Username (admin)" />
+    <input type="password" id="password" placeholder="Masukan Password" />
+    <button onclick="login()">Login</button>
+
+    <div class="footer">
+      <div>@Admin SMPN 2 Pajangan</div>
+      <div id="currentTime" class="date-time"></div>
+    </div>
+
+    <p id="loginError" class="error"></p>
+  </div>
+
+  <!-- Section Admin Panel -->
+  <div class="container" id="adminPanel" style="display:none;">
+    <h3>Tambah / Edit Token</h3>
+    <form id="tokenForm">
+      <input type="text" id="subject" placeholder="Mata Pelajaran" required />
+      <input type="text" id="kelas" placeholder="Kelas" required />
+      <input type="text" id="token" placeholder="Token Ujian" required />
+      <input type="url" id="url" placeholder="Link Ujian" required />
+      <label>Tanggal Mulai</label>
+      <input type="datetime-local" id="startTime" required />
+      <label>Tanggal Selesai</label>
+      <input type="datetime-local" id="endTime" required />
+      <button type="submit">Simpan</button>
+      <p id="errorMsg" class="error"></p>
+    </form>
+
+    <h3>Daftar Token</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Mapel</th>
+          <th>Kelas</th>
+          <th>Token</th>
+          <th>Link</th>
+          <th>Token dibuka</th>
+          <th>Token ditutup</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tokenTableBody"></tbody>
+    </table>
+
+    <div class="footer">
+      <div>@Admin SMPN 2 Pajangan</div>
+      <div id="adminDateTime" class="date-time"></div>
+    </div>
+  </div>
+  <!-- Modal Edit -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <h4>Edit Token</h4>
+      <form id="modalForm">
+        <input type="text" id="editSubject" required />
+        <input type="text" id="editKelas" required />
+        <input type="text" id="editToken" required />
+        <input type="url" id="editUrl" required />
+        <label>Tanggal Mulai</label>
+        <input type="datetime-local" id="editStartTime" required />
+        <label>Tanggal Selesai</label>
+        <input type="datetime-local" id="editEndTime" required />
+        <button type="submit">Simpan</button>
+        <button type="button" onclick="closeEditModal()">Batal</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Hapus -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <p>Yakin ingin menghapus token ini?</p>
+      <button onclick="confirmDelete()">Hapus</button>
+      <button onclick="closeDeleteModal()">Batal</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
+      authDomain: "ujian-online-berbasis-android.firebaseapp.com",
+      databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
+      projectId: "ujian-online-berbasis-android",
+      storageBucket: "ujian-online-berbasis-android.appspot.com",
+      messagingSenderId: "923446282537",
+      appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
     };
 
-    update(ref(db, 'tokens/' + currentTokenId), updated);
-    closeEditModal();
-    loadTokens();
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const ADMIN_USER = "admin";
+    const ADMIN_PASS = "12345";
+    let currentTokenId = null;
+    let tokenCache = [];
+
+    window.login = function() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      if (username === ADMIN_USER && password === ADMIN_PASS) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadTokens();
+      } else {
+        document.getElementById("loginError").innerText = "Username atau password salah.";
+      }
+    };
+
+    function loadTokens() {
+      onValue(ref(db, 'tokens'), (snapshot) => {
+        const tbody = document.getElementById('tokenTableBody');
+        tbody.innerHTML = '';
+        tokenCache = [];
+
+        snapshot.forEach(child => {
+          const data = child.val();
+          data.key = child.key;
+          tokenCache.push(data);
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${tokenCache.length}</td>
+            <td>${data.subject}</td>
+            <td>${data.kelas}</td>
+            <td>${data.token}</td>
+            <td><a href="${data.url}" target="_blank">Link</a></td>
+            <td>${data.startTime}</td>
+            <td>${data.endTime}</td>
+            <td>
+              <button onclick="editToken('${data.key}')">Edit</button>
+              <button onclick="promptDelete('${data.key}')">Hapus</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+    }
+
+    // Tambah atau update token
+    document.getElementById('tokenForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const subject = document.getElementById('subject').value.trim();
+      const kelas = document.getElementById('kelas').value.trim();
+      const token = document.getElementById('token').value.trim();
+      const url = document.getElementById('url').value.trim();
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (!subject || !kelas || !token || !url || !startTime || !endTime) {
+        errorMsg.innerText = "Semua field harus diisi!";
+        return;
+      }
+
+      const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
+      const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
+      if (isTokenDup || isUrlDup) {
+        errorMsg.innerText = "Token atau URL sudah ada!";
+        return;
+      }
+
+      errorMsg.innerText = "";
+      const tokenData = { subject, kelas, token, url, startTime, endTime };
+      if (currentTokenId) {
+        update(ref(db, 'tokens/' + currentTokenId), tokenData);
+        currentTokenId = null;
+      } else {
+        push(ref(db, 'tokens'), tokenData);
+      }
+
+      this.reset();
+      loadTokens();
+    });
+
+    // Edit Token
+    window.editToken = function(id) {
+      const token = tokenCache.find(t => t.key === id);
+      currentTokenId = id;
+      document.getElementById('editSubject').value = token.subject;
+      document.getElementById('editKelas').value = token.kelas;
+      document.getElementById('editToken').value = token.token;
+      document.getElementById('editUrl').value = token.url;
+      document.getElementById('editStartTime').value = token.startTime;
+      document.getElementById('editEndTime').value = token.endTime;
+      document.getElementById('editModal').style.display = 'flex';
+    };
+
+    document.getElementById('modalForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const updated = {
+        subject: document.getElementById('editSubject').value.trim(),
+        kelas: document.getElementById('editKelas').value.trim(),
+        token: document.getElementById('editToken').value.trim(),
+        url: document.getElementById('editUrl').value.trim(),
+        startTime: document.getElementById('editStartTime').value,
+        endTime: document.getElementById('editEndTime').value
+      };
+      update(ref(db, 'tokens/' + currentTokenId), updated);
+      closeEditModal();
+      loadTokens();
+    });
+
+    window.closeEditModal = function() {
+      document.getElementById('editModal').style.display = 'none';
+      currentTokenId = null;
+    };
+
+    // Delete Popup
+    let deleteId = null;
+    window.promptDelete = function(id) {
+      deleteId = id;
+      document.getElementById('deleteModal').style.display = 'flex';
+    };
+
+    window.confirmDelete = function() {
+      if (deleteId) {
+        remove(ref(db, 'tokens/' + deleteId));
+        deleteId = null;
+        closeDeleteModal();
+        loadTokens();
+      }
+    };
+
+    window.closeDeleteModal = function() {
+      document.getElementById('deleteModal').style.display = 'none';
+      deleteId = null;
+    };
+
+    // Realtime Jam & Tanggal
+    function updateTime() {
+  const now = new Date();
+  
+  const tanggal = now.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
   });
 
-  window.closeEditModal = function() {
-    document.getElementById('editModal').style.display = 'none';
-    currentTokenId = null;
-  };
+  const waktu = now.toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
 
-// Delete Token - tampilkan modal konfirmasi
-  let deleteId = null;
-  window.promptDelete = function(id) {
-    deleteId = id;
-    document.getElementById('deleteModal').style.display = 'flex';
-  };
+  const display = `${tanggal} | ${waktu}`;
+  document.getElementById("currentTime").innerText = display;
+  document.getElementById("adminDateTime").innerText = display;
+}
 
-  // Konfirmasi hapus
-  window.confirmDelete = function() {
-    if (deleteId) {
-      remove(ref(db, 'tokens/' + deleteId));
-      deleteId = null;
-      closeDeleteModal();
-      loadTokens();
-    }
-  };
-
-  window.closeDeleteModal = function() {
-    document.getElementById('deleteModal').style.display = 'none';
-    deleteId = null;
-  };
-
-  // Realtime Jam & Tanggal
-  function updateTime() {
-    const now = new Date();
-    const tanggal = now.toLocaleDateString('id-ID', {
-      weekday: 'long',
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    });
-    const waktu = now.toLocaleTimeString('id-ID', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-    const display = `${tanggal} | ${waktu}`;
-    document.getElementById("currentTime").innerText = display;
-    document.getElementById("adminDateTime").innerText = display;
-  }
-
-  setInterval(updateTime, 1000);
-  updateTime();
-</script>
+setInterval(updateTime, 1000);
+updateTime();
+  </script>
 </body>
 </html>
