@@ -18,7 +18,7 @@
     }
     .logo {
       display: block;
-      margin: 0 auto;
+      margin: 0 auto 10px;
       width: 100px;
     }
     .container {
@@ -36,12 +36,23 @@
       box-sizing: border-box;
       font-size: 16px;
     }
+    input.duplicate {
+      border: 2px solid red;
+      background-color: #ffe6e6;
+    }
     button {
       padding: 10px 20px;
       margin: 10px auto;
-      display: block;
+      display: inline-block;
       font-size: 16px;
       cursor: pointer;
+    }
+    .btn-small {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+    .form-group {
+      margin-bottom: 15px;
     }
     .error {
       color: red;
@@ -56,10 +67,19 @@
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
-      word-wrap: break-word;
     }
     th {
       background-color: #f4f4f4;
+    }
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-row select {
+      flex: 1;
+      min-width: 150px;
     }
     .footer {
       text-align: center;
@@ -67,37 +87,54 @@
       color: #555;
       font-size: 14px;
     }
+    @media (max-width: 600px) {
+      table, th, td {
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <!-- Logo SMPN 2 Pajangan -->
-    <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo SMPN 2 Pajangan">
+    <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo">
     <h2>SMP NEGERI 2 PAJANGAN</h2>
   </div>
 
-  <!-- Section Login -->
   <div class="container" id="loginSection">
     <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
     <input type="text" id="username" placeholder="Masukan Username (admin)" />
     <input type="password" id="password" placeholder="Masukan Password" />
     <button onclick="login()">Login</button>
     <p id="loginError" class="error"></p>
+    <div style="text-align: center; color: #555; margin-top: 20px;">
+      <div>@Admin SMPN 2 Pajangan</div>
+      <div id="realtimeClock"></div>
+    </div>
   </div>
 
-  <!-- Section Admin Panel -->
   <div class="container" id="adminPanel" style="display:none;">
     <h3>Tambah / Edit Token</h3>
     <form id="tokenForm">
-      <div><input type="text" id="subject" placeholder="Mata Pelajaran" required /></div>
-      <div><input type="text" id="kelas" placeholder="Kelas" required /></div>
-      <div><input type="text" id="token" placeholder="Token Ujian" required /></div>
-      <div><input type="url" id="url" placeholder="Link Ujian" required /></div>
-      <div><label>Tanggal Mulai</label><input type="datetime-local" id="startTime" required /></div>
-      <div><label>Tanggal Selesai</label><input type="datetime-local" id="endTime" required /></div>
+      <div class="form-group"><input type="text" id="subject" placeholder="Mata Pelajaran" required /></div>
+      <div class="form-group"><input type="text" id="kelas" placeholder="Kelas" required /></div>
+      <div class="form-group"><input type="text" id="token" placeholder="Token Ujian" required /></div>
+      <div class="form-group"><input type="url" id="url" placeholder="Link Ujian" required /></div>
+      <div class="form-group">
+        <label>Tanggal Mulai</label>
+        <input type="datetime-local" id="startTime" required />
+      </div>
+      <div class="form-group">
+        <label>Tanggal Selesai</label>
+        <input type="datetime-local" id="endTime" required />
+      </div>
       <button type="submit">Simpan</button>
       <p id="errorMsg" class="error"></p>
     </form>
+
+    <div class="filter-row">
+      <select id="filterKelas"><option value="">Semua Kelas</option></select>
+      <select id="filterMapel"><option value="">Semua Mapel</option></select>
+    </div>
 
     <h3>Daftar Token</h3>
     <table>
@@ -119,13 +156,23 @@
 
   <div class="footer">
     <div>@Admin SMPN 2 Pajangan</div>
+    <div id="clock"></div>
+  </div>
+
+  <!-- Popup Konfirmasi Hapus -->
+  <div id="deletePopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background-color: rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:1000;">
+    <div style="background:#fff; padding:20px 30px; border-radius:10px; text-align:center; box-shadow:0 0 10px rgba(0,0,0,0.3);">
+      <p style="margin-bottom: 20px;">Yakin ingin menghapus token ini?</p>
+      <button onclick="confirmDelete()" style="margin-right:10px;">Ya</button>
+      <button onclick="closePopup('deletePopup')">Batal</button>
+    </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
       authDomain: "ujian-online-berbasis-android.firebaseapp.com",
@@ -136,66 +183,75 @@
       appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Username & Password
     const ADMIN_USER = "admin";
     const ADMIN_PASS = "12345";
     let currentTokenId = null;
     let tokenCache = [];
+    let pendingDeleteId = null;
 
-    // Login function
-    window.login = function() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-
-      if (username === ADMIN_USER && password === ADMIN_PASS) {
+    window.login = function () {
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value.trim();
+      if (u === ADMIN_USER && p === ADMIN_PASS) {
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
-        loadTokens();  // Load data after login
+        loadTokens();
       } else {
-        document.getElementById("loginError").innerText = "Username atau password salah.";
+        document.getElementById('loginError').innerText = "Username atau password salah.";
       }
     };
 
-    // Load tokens from Firebase
     function loadTokens() {
-      onValue(ref(db, 'tokens'), (snapshot) => {
+      onValue(ref(db, 'tokens'), snapshot => {
+        tokenCache = [];
         const tokenTableBody = document.getElementById('tokenTableBody');
         tokenTableBody.innerHTML = '';
-        tokenCache = [];
+        const kelasSet = new Set();
+        const mapelSet = new Set();
+        let no = 1;
 
-        snapshot.forEach((child) => {
+        snapshot.forEach(child => {
           const data = child.val();
           data.key = child.key;
           tokenCache.push(data);
-
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${tokenCache.length}</td>
-            <td>${data.subject}</td>
-            <td>${data.kelas}</td>
-            <td>${data.token}</td>
-            <td><a href="${data.url}" target="_blank">Link</a></td>
-            <td>${data.startTime}</td>
-            <td>${data.endTime}</td>
-            <td>
-              <button onclick="editToken('${data.key}')">Edit</button>
-              <button onclick="deleteToken('${data.key}')">Hapus</button>
-            </td>
-          `;
-          tokenTableBody.appendChild(row);
+          kelasSet.add(data.kelas);
+          mapelSet.add(data.subject);
         });
+
+        updateFilterOptions(kelasSet, mapelSet);
+        renderTokens(tokenCache);
       });
     }
 
-    // Edit token
+    function renderTokens(data) {
+      const tbody = document.getElementById('tokenTableBody');
+      tbody.innerHTML = '';
+      let count = 1;
+      data.forEach(d => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${count++}</td>
+          <td>${d.subject}</td>
+          <td>${d.kelas}</td>
+          <td>${d.token}</td>
+          <td><a href="${d.url}" target="_blank">Link</a></td>
+          <td>${d.startTime}</td>
+          <td>${d.endTime}</td>
+          <td>
+            <button class="btn-small" onclick="editToken('${d.key}')">Edit</button>
+            <button class="btn-small" onclick="deleteToken('${d.key}')">Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
     window.editToken = function(id) {
       currentTokenId = id;
       const token = tokenCache.find(t => t.key === id);
-
       document.getElementById("subject").value = token.subject;
       document.getElementById("kelas").value = token.kelas;
       document.getElementById("token").value = token.token;
@@ -204,61 +260,111 @@
       document.getElementById("endTime").value = token.endTime;
     };
 
-    // Delete token
     window.deleteToken = function(id) {
-      if (confirm("Apakah Anda yakin ingin menghapus token ini?")) {
-        remove(ref(db, 'tokens/' + id));
-        loadTokens(); // Reload token list after deletion
+      pendingDeleteId = id;
+      document.getElementById('deletePopup').style.display = 'flex';
+    };
+
+    window.confirmDelete = function() {
+      if (pendingDeleteId) {
+        remove(ref(db, 'tokens/' + pendingDeleteId));
+        pendingDeleteId = null;
+        closePopup('deletePopup');
+        loadTokens();
       }
     };
 
-    // Save or update token
-document.getElementById('tokenForm').addEventListener('submit', function(e) {
-  e.preventDefault();
+    window.closePopup = function(id) {
+      document.getElementById(id).style.display = 'none';
+    };
 
-  const subject = document.getElementById('subject').value.trim();
-  const kelas = document.getElementById('kelas').value.trim();
-  const token = document.getElementById('token').value.trim();
-  const url = document.getElementById('url').value.trim();
-  const startTime = document.getElementById('startTime').value;
-  const endTime = document.getElementById('endTime').value;
-  const errorMsg = document.getElementById('errorMsg');
+    document.getElementById('tokenForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const subject = document.getElementById('subject').value.trim().toUpperCase();
+      const kelas = document.getElementById('kelas').value.trim();
+      const token = document.getElementById('token').value.trim().toUpperCase();
+      const url = document.getElementById('url').value.trim();
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const errorMsg = document.getElementById('errorMsg');
 
-  // Validasi input kosong
-  if (!subject || !kelas || !token || !url || !startTime || !endTime) {
-    errorMsg.innerText = "Semua field harus diisi!";
-    return;
-  }
+      const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
+      const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
 
-  // Cek duplikasi token atau URL
-  const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
-  const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
+      if (!subject || !kelas || !token || !url || !startTime || !endTime) {
+        errorMsg.innerText = "Semua kolom wajib diisi.";
+        return;
+      }
 
-  if (isTokenDup || isUrlDup) {
-    errorMsg.innerText = "Token atau URL sudah ada, silakan gunakan yang berbeda!";
-    return;
-  }
+      if (isTokenDup || isUrlDup) {
+        errorMsg.innerText = "Token atau URL sudah ada, silakan gunakan yang berbeda.";
+        checkDuplicateInputs();
+        return;
+      }
 
-  // Reset pesan error jika validasi berhasil
-  errorMsg.innerText = "";
+      const tokenData = { subject, kelas, token, url, startTime, endTime, createdAt: new Date().toISOString() };
 
-  // Data token
-  const tokenData = { subject, kelas, token, url, startTime, endTime };
+      if (currentTokenId) {
+        update(ref(db, 'tokens/' + currentTokenId), tokenData);
+        currentTokenId = null;
+      } else {
+        push(ref(db, 'tokens'), tokenData);
+      }
 
-  if (currentTokenId) {
-    // Update token
-    update(ref(db, 'tokens/' + currentTokenId), tokenData);
-    currentTokenId = null;
-  } else {
-    // Tambahkan token baru
-    push(ref(db, 'tokens'), tokenData);
-  }
+      this.reset();
+      errorMsg.innerText = "";
+      checkDuplicateInputs();
+      loadTokens();
+    });
 
-  // Reset form setelah berhasil menyimpan
-  this.reset();
-  loadTokens(); // Reload token list
+    function checkDuplicateInputs() {
+      const tokenInput = document.getElementById('token');
+      const urlInput = document.getElementById('url');
+      const tokenVal = tokenInput.value.trim().toUpperCase();
+      const urlVal = urlInput.value.trim();
 
-});
+      const tokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === tokenVal);
+      const urlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === urlVal);
+
+      tokenInput.classList.toggle('duplicate', tokenDup);
+      urlInput.classList.toggle('duplicate', urlDup);
+    }
+
+    document.getElementById('token').addEventListener('input', checkDuplicateInputs);
+    document.getElementById('url').addEventListener('input', checkDuplicateInputs);
+
+    function updateFilterOptions(kelasSet, mapelSet) {
+      const kelasSelect = document.getElementById('filterKelas');
+      const mapelSelect = document.getElementById('filterMapel');
+      kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
+      mapelSelect.innerHTML = `<option value="">Semua Mapel</option>`;
+      kelasSet.forEach(k => kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
+      mapelSet.forEach(m => mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
+    }
+
+    document.getElementById('filterKelas').addEventListener('change', filterTokens);
+    document.getElementById('filterMapel').addEventListener('change', filterTokens);
+
+    function filterTokens() {
+      const kelas = document.getElementById('filterKelas').value;
+      const mapel = document.getElementById('filterMapel').value;
+      let filtered = tokenCache;
+      if (kelas) filtered = filtered.filter(t => t.kelas === kelas);
+      if (mapel) filtered = filtered.filter(t => t.subject === mapel);
+      renderTokens(filtered);
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateStr = now.toLocaleDateString('id-ID', options);
+      const timeStr = now.toLocaleTimeString('id-ID');
+      document.getElementById('clock').innerText = `${dateStr} - ${timeStr}`;
+      const realtimeClock = document.getElementById('realtimeClock');
+      if (realtimeClock) realtimeClock.innerText = `${dateStr} - ${timeStr}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
   </script>
 </body>
 </html>
