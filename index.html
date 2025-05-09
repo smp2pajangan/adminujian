@@ -294,19 +294,35 @@
     };
 
     document.getElementById('modalForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const updated = {
-        subject: document.getElementById('editSubject').value.trim(),
-        kelas: document.getElementById('editKelas').value.trim(),
-        token: document.getElementById('editToken').value.trim(),
-        url: document.getElementById('editUrl').value.trim(),
-        startTime: document.getElementById('editStartTime').value,
-        endTime: document.getElementById('editEndTime').value
-      };
-      update(ref(db, 'tokens/' + currentTokenId), updated);
-      closeEditModal();
-      loadTokens();
-    });
+  e.preventDefault();
+  
+  const updated = {
+    subject: document.getElementById('editSubject').value.trim(),
+    kelas: document.getElementById('editKelas').value.trim(),
+    token: document.getElementById('editToken').value.trim(),
+    url: document.getElementById('editUrl').value.trim(),
+    startTime: document.getElementById('editStartTime').value,
+    endTime: document.getElementById('editEndTime').value
+  };
+
+  // Validasi duplikasi token dan URL
+  const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === updated.token);
+  const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === updated.url);
+
+  if (!updated.subject || !updated.kelas || !updated.token || !updated.url || !updated.startTime || !updated.endTime) {
+    alert("Semua field harus diisi!");
+    return;
+  }
+
+  if (isTokenDup || isUrlDup) {
+    alert("Token atau URL sudah digunakan!");
+    return;
+  }
+
+  update(ref(db, 'tokens/' + currentTokenId), updated);
+  closeEditModal();
+  loadTokens();
+});
 
     window.closeEditModal = function() {
       document.getElementById('editModal').style.display = 'none';
