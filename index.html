@@ -269,38 +269,50 @@
 
     // Tambah atau update token
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const subject = document.getElementById('subject').value.trim().toUpperCase(); // UPPERCASE
-const kelas = document.getElementById('kelas').value.trim(); // tetap seperti biasa
-const token = document.getElementById('token').value.trim().toUpperCase(); // UPPERCASE document.getElementById('url').value.trim();
-      const startTime = document.getElementById('startTime').value;
-      const endTime = document.getElementById('endTime').value;
-      const errorMsg = document.getElementById('errorMsg');
+  e.preventDefault();
+  const subject = document.getElementById('subject').value.trim().toUpperCase();
+  const kelas = document.getElementById('kelas').value.trim();
+  const token = document.getElementById('token').value.trim().toUpperCase();
+  const url = document.getElementById('url').value.trim();
+  const startTime = document.getElementById('startTime').value;
+  const endTime = document.getElementById('endTime').value;
+  const errorMsg = document.getElementById('errorMsg');
 
-      if (!subject || !kelas || !token || !url || !startTime || !endTime) {
-        errorMsg.innerText = "Semua field harus diisi!";
-        return;
-      }
+  if (!subject || !kelas || !token || !url || !startTime || !endTime) {
+    errorMsg.innerText = "Semua field harus diisi!";
+    return;
+  }
 
-      const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
-      const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
-      if (isTokenDup || isUrlDup) {
-        errorMsg.innerText = "Token atau URL sudah ada!";
-        return;
-      }
+  const now = new Date();
+  if (new Date(startTime) <= now || new Date(endTime) <= now) {
+    errorMsg.innerText = "Waktu mulai dan selesai harus di masa depan!";
+    return;
+  }
 
-      errorMsg.innerText = "";
-      const tokenData = { subject, kelas, token, url, startTime, endTime };
-      if (currentTokenId) {
-        update(ref(db, 'tokens/' + currentTokenId), tokenData);
-        currentTokenId = null;
-      } else {
-        push(ref(db, 'tokens'), tokenData);
-      }
+  if (new Date(startTime) >= new Date(endTime)) {
+    errorMsg.innerText = "Waktu mulai harus sebelum waktu selesai!";
+    return;
+  }
 
-      this.reset();
-      loadTokens();
-    });
+  const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
+  const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
+  if (isTokenDup || isUrlDup) {
+    errorMsg.innerText = "Token atau URL sudah ada!";
+    return;
+  }
+
+  errorMsg.innerText = "";
+  const tokenData = { subject, kelas, token, url, startTime, endTime };
+  if (currentTokenId) {
+    update(ref(db, 'tokens/' + currentTokenId), tokenData);
+    currentTokenId = null;
+  } else {
+    push(ref(db, 'tokens'), tokenData);
+  }
+
+  this.reset();
+  loadTokens();
+});
 
     // Edit Token
 window.editToken = function(id) {
@@ -318,20 +330,31 @@ window.editToken = function(id) {
 
 document.getElementById('modalForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  
+
   const updated = {
-  subject: document.getElementById('editSubject').value.trim().toUpperCase(), // UPPERCASE
-  kelas: document.getElementById('editKelas').value.trim(),
-  token: document.getElementById('editToken').value.trim().toUpperCase(), // UPPERCASE
-  url: document.getElementById('editUrl').value.trim(),
-  startTime: document.getElementById('editStartTime').value,
-  endTime: document.getElementById('editEndTime').value
-};
+    subject: document.getElementById('editSubject').value.trim().toUpperCase(),
+    kelas: document.getElementById('editKelas').value.trim(),
+    token: document.getElementById('editToken').value.trim().toUpperCase(),
+    url: document.getElementById('editUrl').value.trim(),
+    startTime: document.getElementById('editStartTime').value,
+    endTime: document.getElementById('editEndTime').value
+  };
 
   const errorEl = document.getElementById('editErrorMsg');
 
   if (!updated.subject || !updated.kelas || !updated.token || !updated.url || !updated.startTime || !updated.endTime) {
     errorEl.innerText = "Semua field harus diisi!";
+    return;
+  }
+
+  const now = new Date();
+  if (new Date(updated.startTime) <= now || new Date(updated.endTime) <= now) {
+    errorEl.innerText = "Waktu mulai dan selesai harus di masa depan!";
+    return;
+  }
+
+  if (new Date(updated.startTime) >= new Date(updated.endTime)) {
+    errorEl.innerText = "Waktu mulai harus sebelum waktu selesai!";
     return;
   }
 
