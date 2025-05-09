@@ -36,6 +36,10 @@
       box-sizing: border-box;
       font-size: 16px;
     }
+    input.duplicate {
+      border: 2px solid red;
+      background-color: #ffe6e6;
+    }
     button {
       padding: 10px 20px;
       margin: 10px auto;
@@ -83,34 +87,6 @@
       margin-top: 30px;
       color: #555;
       font-size: 14px;
-    }
-    /* Modal Styling */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      width: 400px;
-      max-width: 90%;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    button[type="button"] {
-      background-color: #ccc;
-      margin-left: 10px;
-    }
-    button[type="submit"] {
-      background-color: #0066cc;
-      color: white;
     }
     @media (max-width: 600px) {
       table, th, td {
@@ -179,39 +155,6 @@
     </table>
   </div>
 
-  <!-- Modal Edit Token -->
-  <div id="editModal" style="display:none;">
-    <div class="modal-overlay">
-      <div class="modal-content">
-        <h3>Edit Token</h3>
-        <form id="editTokenForm">
-          <div class="form-group">
-            <input type="text" id="editSubject" placeholder="Mata Pelajaran" required />
-          </div>
-          <div class="form-group">
-            <input type="text" id="editKelas" placeholder="Kelas" required />
-          </div>
-          <div class="form-group">
-            <input type="text" id="editToken" placeholder="Token Ujian" required />
-          </div>
-          <div class="form-group">
-            <input type="url" id="editUrl" placeholder="Link Ujian" required />
-          </div>
-          <div class="form-group">
-            <label>Tanggal Mulai</label>
-            <input type="datetime-local" id="editStartTime" required />
-          </div>
-          <div class="form-group">
-            <label>Tanggal Selesai</label>
-            <input type="datetime-local" id="editEndTime" required />
-          </div>
-          <button type="submit">Simpan Perubahan</button>
-          <button type="button" onclick="closeModal()">Batal</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
   <div class="footer">
     <div>@Admin SMPN 2 Pajangan</div>
     <div id="clock"></div>
@@ -237,100 +180,151 @@
     const ADMIN_USER = "admin";
     const ADMIN_PASS = "12345";
     let currentTokenId = null;
-    const tokenTableBody = document.getElementById('tokenTableBody');
+    let tokenCache = [];
 
-    function login() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      if (username === ADMIN_USER && password === ADMIN_PASS) {
+    window.login = function () {
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value.trim();
+      if (u === ADMIN_USER && p === ADMIN_PASS) {
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
-        loadTokenData();
+        loadTokens();
       } else {
-        document.getElementById("loginError").innerText = "Username atau password salah.";
+        document.getElementById('loginError').innerText = "Username atau password salah.";
       }
-    }
+    };
 
-    function loadTokenData() {
-      const tokenRef = ref(db, "tokens");
-      onValue(tokenRef, (snapshot) => {
-        const data = snapshot.val();
+    function loadTokens() {
+      onValue(ref(db, 'tokens'), snapshot => {
+        const tokenTableBody = document.getElementById('tokenTableBody');
         tokenTableBody.innerHTML = '';
-        if (data) {
-          let no = 1;
-          for (const key in data) {
-            const tokenData = data[key];
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${no}</td>
-              <td>${tokenData.subject}</td>
-              <td>${tokenData.kelas}</td>
-              <td>${tokenData.token}</td>
-              <td><a href="${tokenData.url}" target="_blank">Link</a></td>
-              <td>${tokenData.startTime}</td>
-              <td>${tokenData.endTime}</td>
-              <td>
-                <button class="btn-small" onclick="openEditModal('${key}', '${tokenData.subject}', '${tokenData.kelas}', '${tokenData.token}', '${tokenData.url}', '${tokenData.startTime}', '${tokenData.endTime}')">Edit</button>
-                <button class="btn-small" onclick="deleteToken('${key}')">Hapus</button>
-              </td>
-            `;
-            tokenTableBody.appendChild(row);
-            no++;
-          }
-        }
+        tokenCache = [];
+        const kelasSet = new Set();
+        const mapelSet = new Set();
+        let count = 1;
+
+        snapshot.forEach(child => {
+          const data = child.val();
+          data.key = child.key;
+          tokenCache.push(data);
+          kelasSet.add(data.kelas);
+          mapelSet.add(data.subject);
+        });
+
+        updateFilterOptions(kelasSet, mapelSet);
+        renderTokens(tokenCache);
       });
     }
 
-    function openEditModal(id, subject, kelas, token, url, startTime, endTime) {
-      currentTokenId = id;
-      document.getElementById("editSubject").value = subject;
-      document.getElementById("editKelas").value = kelas;
-      document.getElementById("editToken").value = token;
-      document.getElementById("editUrl").value = url;
-      document.getElementById("editStartTime").value = startTime;
-      document.getElementById("editEndTime").value = endTime;
-      document.getElementById("editModal").style.display = "flex";
+    function renderTokens(data) {
+      const tokenTableBody = document.getElementById('tokenTableBody');
+      tokenTableBody.innerHTML = '';
+      let count = 1;
+      data.forEach(data => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${count++}</td>
+          <td>${data.subject}</td>
+          <td>${data.kelas}</td>
+          <td>${data.token}</td>
+          <td><a href="${data.url}" target="_blank">Link</a></td>
+          <td>${data.startTime}</td>
+          <td>${data.endTime}</td>
+          <td><button class="btn-small" onclick="hapusToken('${data.key}')">Hapus</button></td>
+        `;
+        tokenTableBody.appendChild(row);
+      });
     }
 
-    function closeModal() {
-      document.getElementById("editModal").style.display = "none";
+    function updateFilterOptions(kelasSet, mapelSet) {
+      const kelasSelect = document.getElementById('filterKelas');
+      const mapelSelect = document.getElementById('filterMapel');
+      kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
+      mapelSelect.innerHTML = `<option value="">Semua Mapel</option>`;
+      kelasSet.forEach(k => kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
+      mapelSet.forEach(m => mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
     }
 
-    document.getElementById("editTokenForm").addEventListener("submit", function(event) {
-      event.preventDefault();
+    document.getElementById('filterKelas').addEventListener('change', filterTokens);
+    document.getElementById('filterMapel').addEventListener('change', filterTokens);
 
-      const updatedData = {
-        subject: document.getElementById("editSubject").value,
-        kelas: document.getElementById("editKelas").value,
-        token: document.getElementById("editToken").value,
-        url: document.getElementById("editUrl").value,
-        startTime: document.getElementById("editStartTime").value,
-        endTime: document.getElementById("editEndTime").value,
-      };
+    function filterTokens() {
+      const kelas = document.getElementById('filterKelas').value;
+      const mapel = document.getElementById('filterMapel').value;
+      let filtered = tokenCache;
+      if (kelas) filtered = filtered.filter(t => t.kelas === kelas);
+      if (mapel) filtered = filtered.filter(t => t.subject === mapel);
+      renderTokens(filtered);
+    }
 
-      const tokenRef = ref(db, 'tokens/' + currentTokenId);
-      update(tokenRef, updatedData)
-        .then(() => {
-          closeModal();
-          loadTokenData();
-        })
-        .catch((error) => {
-          alert('Error updating token: ' + error.message);
-        });
+    window.hapusToken = function(id) {
+      if (confirm("Apakah Anda yakin ingin menghapus token ini?")) {
+        remove(ref(db, 'tokens/' + id));
+      }
+    };
+
+    document.getElementById('tokenForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const subject = document.getElementById('subject').value.trim().toUpperCase();
+      const kelas = document.getElementById('kelas').value.trim();
+      const token = document.getElementById('token').value.trim().toUpperCase();
+      const url = document.getElementById('url').value.trim();
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const createdAt = new Date().toISOString();
+      const errorMsg = document.getElementById('errorMsg');
+
+      const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
+      const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
+
+      if (isTokenDup || isUrlDup) {
+        errorMsg.innerText = "Token atau URL sudah digunakan. Silakan ganti.";
+        checkDuplicateInputs(); return;
+      }
+
+      const tokenData = { subject, kelas, token, url, startTime, endTime, createdAt };
+      if (currentTokenId) {
+        update(ref(db, 'tokens/' + currentTokenId), tokenData);
+        currentTokenId = null;
+      } else {
+        push(ref(db, 'tokens'), tokenData);
+      }
+
+      this.reset();
+      errorMsg.innerText = "";
+      checkDuplicateInputs();
+      loadTokens();
     });
 
-    function deleteToken(id) {
-      if (confirm('Apakah Anda yakin ingin menghapus token ini?')) {
-        const tokenRef = ref(db, 'tokens/' + id);
-        remove(tokenRef)
-          .then(() => {
-            loadTokenData();
-          })
-          .catch((error) => {
-            alert('Error deleting token: ' + error.message);
-          });
+    function checkDuplicateInputs() {
+      const tokenInput = document.getElementById('token');
+      const urlInput = document.getElementById('url');
+      const tokenVal = tokenInput.value.trim().toUpperCase();
+      const urlVal = urlInput.value.trim();
+
+      const tokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === tokenVal);
+      const urlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === urlVal);
+
+      tokenInput.classList.toggle('duplicate', tokenDup);
+      urlInput.classList.toggle('duplicate', urlDup);
+    }
+
+    document.getElementById('token').addEventListener('input', checkDuplicateInputs);
+    document.getElementById('url').addEventListener('input', checkDuplicateInputs);
+
+    function updateClock() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateStr = now.toLocaleDateString('id-ID', options);
+      const timeStr = now.toLocaleTimeString('id-ID');
+      document.getElementById('clock').innerText = `${dateStr} - ${timeStr}`;
+      const realtimeClock = document.getElementById('realtimeClock');
+      if (realtimeClock) {
+        realtimeClock.innerText = `${dateStr} - ${timeStr}`;
       }
     }
+    setInterval(updateClock, 1000);
+    updateClock();
   </script>
 </body>
 </html>
