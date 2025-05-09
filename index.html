@@ -179,52 +179,6 @@
     </table>
   </div>
 
-  <div class="container" id="adminPanel" style="display:none;">
-    <h3>Tambah / Edit Token</h3>
-    <form id="tokenForm">
-      <div class="form-group"><input type="text" id="subject" placeholder="Mata Pelajaran" required /></div>
-      <div class="form-group"><input type="text" id="kelas" placeholder="Kelas" required /></div>
-      <div class="form-group"><input type="text" id="token" placeholder="Token Ujian" required /></div>
-      <div class="form-group"><input type="url" id="url" placeholder="Link Ujian" required /></div>
-      <div class="form-group">
-        <label>Tanggal Mulai</label>
-        <input type="datetime-local" id="startTime" required />
-      </div>
-      <div class="form-group">
-        <label>Tanggal Selesai</label>
-        <input type="datetime-local" id="endTime" required />
-      </div>
-      <button type="submit">Simpan</button>
-      <p id="errorMsg" class="error"></p>
-    </form>
-
-    <div class="filter-row">
-      <select id="filterKelas"><option value="">Semua Kelas</option></select>
-      <select id="filterMapel"><option value="">Semua Mapel</option></select>
-    </div>
-
-    <h3>Daftar Token</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Mapel</th>
-          <th>Kelas</th>
-          <th>Token</th>
-          <th>Link</th>
-          <th>Token dibuka</th>
-          <th>Token ditutup</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="tokenTableBody"></tbody>
-    </table>
-  </div>
-  <div class="footer">
-    <div>@Admin SMPN 2 Pajangan</div>
-    <div id="clock"></div>
-  </div>
-
   <!-- Modal Edit Token -->
   <div id="editModal" style="display:none;">
     <div class="modal-overlay">
@@ -257,26 +211,12 @@
       </div>
     </div>
   </div>
- </style>
-</head>
-<body>
-  <div class="header">
-    <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo">
-    <h2>SMP NEGERI 2 PAJANGAN</h2>
+
+  <div class="footer">
+    <div>@Admin SMPN 2 Pajangan</div>
+    <div id="clock"></div>
   </div>
 
-  <div class="container" id="loginSection">
-    <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
-    <input type="text" id="username" placeholder="Masukan Username (admin)" />
-    <input type="password" id="password" placeholder="Masukan Password" />
-    <button onclick="login()">Login</button>
-    <p id="loginError" class="error"></p>
-    <div style="text-align: center; color: #555; margin-top: 20px;">
-      <div>@Admin SMPN 2 Pajangan</div>
-      <div id="realtimeClock"></div>
-    </div>
-  </div>
-  
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
