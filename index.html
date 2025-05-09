@@ -349,7 +349,7 @@ document.getElementById('modalForm').addEventListener('submit', function(e) {
 
   const now = new Date();
   if (new Date(updated.startTime) <= now || new Date(updated.endTime) <= now) {
-    errorEl.innerText = "Waktu mulai dan selesai harus di masa depan!";
+    errorEl.innerText = "Waktu mulai dan selesai harus dimasa depan!";
     return;
   }
 
@@ -412,10 +412,10 @@ window.closeEditModal = function() {
   const waktu = now.toLocaleTimeString('id-ID', {
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false
+    hour12: '2-digit',
   });
 
-  const display = `${tanggal} | ${waktu}`;
+  const display = `${tanggal} pukul ${waktu}`;
   document.getElementById("currentTime").innerText = display;
   document.getElementById("adminDateTime").innerText = display;
 }
