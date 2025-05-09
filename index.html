@@ -303,7 +303,7 @@
 <!--     JavaScript         -->
 <!-- ======================== -->
 
-    <script type="module">
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
@@ -419,6 +419,11 @@
       document.getElementById("editModal").classList.remove('show');
     }
 
+    // Close Delete Modal
+    function closeDeleteModal() {
+      document.getElementById("deleteModal").classList.remove('show');
+    }
+
     // Delete token
     window.deleteToken = function(id) {
       currentTokenId = id;
@@ -433,11 +438,6 @@
         loadTokens();
       }
       closeDeleteModal();
-    }
-
-    // Close Delete Modal
-    function closeDeleteModal() {
-      document.getElementById("deleteModal").classList.remove('show');
     }
 
     // Real-time clock update
