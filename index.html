@@ -213,48 +213,52 @@
     };
 
     // Save or update token
-    document.getElementById('tokenForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+document.getElementById('tokenForm').addEventListener('submit', function(e) {
+  e.preventDefault();
 
-      const subject = document.getElementById('subject').value.trim();
-      const kelas = document.getElementById('kelas').value.trim();
-      const token = document.getElementById('token').value.trim();
-      const url = document.getElementById('url').value.trim();
-      const startTime = document.getElementById('startTime').value;
-      const endTime = document.getElementById('endTime').value;
-      const errorMsg = document.getElementById('errorMsg');
+  const subject = document.getElementById('subject').value.trim();
+  const kelas = document.getElementById('kelas').value.trim();
+  const token = document.getElementById('token').value.trim();
+  const url = document.getElementById('url').value.trim();
+  const startTime = document.getElementById('startTime').value;
+  const endTime = document.getElementById('endTime').value;
+  const errorMsg = document.getElementById('errorMsg');
 
-      // Validation checks
-      if (!subject || !kelas || !token || !url || !startTime || !endTime) {
-        errorMsg.innerText = "Semua field harus diisi!";
-        return;
-      }
+  // Validasi input kosong
+  if (!subject || !kelas || !token || !url || !startTime || !endTime) {
+    errorMsg.innerText = "Semua field harus diisi!";
+    return;
+  }
 
-      // Check for duplicate token or URL
-      const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
-      const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
+  // Cek duplikasi token atau URL
+  const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
+  const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
 
-      if (isTokenDup || isUrlDup) {
-        errorMsg.innerText = "Token atau URL sudah ada, silakan gunakan yang berbeda!";
-        return;
-      }
+  if (isTokenDup || isUrlDup) {
+    errorMsg.innerText = "Token atau URL sudah ada, silakan gunakan yang berbeda!";
+    return;
+  }
 
-      // Token data
-      const tokenData = { subject, kelas, token, url, startTime, endTime };
+  // Reset pesan error jika validasi berhasil
+  errorMsg.innerText = "";
 
-      if (currentTokenId) {
-        // Update token
-        update(ref(db, 'tokens/' + currentTokenId), tokenData);
-        currentTokenId = null;
-      } else {
-        // Add new token
-        push(ref(db, 'tokens'), tokenData);
-      }
+  // Data token
+  const tokenData = { subject, kelas, token, url, startTime, endTime };
 
-      // Reset form and load updated data
-      this.reset();
-      loadTokens();
-    });
+  if (currentTokenId) {
+    // Update token
+    update(ref(db, 'tokens/' + currentTokenId), tokenData);
+    currentTokenId = null;
+  } else {
+    // Tambahkan token baru
+    push(ref(db, 'tokens'), tokenData);
+  }
+
+  // Reset form setelah berhasil menyimpan
+  this.reset();
+  loadTokens(); // Reload token list
+
+});
   </script>
 </body>
 </html>
