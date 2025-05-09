@@ -91,6 +91,18 @@
     .modal button {
       margin: 5px;
     }
+    .login-link {
+     color: #007BFF;
+     text-decoration: underline;
+     font-weight: bold;
+    }
+    .login-link:hover {
+     color: darkorange;
+     cursor: pointer;
+    }
+    .login-link:active {
+     color: red;
+    }
   </style>
 </head>
 <body>
@@ -99,22 +111,28 @@
     <h2>SMP NEGERI 2 PAJANGAN</h2>
   </div>
 
-  <!-- Section Login -->
+  <!-- SECTION LOGIN -->
   <div class="container" id="loginSection">
-    <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
-    <input type="text" id="username" placeholder="Masukan Username (admin)" />
-    <input type="password" id="password" placeholder="Masukan Password" />
-    <button onclick="login()">Login</button>
+  <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
+  <input type="text" id="username" placeholder="Masukan Username (admin)" />
+  <input type="password" id="password" placeholder="Masukan Password" />
+  <button onclick="login()">Login</button>
 
-    <div class="footer">
-      <div>@Admin SMPN 2 Pajangan</div>
-      <div id="currentTime" class="date-time"></div>
-    </div>
+  <!-- Tambahan link ke halaman login ujian siswa -->
+  <p style="text-align: center; font-size: 14px; margin-top: 10px;">
+    Halaman login ujian siswa?
+    <a href="http://smp2pajangan.github.io/loginujian" class="login-link">Loginujian</a>
+  </p>
 
-    <p id="loginError" class="error"></p>
+  <div class="footer">
+    <div>@Admin SMPN 2 Pajangan</div>
+    <div id="currentTime" class="date-time"></div>
   </div>
 
-  <!-- Section Admin Panel -->
+  <p id="loginError" class="error"></p>
+</div>
+
+  <!-- SECTION ADMIN PANEL -->
   <div class="container" id="adminPanel" style="display:none;">
     <h3>Tambah / Edit Token</h3>
     <form id="tokenForm">
