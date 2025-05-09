@@ -1,8 +1,3 @@
-<!-- ======================== -->
-<!--        TAHAP 1          -->
-<!--  Struktur HTML & CSS    -->
-<!-- ======================== -->
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -10,32 +5,22 @@
   <title>Panel Admin Ujian</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    :root {
-      --primary: #0066cc;
-      --danger: #dc3545;
-      --success: #28a745;
-      --gray: #6c757d;
-    }
-
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       background-color: #f0f4f8;
     }
-
     .header {
-      background-color: var(--primary);
+      background-color: #0066cc;
       color: white;
       padding: 15px;
       text-align: center;
     }
-
     .logo {
       display: block;
       margin: 0 auto;
       width: 100px;
     }
-
     .container {
       max-width: 800px;
       margin: 20px auto;
@@ -44,7 +29,6 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
     input, select {
       padding: 10px;
       margin: 8px 0;
@@ -52,182 +36,88 @@
       box-sizing: border-box;
       font-size: 16px;
     }
-
     button {
       padding: 10px 20px;
-      margin: 10px auto;
-      display: block;
       font-size: 16px;
       cursor: pointer;
     }
-
     .error {
       color: red;
       font-size: 14px;
       text-align: center;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
     }
-
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
       word-wrap: break-word;
-      text-align: center;
     }
-
     th {
       background-color: #f4f4f4;
     }
-
-    /* Tombol tabel */
-    .table-button {
-      padding: 4px 8px;
-      font-size: 12px;
-      margin: 2px;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #555;
     }
-
-    .table-button.edit {
-      background-color: #007bff;
-    }
-
-    .table-button.delete {
-      background-color: var(--danger);
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      transition: opacity 0.3s ease;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      min-width: 280px;
-      max-width: 90%;
-      animation: fadeInScale 0.3s ease;
-    }
-
-    .modal.fade-out .modal-content {
-      animation: fadeOutScale 0.3s ease forwards;
-    }
-
-    .modal-buttons {
+    .center-buttons {
       display: flex;
       justify-content: center;
       gap: 10px;
-      margin-top: 15px;
-    }
-
-    .modal-button {
-      padding: 8px 16px;
-      font-size: 14px;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
-    }
-
-    .modal-button.save {
-      background-color: var(--success);
-    }
-
-    .modal-button.cancel {
-      background-color: var(--gray);
-    }
-
-    .modal-button.delete {
-      background-color: var(--danger);
-    }
-
-    @keyframes fadeInScale {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    @keyframes fadeOutScale {
-      from {
-        opacity: 1;
-        transform: scale(1);
-      }
-      to {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-    }
-
-    .footer {
-      text-align: center;
-      color: #555;
-      font-size: 14px;
       margin-top: 20px;
     }
-
-    @media screen and (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
-        font-size: 12px;
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: white;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      text-align: center;
+    }
+    .modal input {
+      width: 100%;
+    }
+    .modal button {
+      padding: 8px 16px;
+    }
+    @media (max-width: 600px) {
+      .container, .modal-content {
+        margin: 10px;
       }
-
-      .modal-content {
-        padding: 15px;
+      .logo {
+        width: 80px;
       }
     }
   </style>
 </head>
 <body>
-
-<!-- ======================== -->
-<!--        TAHAP 2          -->
-<!--  Body, Login & Panel    -->
-<!-- ======================== -->
-
-    <div class="header">
+  <div class="header">
     <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo SMPN 2 Pajangan">
     <h2>SMP NEGERI 2 PAJANGAN</h2>
   </div>
 
-  <!-- Section Login -->
   <div class="container" id="loginSection">
     <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
-    <input type="text" id="username" placeholder="Masukkan Username (admin)" />
-    <input type="password" id="password" placeholder="Masukkan Password" />
+    <input type="text" id="username" placeholder="Masukan Username (admin)" />
+    <input type="password" id="password" placeholder="Masukan Password" />
     <button onclick="login()">Login</button>
     <p id="loginError" class="error"></p>
-
-    <div class="footer">
-      <div>@Admin SMPN 2 Pajangan</div>
-      <div id="currentTime"></div>
-    </div>
+    <div class="footer" id="adminDateTimeLogin"></div>
   </div>
 
-  <!-- Section Admin Panel -->
   <div class="container" id="adminPanel" style="display:none;">
     <h3>Tambah / Edit Token</h3>
     <form id="tokenForm">
@@ -252,23 +142,20 @@
           <th>Kelas</th>
           <th>Token</th>
           <th>Link</th>
-          <th>Token Dibuka</th>
-          <th>Token Ditutup</th>
+          <th>Token dibuka</th>
+          <th>Token ditutup</th>
           <th>Aksi</th>
         </tr>
       </thead>
       <tbody id="tokenTableBody"></tbody>
     </table>
-
-    <div class="footer">
-      <div>@Admin SMPN 2 Pajangan</div>
-      <div id="adminDateTime"></div>
-    </div>
+    <div class="footer" id="adminDateTime"></div>
   </div>
 
   <!-- Modal Edit -->
-  <div class="modal" id="editModal">
+  <div id="editModal" class="modal">
     <div class="modal-content">
+      <h3>Edit Token</h3>
       <form id="modalForm">
         <input type="text" id="editSubject" required />
         <input type="text" id="editKelas" required />
@@ -278,31 +165,24 @@
         <input type="datetime-local" id="editStartTime" required />
         <label>Tanggal Selesai</label>
         <input type="datetime-local" id="editEndTime" required />
-
-        <div class="modal-buttons">
-          <button type="submit" class="modal-button save">Simpan</button>
-          <button type="button" onclick="closeEditModal()" class="modal-button cancel">Batal</button>
+        <div class="center-buttons">
+          <button type="submit">Simpan</button>
+          <button type="button" onclick="closeEditModal()">Batal</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal Delete -->
-  <div class="modal" id="deleteModal">
+  <!-- Modal Hapus -->
+  <div id="deleteModal" class="modal">
     <div class="modal-content">
-      <p>Yakin ingin menghapus token ini?</p>
-      <div class="modal-buttons">
-        <button onclick="confirmDelete()" class="modal-button delete">Hapus</button>
-        <button onclick="closeDeleteModal()" class="modal-button cancel">Batal</button>
+      <h3>Yakin ingin menghapus token ini?</h3>
+      <div class="center-buttons">
+        <button onclick="confirmDelete()">Hapus</button>
+        <button onclick="closeDeleteModal()">Batal</button>
       </div>
     </div>
   </div>
-
-<!-- ======================== -->
-<!--        TAHAP 3          -->
-<!--     JavaScript         -->
-<!-- ======================== -->
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
@@ -337,6 +217,7 @@
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();  // Load data after login
+        updateDateTime();
       } else {
         document.getElementById("loginError").innerText = "Username atau password salah.";
       }
@@ -364,8 +245,8 @@
             <td>${data.startTime}</td>
             <td>${data.endTime}</td>
             <td>
-              <button onclick="editToken('${data.key}')" class="table-button edit">Edit</button>
-              <button onclick="deleteToken('${data.key}')" class="table-button delete">Hapus</button>
+              <button onclick="openEditModal('${data.key}')">Edit</button>
+              <button onclick="openDeleteModal('${data.key}')">Hapus</button>
             </td>
           `;
           tokenTableBody.appendChild(row);
@@ -373,8 +254,8 @@
       });
     }
 
-    // Edit token
-    window.editToken = function(id) {
+    // Open edit modal and populate fields
+    window.openEditModal = function(id) {
       currentTokenId = id;
       const token = tokenCache.find(t => t.key === id);
 
@@ -385,11 +266,35 @@
       document.getElementById("editStartTime").value = token.startTime;
       document.getElementById("editEndTime").value = token.endTime;
 
-      // Show the modal
-      document.getElementById("editModal").classList.add('show');
+      document.getElementById("editModal").style.display = "block";
     };
 
-    // Save edited token
+    // Close edit modal
+    window.closeEditModal = function() {
+      document.getElementById("editModal").style.display = "none";
+    };
+
+    // Open delete modal
+    window.openDeleteModal = function(id) {
+      currentTokenId = id;
+      document.getElementById("deleteModal").style.display = "block";
+    };
+
+    // Close delete modal
+    window.closeDeleteModal = function() {
+      document.getElementById("deleteModal").style.display = "none";
+    };
+
+    // Confirm delete token
+    window.confirmDelete = function() {
+      if (currentTokenId) {
+        remove(ref(db, 'tokens/' + currentTokenId));
+        loadTokens(); // Reload token list after deletion
+      }
+      closeDeleteModal();
+    };
+
+    // Save or update token
     document.getElementById('modalForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -406,59 +311,123 @@
         return;
       }
 
-      // Data token yang diperbarui
+      // Data token
       const tokenData = { subject, kelas, token, url, startTime, endTime };
 
-      update(ref(db, 'tokens/' + currentTokenId), tokenData);
-      closeEditModal();
-      loadTokens();
+      if (currentTokenId) {
+        // Update token
+        update(ref(db, 'tokens/' + currentTokenId), tokenData);
+        currentTokenId = null;
+      } else {
+        // Tambahkan token baru
+        push(ref(db, 'tokens'), tokenData);
+      }
+
+      // Reset form setelah berhasil menyimpan
+      document.getElementById("modalForm").reset();
+      loadTokens(); // Reload token list
+      closeEditModal(); // Close the modal after saving
     });
 
-    // Close Edit Modal
-    function closeEditModal() {
-      document.getElementById("editModal").classList.remove('show');
+    // Display current date & time
+    function updateDateTime() {
+      const dateTimeElement = document.getElementById("adminDateTime");
+
+      setInterval(() => {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const formattedDate = now.toLocaleDateString('id-ID', options);
+        const formattedTime = now.toLocaleTimeString('id-ID');
+
+        dateTimeElement.innerHTML = `${formattedDate} | ${formattedTime}`;
+      }, 1000);
     }
-
-    // Close Delete Modal
-    function closeDeleteModal() {
-      document.getElementById("deleteModal").classList.remove('show');
-    }
-
-    // Delete token
-    window.deleteToken = function(id) {
-      currentTokenId = id;
-      // Show the modal
-      document.getElementById("deleteModal").classList.add('show');
-    };
-
-    // Confirm delete
-    function confirmDelete() {
-      if (currentTokenId) {
-        remove(ref(db, 'tokens/' + currentTokenId));
-        loadTokens();
-      }
-      closeDeleteModal();
-    }
-
-    // Real-time clock update
-    function updateClock() {
-      const now = new Date();
-      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-      const day = days[now.getDay()];
-      const date = now.getDate().toString().padStart(2, '0');
-      const month = (now.getMonth() + 1).toString().padStart(2, '0');
-      const year = now.getFullYear();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-
-      const formattedTime = `${day}, ${date} ${month} ${year} | ${hours}:${minutes}`;
-      document.getElementById("currentTime").innerText = formattedTime;
-      document.getElementById("adminDateTime").innerText = formattedTime;
-    }
-
-    // Update clock every minute
-    setInterval(updateClock, 60000);
-    updateClock(); // Initialize clock immediately
   </script>
+  <div class="footer">
+    <div>@Admin SMPN 2 Pajangan</div>
+    <div id="adminDateTime"></div>
+  </div>
+
+  <!-- Modal Edit -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeEditModal()">&times;</span>
+      <h3>Edit Token</h3>
+      <form id="modalForm">
+        <input type="text" id="editSubject" placeholder="Mata Pelajaran" required />
+        <input type="text" id="editKelas" placeholder="Kelas" required />
+        <input type="text" id="editToken" placeholder="Token Ujian" required />
+        <input type="url" id="editUrl" placeholder="Link Ujian" required />
+        <input type="datetime-local" id="editStartTime" required />
+        <input type="datetime-local" id="editEndTime" required />
+        <div class="modal-buttons">
+          <button type="submit">Simpan</button>
+          <button type="button" onclick="closeEditModal()">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Hapus -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeDeleteModal()">&times;</span>
+      <h3>Apakah Anda yakin ingin menghapus token ini?</h3>
+      <div class="modal-buttons">
+        <button onclick="confirmDelete()">Hapus</button>
+        <button onclick="closeDeleteModal()">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding-top: 60px;
+    }
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 70%;
+      max-width: 500px;
+    }
+    .modal-buttons {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .modal-buttons button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .modal .close {
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 25px;
+      font-size: 30px;
+      font-weight: bold;
+    }
+    .modal .close:hover,
+    .modal .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
 </body>
 </html>
