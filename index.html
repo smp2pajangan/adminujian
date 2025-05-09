@@ -106,8 +106,23 @@
       cursor: pointer;
     }
 
-    /* Tombol Batal */
-    #cancelBtn {
+    /* Tombol Hapus dan Batal */
+    #deleteBtn {
+      padding: 10px 20px;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    #deleteBtn:hover {
+      background-color: darkred;
+    }
+
+    #cancelDeleteBtn {
       padding: 10px 20px;
       background-color: #ccc;
       color: white;
@@ -118,7 +133,7 @@
       margin-top: 10px;
     }
 
-    #cancelBtn:hover {
+    #cancelDeleteBtn:hover {
       background-color: #999;
     }
   </style>
@@ -187,6 +202,17 @@
         <button type="button" id="cancelBtn">Batal</button> <!-- Tombol Batal -->
         <p id="editErrorMsg" class="error"></p>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal Hapus Token -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Apakah Anda yakin ingin menghapus token ini?</h3>
+      <p id="deleteMessage"></p>
+      <button id="deleteBtn">Hapus</button>
+      <button type="button" id="cancelDeleteBtn">Batal</button>
     </div>
   </div>
 
@@ -284,11 +310,17 @@
     // Menangani penutupan modal dengan tombol close (X)
     document.querySelector(".close").onclick = function() {
       document.getElementById("editModal").style.display = "none";
+      document.getElementById("deleteModal").style.display = "none";
     };
 
-    // Menangani penutupan modal dengan tombol Batal
+    // Menangani penutupan modal dengan tombol Batal di Edit Token
     document.getElementById("cancelBtn").onclick = function() {
       document.getElementById("editModal").style.display = "none";
+    };
+
+    // Menangani penutupan modal dengan tombol Batal di Hapus Token
+    document.getElementById("cancelDeleteBtn").onclick = function() {
+      document.getElementById("deleteModal").style.display = "none";
     };
 
     // Menangani pengeditan token
@@ -332,6 +364,23 @@
       document.getElementById("editModal").style.display = "none";
       loadTokens(); // Reload token list
     });
+
+    // Fungsi untuk menghapus token
+    window.deleteToken = function(id) {
+      currentTokenId = id;
+      const token = tokenCache.find(t => t.key === id);
+      document.getElementById("deleteMessage").innerText = `Anda akan menghapus token untuk ${token.subject} kelas ${token.kelas}`;
+      
+      // Tampilkan modal hapus
+      document.getElementById("deleteModal").style.display = "block";
+    };
+
+    // Fungsi untuk menghapus token yang dipilih
+    document.getElementById("deleteBtn").onclick = function() {
+      remove(ref(db, 'tokens/' + currentTokenId)); // Menghapus data dari Firebase
+      document.getElementById("deleteModal").style.display = "none";
+      loadTokens(); // Reload token list setelah penghapusan
+    };
   </script>
 </body>
 </html>
