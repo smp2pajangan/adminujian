@@ -59,6 +59,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
+      margin-top: 10px; /* Beri jarak sedikit dari filter */
     }
     th, td {
       border: 1px solid #ccc;
@@ -191,6 +192,14 @@
         flex-direction: row; /* Atur tombol aksi menjadi satu baris */
         justify-content: center;
       }
+      /* Gaya untuk input filter di layar kecil */
+      #filterMapel {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      #filterKelas {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -239,6 +248,13 @@
     </form>
 
     <h3>Daftar Token</h3>
+    <div>
+      Filter Mapel: <input type="text" id="filterMapel" onkeyup="filterTable()" placeholder="Cari Mapel">
+      Filter Kelas:
+      <select id="filterKelas" onchange="filterTable()">
+        <option value="">Tampilkan Semua</option>
+      </select>
+    </div>
     <table>
       <thead>
         <tr>
@@ -295,7 +311,7 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import {initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
     const firebaseConfig = {
@@ -320,38 +336,50 @@
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Hapus.png";
 
-
-    window.login = function() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      if (username === ADMIN_USER && password === ADMIN_PASS) {
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        loadTokens();
-      } else {
-        document.getElementById("loginError").innerText = "Username atau password salah.";
-      }
-    };
-
     function loadTokens() {
       onValue(ref(db, 'tokens'), (snapshot) => {
         const tbody = document.getElementById('tokenTableBody');
         tbody.innerHTML = '';
         tokenCache = [];
+        const uniqueClasses = new Set();
         let counter = 0;
 
         snapshot.forEach(child => {
-          counter++;
           const data = child.val();
           data.key = child.key;
           tokenCache.push(data);
+          uniqueClasses.add(data.kelas);
+        });
 
+        // Sort tokenCache by kelas in ascending order
+        tokenCache.sort((a, b) => {
+          const kelasA = parseInt(a.kelas, 10);
+          const kelasB = parseInt(b.kelas, 10);
+          return kelasA - kelasB;
+        });
+
+        const filterKelasSelect = document.getElementById('filterKelas');
+        // Clear existing options except "Tampilkan Semua"
+        while (filterKelasSelect.options.length > 1) {
+          filterKelasSelect.remove(filterKelasSelect.options.length - 1);
+        }
+
+        // Add unique classes to the filter dropdown
+        [...uniqueClasses].sort((a, b) => parseInt(a, 10) - parseInt(b, 10)).forEach(kelas => {
+          const option = document.createElement('option');
+          option.value = kelas;
+          option.textContent = kelas;
+          filterKelasSelect.appendChild(option);
+        });
+
+        counter = 1;
+        tokenCache.forEach(data => {
           const row = document.createElement('tr');
           const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
 
           row.innerHTML = `
-            <td>${counter}</td>
+            <td>${counter++}</td>
             <td>${data.subject}</td>
             <td>${data.kelas}</td>
             <td>${data.token}</td>
@@ -371,8 +399,46 @@
           `;
           tbody.appendChild(row);
         });
+        filterTable(); // Initial filter after loading
       });
     }
+
+    function filterTable() {
+      const filterMapelInput = document.getElementById("filterMapel");
+      const filterKelasSelect = document.getElementById("filterKelas");
+      const filterMapelValue = filterMapelInput.value.toUpperCase();
+      const filterKelasValue = filterKelasSelect.value;
+      const table = document.getElementById("tokenTableBody");
+      const rows = table.getElementsByTagName("tr");
+
+      for (let i = 0; i < rows.length; i++) {
+        const tdMapel = rows[i].getElementsByTagName("td")[1]; // Kolom Mapel (indeks 1)
+        const tdKelas = rows[i].getElementsByTagName("td")[2]; // Kolom Kelas (indeks 2)
+        if (tdMapel && tdKelas) {
+          const mapelText = tdMapel.textContent.toUpperCase();
+          const kelasText = tdKelas.textContent;
+          const mapelMatch = mapelText.indexOf(filterMapelValue) > -1;
+          const kelasMatch = filterKelasValue === "" || kelasText === filterKelasValue;
+          if (mapelMatch && kelasMatch) {
+            rows[i].style.display = "";
+          } else {
+            rows[i].style.display = "none";
+          }
+        }
+      }
+    }
+
+    window.login = function() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      if (username === ADMIN_USER && password === ADMIN_PASS) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadTokens();
+      } else {
+        document.getElementById("loginError").innerText = "Username atau password salah.";
+      }
+    };
 
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -408,6 +474,9 @@
         })
         .catch(err => {
           errorMsg.innerText = "Gagal menyimpan token: " + err.message;
+        })
+        .finally(() => {
+          loadTokens(); // Reload tokens to reflect the new order
         });
     });
 
@@ -420,7 +489,6 @@
       document.getElementById('editKelas').value = tokenToEdit.kelas;
       document.getElementById('editToken').value = tokenToEdit.token;
       document.getElementById('editUrl').value = tokenToEdit.url;
-      document.getElementById
       document.getElementById('editStartTime').value = tokenToEdit.startTime;
       document.getElementById('editEndTime').value = tokenToEdit.endTime;
 
@@ -465,6 +533,9 @@
           })
           .catch(err => {
             errorEl.innerText = "Gagal menyimpan perubahan: " + err.message;
+          })
+          .finally(() => {
+            loadTokens(); // Reload tokens to reflect potential class changes
           });
       }
     });
@@ -488,6 +559,7 @@
             alert("Gagal menghapus token: " + err.message);
           })
           .finally(() => {
+            loadTokens(); // Reload tokens after deletion
             closeDeleteModal();
           });
       }
@@ -518,3 +590,4 @@
   </script>
 </body>
 </html>
+
