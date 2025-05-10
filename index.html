@@ -147,15 +147,19 @@
   <div class="container" id="adminPanel" style="display:none;">
     <h3>Tambah / Edit Token</h3>
     <form id="tokenForm">
-      <input type="text" id="subject" placeholder="Mata Pelajaran" required />
-      <input type="text" id="kelas" placeholder="Kelas" required />
-      <input type="text" id="token" placeholder="Token Ujian" required />
-      <input type="url" id="url" placeholder="Link Ujian" required />
-      <label>Tanggal Mulai</label>
+      <label>Mata Pelajaran</label>
+      <input type="text" id="subject" placeholder="Gunakan kapital" required />
+      <label>Kelas</label>
+      <input type="text" id="kelas" placeholder="Berupa angka saja" required />
+      <label>Token Ujian</label>
+      <input type="text" id="token" placeholder="Berupa huruf/angka (gunakan kapital)" required />
+      <label>Link Ujian</label>
+      <input type="url" id="url" placeholder="Gunakan http://" required />
+      <label>Waktu Token Dibuka</label>
       <input type="datetime-local" id="startTime" required />
-      <label>Tanggal Selesai</label>
+      <label>Waktu Token Ditutup</label>
       <input type="datetime-local" id="endTime" required />
-      <button type="submit">Simpan</button>
+      <button type="submit">Tambah</button>
       <p id="errorMsg" class="error"></p>
     </form>
 
@@ -168,8 +172,8 @@
           <th>Kelas</th>
           <th>Token</th>
           <th>Link</th>
-          <th>Token dibuka</th>
-          <th>Token ditutup</th>
+          <th>Token Dibuka</th>
+          <th>Token Ditutup</th>
           <th>Aksi</th>
         </tr>
       </thead>
@@ -187,13 +191,17 @@
   <div class="modal-content">
     <h4>Edit Token</h4>
     <form id="modalForm">
+      <label>Mata Pelajaran</label>
       <input type="text" id="editSubject" required />
+      <label>Kelas</label>
       <input type="text" id="editKelas" required />
+      <label>Token Ujian</label>
       <input type="text" id="editToken" required />
+      <label>Link Ujian</label>
       <input type="url" id="editUrl" required />
-      <label>Tanggal Mulai</label>
+      <label>Waktu Token Dibuka</label>
       <input type="datetime-local" id="editStartTime" required />
-      <label>Tanggal Selesai</label>
+      <label>Waktu Token Ditutup</label>
       <input type="datetime-local" id="editEndTime" required />
       
       <!-- Pesan error di sini -->
