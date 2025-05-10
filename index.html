@@ -59,7 +59,6 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
-      margin-top: 10px; /* Beri jarak sedikit dari filter */
     }
     th, td {
       border: 1px solid #ccc;
@@ -321,6 +320,19 @@
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Hapus.png";
 
+
+    window.login = function() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      if (username === ADMIN_USER && password === ADMIN_PASS) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadTokens();
+      } else {
+        document.getElementById("loginError").innerText = "Username atau password salah.";
+      }
+    };
+
     function loadTokens() {
       onValue(ref(db, 'tokens'), (snapshot) => {
         const tbody = document.getElementById('tokenTableBody');
@@ -359,49 +371,8 @@
           `;
           tbody.appendChild(row);
         });
-
-        const newTbody = document.createElement('tbody');
-        let sortedCounter = 1;
-        tokenCache.forEach(data => {
-          const row = document.createElement('tr');
-          const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-          const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-          row.innerHTML = `
-            <td>${sortedCounter++}</td>
-            <td>${data.subject}</td>
-            <td>${data.kelas}</td>
-            <td>${data.token}</td>
-            <td><a href="${data.url}" target="_blank">Link</a></td>
-            <td>${startTimeFormatted}</td>
-            <td>${endTimeFormatted}</td>
-            <td>
-              <div class="action-buttons">
-                <button class="action-button-icon" onclick="editToken('${data.key}')" title="Edit Token">
-                  <img src="${EDIT_ICON_URL}" alt="Edit">
-                </button>
-                <button class="action-button-icon" onclick="promptDelete('${data.key}')" title="Hapus Token">
-                  <img src="${DELETE_ICON_URL}" alt="Hapus">
-                </button>
-              </div>
-            </td>
-          `;
-          newTbody.appendChild(row);
-        });
-        document.querySelector('#adminPanel table tbody').replaceWith(newTbody);
       });
     }
-
-    window.login = function() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      if (username === ADMIN_USER && password === ADMIN_PASS) {
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        loadTokens();
-      } else {
-        document.getElementById("loginError").innerText = "Username atau password salah.";
-      }
-    };
 
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -434,7 +405,6 @@
       push(ref(db, 'tokens'), tokenData)
         .then(() => {
           this.reset();
-          loadTokens(); // Panggil loadTokens setelah berhasil menambah
         })
         .catch(err => {
           errorMsg.innerText = "Gagal menyimpan token: " + err.message;
@@ -491,7 +461,6 @@
         update(ref(db, 'tokens/' + currentTokenId), updatedData)
           .then(() => {
             closeEditModal();
-            loadTokens(); // Panggil loadTokens setelah berhasil mengedit
           })
           .catch(err => {
             errorEl.innerText = "Gagal menyimpan perubahan: " + err.message;
@@ -518,7 +487,7 @@
             alert("Gagal menghapus token: " + err.message);
           })
           .finally(() => {
-            loadTokens(); // Muat ulang agar urutan terbaru terlihat
+            closeDeleteModal();
           });
       }
     };
