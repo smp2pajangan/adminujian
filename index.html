@@ -4,23 +4,28 @@
   <meta charset="UTF-8" />
   <title>Panel Admin Ujian</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ===== STYLE CSS ===== -->
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       background-color: #f0f4f8;
     }
+
     .header {
       background-color: #0066cc;
       color: white;
       padding: 15px;
       text-align: center;
     }
+
     .logo {
       display: block;
       margin: 0 auto;
       width: 100px;
     }
+
     .container {
       max-width: 800px;
       margin: 20px auto;
@@ -29,6 +34,7 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
     input, select {
       padding: 10px;
       margin: 8px 0;
@@ -36,6 +42,7 @@
       box-sizing: border-box;
       font-size: 16px;
     }
+
     button {
       padding: 10px 20px;
       margin: 10px auto;
@@ -43,44 +50,54 @@
       font-size: 16px;
       cursor: pointer;
     }
+
     .error {
       color: red;
       font-size: 14px;
       text-align: center;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
     }
+
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
       word-wrap: break-word;
     }
+
     th {
       background-color: #f4f4f4;
     }
+
     .footer {
       text-align: center;
       margin-top: 20px;
       color: #555;
       font-size: 14px;
     }
+
     .date-time {
       font-size: 14px;
       color: #555;
     }
+
     .modal {
       display: none;
       position: fixed;
       z-index: 10;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0,0,0,0.5);
       justify-content: center;
       align-items: center;
     }
+
     .modal-content {
       background: #fff;
       padding: 20px;
@@ -88,79 +105,85 @@
       width: 90%;
       max-width: 400px;
     }
+
     .modal button {
       margin: 5px;
     }
+
     .login-link {
-     color: #007BFF;
-     text-decoration: underline;
-     font-weight: bold;
-    }
-    .login-link:hover {
-     color: darkorange;
-     cursor: pointer;
-    }
-    .login-link:active {
-     color: red;
-    }
-    .action-buttons {
-     display: flex;
-     gap: 4px;
-     justify-content: center;
-     flex-wrap: wrap;
+      color: #007BFF;
+      text-decoration: underline;
+      font-weight: bold;
     }
 
-.action-buttons button {
-  padding: 4px 8px;
-  font-size: 12px;
-}
+    .login-link:hover {
+      color: darkorange;
+      cursor: pointer;
+    }
+
+    .login-link:active {
+      color: red;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .action-buttons button {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
   </style>
 </head>
+
+  <!-- ===== BODY & LOGIN SECTION ===== -->
 <body>
   <div class="header">
-    <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo SMPN 2 Pajangan">
-    <h2>SMP NEGERI 2 PAJANGAN</h2>
+    <img src="https://smp2pajangan.github.io/loginujian/img/logo.png" class="logo" />
+    <h2>Panel Admin Ujian</h2>
+    <div class="date-time" id="dateTime"></div>
   </div>
 
-  <!-- SECTION LOGIN -->
-  <div class="container" id="loginSection">
-  <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
-  <input type="text" id="username" placeholder="Masukan Username (admin)" />
-  <input type="password" id="password" placeholder="Masukan Password" />
-  <button onclick="login()">Login</button>
+  <div class="container">
+    <h3>Form Tambah Data Token</h3>
 
-  <!-- Tambahan link ke halaman login ujian siswa -->
-  <p style="text-align: center; font-size: 14px; margin-top: 10px;">
-    Halaman login ujian siswa?
-    <a href="http://smp2pajangan.github.io/loginujian" class="login-link">Loginujian</a>
-  </p>
+    <label for="mapel">Mata Pelajaran:</label>
+    <input type="text" id="mapel" placeholder="Contoh: Matematika" />
 
-  <div class="footer">
-    <div>@Admin SMPN 2 Pajangan</div>
-    <div id="currentTime" class="date-time"></div>
+    <label for="kelas">Kelas:</label>
+    <input type="text" id="kelas" placeholder="Contoh: 9A" />
+
+    <label for="token">Token:</label>
+    <input type="text" id="token" placeholder="Masukkan token" />
+
+    <label for="link">Link Ujian:</label>
+    <input type="text" id="link" placeholder="Tempelkan link Google Form" />
+
+    <label for="buka">Token Dibuka:</label>
+    <input type="datetime-local" id="buka" />
+
+    <label for="tutup">Token Ditutup:</label>
+    <input type="datetime-local" id="tutup" />
+
+    <button onclick="addToken()">Tambah Token</button>
+
+    <div class="error" id="error"></div>
+
+    <hr />
+    <h3>Filter Data</h3>
+    <label for="filterMapel">Filter Mapel:</label>
+    <input type="text" id="filterMapel" placeholder="Contoh: IPA" oninput="filterTable()" />
+
+    <label for="filterKelas">Filter Kelas:</label>
+    <input type="text" id="filterKelas" placeholder="Contoh: 8B" oninput="filterTable()" />
   </div>
 
-  <p id="loginError" class="error"></p>
-</div>
-
-  <!-- SECTION ADMIN PANEL -->
-  <div class="container" id="adminPanel" style="display:none;">
-    <h3>Tambah / Edit Token</h3>
-    <form id="tokenForm">
-      <input type="text" id="subject" placeholder="Mata Pelajaran" required />
-      <input type="text" id="kelas" placeholder="Kelas" required />
-      <input type="text" id="token" placeholder="Token Ujian" required />
-      <input type="url" id="url" placeholder="Link Ujian" required />
-      <label>Tanggal Mulai</label>
-      <input type="datetime-local" id="startTime" required />
-      <label>Tanggal Selesai</label>
-      <input type="datetime-local" id="endTime" required />
-      <button type="submit">Simpan</button>
-      <p id="errorMsg" class="error"></p>
-    </form>
-
-    <h3>Daftar Token</h3>
-    <table>
+<!-- ===== TABEL TOKEN & MODAL EDIT ===== -->
+<div class="table-container">
+    <table id="tokenTable">
       <thead>
         <tr>
           <th>No</th>
@@ -168,273 +191,230 @@
           <th>Kelas</th>
           <th>Token</th>
           <th>Link</th>
-          <th>Token dibuka</th>
-          <th>Token ditutup</th>
+          <th>Dibuka</th>
+          <th>Ditutup</th>
           <th>Aksi</th>
         </tr>
       </thead>
-      <tbody id="tokenTableBody"></tbody>
+      <tbody id="tableBody">
+        <!-- Data token akan ditampilkan di sini -->
+      </tbody>
     </table>
-
-    <div class="footer">
-      <div>@Admin SMPN 2 Pajangan</div>
-      <div id="adminDateTime" class="date-time"></div>
-    </div>
   </div>
 
   <!-- Modal Edit -->
-<div id="editModal" class="modal">
-  <div class="modal-content">
-    <h4>Edit Token</h4>
-    <form id="modalForm">
-      <input type="text" id="editSubject" required />
-      <input type="text" id="editKelas" required />
-      <input type="text" id="editToken" required />
-      <input type="url" id="editUrl" required />
-      <label>Tanggal Mulai</label>
-      <input type="datetime-local" id="editStartTime" required />
-      <label>Tanggal Selesai</label>
-      <input type="datetime-local" id="editEndTime" required />
-      
-      <!-- Pesan error di sini -->
-      <p id="editErrorMsg" class="error"></p>
-      
-      <button type="submit">Simpan</button>
-      <button type="button" onclick="closeEditModal()">Batal</button>
-    </form>
-  </div>
-</div>
-
-  <!-- Modal Hapus -->
-  <div id="deleteModal" class="modal">
+  <div id="editModal" class="modal">
     <div class="modal-content">
-      <p>Yakin ingin menghapus token ini?</p>
-      <button onclick="confirmDelete()">Hapus</button>
-      <button onclick="closeDeleteModal()">Batal</button>
+      <span class="close" onclick="closeEditModal()">&times;</span>
+      <h3>Edit Data Token</h3>
+      <input type="hidden" id="editKey" />
+
+      <label for="editMapel">Mata Pelajaran:</label>
+      <input type="text" id="editMapel" />
+
+      <label for="editKelas">Kelas:</label>
+      <input type="text" id="editKelas" />
+
+      <label for="editToken">Token:</label>
+      <input type="text" id="editToken" />
+
+      <label for="editLink">Link Ujian:</label>
+      <input type="text" id="editLink" />
+
+      <label for="editBuka">Token Dibuka:</label>
+      <input type="datetime-local" id="editBuka" />
+
+      <label for="editTutup">Token Ditutup:</label>
+      <input type="datetime-local" id="editTutup" />
+
+      <button onclick="updateToken()">Simpan Perubahan</button>
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
-      authDomain: "ujian-online-berbasis-android.firebaseapp.com",
-      databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
-      projectId: "ujian-online-berbasis-android",
-      storageBucket: "ujian-online-berbasis-android.appspot.com",
-      messagingSenderId: "923446282537",
-      appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    const ADMIN_USER = "admin";
-    const ADMIN_PASS = "12345";
-    let currentTokenId = null;
-    let tokenCache = [];
-
-    window.login = function() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      if (username === ADMIN_USER && password === ADMIN_PASS) {
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        loadTokens();
-      } else {
-        document.getElementById("loginError").innerText = "Username atau password salah.";
-      }
-    };
-
-    function loadTokens() {
-      onValue(ref(db, 'tokens'), (snapshot) => {
-        const tbody = document.getElementById('tokenTableBody');
-        tbody.innerHTML = '';
-        tokenCache = [];
-
-        snapshot.forEach(child => {
-          const data = child.val();
-          data.key = child.key;
-          tokenCache.push(data);
-
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${tokenCache.length}</td>
-            <td>${data.subject}</td>
-            <td>${data.kelas}</td>
-            <td>${data.token}</td>
-            <td><a href="${data.url}" target="_blank">Link</a></td>
-            <td>${data.startTime}</td>
-            <td>${data.endTime}</td>
-            <td>
-  <div class="action-buttons">
-    <button onclick="editToken('${data.key}')">Edit</button>
-    <button onclick="promptDelete('${data.key}')">Hapus</button>
-  </div>
-</td>
-          `;
-          tbody.appendChild(row);
-        });
-      });
-    }
-
-    // Tambah atau update token
-    document.getElementById('tokenForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const subject = document.getElementById('subject').value.trim().toUpperCase();
-  const kelas = document.getElementById('kelas').value.trim();
-  const token = document.getElementById('token').value.trim().toUpperCase();
-  const url = document.getElementById('url').value.trim();
-  const startTime = document.getElementById('startTime').value;
-  const endTime = document.getElementById('endTime').value;
-  const errorMsg = document.getElementById('errorMsg');
-
-  if (!subject || !kelas || !token || !url || !startTime || !endTime) {
-    errorMsg.innerText = "Semua field harus diisi!";
-    return;
-  }
-
-  const now = new Date();
-  if (new Date(startTime) <= now || new Date(endTime) <= now) {
-    errorMsg.innerText = "Waktu mulai dan selesai harus di masa depan!";
-    return;
-  }
-
-  if (new Date(startTime) >= new Date(endTime)) {
-    errorMsg.innerText = "Waktu mulai harus sebelum waktu selesai!";
-    return;
-  }
-
-  const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === token);
-  const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === url);
-  if (isTokenDup || isUrlDup) {
-    errorMsg.innerText = "Token atau URL sudah ada!";
-    return;
-  }
-
-  errorMsg.innerText = "";
-  const tokenData = { subject, kelas, token, url, startTime, endTime };
-  if (currentTokenId) {
-    update(ref(db, 'tokens/' + currentTokenId), tokenData);
-    currentTokenId = null;
-  } else {
-    push(ref(db, 'tokens'), tokenData);
-  }
-
-  this.reset();
-  loadTokens();
-});
-
-    // Edit Token
-window.editToken = function(id) {
-  const token = tokenCache.find(t => t.key === id);
-  currentTokenId = id;
-  document.getElementById('editSubject').value = token.subject;
-  document.getElementById('editKelas').value = token.kelas;
-  document.getElementById('editToken').value = token.token;
-  document.getElementById('editUrl').value = token.url;
-  document.getElementById('editStartTime').value = token.startTime;
-  document.getElementById('editEndTime').value = token.endTime;
-  document.getElementById('editErrorMsg').innerText = ""; // Reset error saat buka modal
-  document.getElementById('editModal').style.display = 'flex';
-};
-
-document.getElementById('modalForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-
-  const updated = {
-    subject: document.getElementById('editSubject').value.trim().toUpperCase(),
-    kelas: document.getElementById('editKelas').value.trim(),
-    token: document.getElementById('editToken').value.trim().toUpperCase(),
-    url: document.getElementById('editUrl').value.trim(),
-    startTime: document.getElementById('editStartTime').value,
-    endTime: document.getElementById('editEndTime').value
+<!-- ===== JAVA SCRIPT (FIREBASE & FUNGSUONALITAS CRUD) ===== -->
+<script>
+  // Konfigurasi Firebase
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID"
   };
 
-  const errorEl = document.getElementById('editErrorMsg');
+  // Inisialisasi Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database().ref("token_ujian");
 
-  if (!updated.subject || !updated.kelas || !updated.token || !updated.url || !updated.startTime || !updated.endTime) {
-    errorEl.innerText = "Semua field harus diisi!";
-    return;
-  }
-
-  const now = new Date();
-  if (new Date(updated.startTime) <= now || new Date(updated.endTime) <= now) {
-    errorEl.innerText = "Waktu mulai dan selesai harus dimasa depan!";
-    return;
-  }
-
-  if (new Date(updated.startTime) >= new Date(updated.endTime)) {
-    errorEl.innerText = "Waktu mulai harus sebelum waktu selesai!";
-    return;
-  }
-
-  const isTokenDup = tokenCache.some(t => t.key !== currentTokenId && t.token === updated.token);
-  const isUrlDup = tokenCache.some(t => t.key !== currentTokenId && t.url === updated.url);
-
-  if (isTokenDup || isUrlDup) {
-    errorEl.innerText = "Token atau URL sudah digunakan!";
-    return;
-  }
-
-  update(ref(db, 'tokens/' + currentTokenId), updated);
-  closeEditModal();
-  loadTokens();
-});
-
-window.closeEditModal = function() {
-  document.getElementById('editModal').style.display = 'none';
-  document.getElementById('editErrorMsg').innerText = ""; // Reset pesan error
-  currentTokenId = null;
-};
-
-    // Delete Popup
-    let deleteId = null;
-    window.promptDelete = function(id) {
-      deleteId = id;
-      document.getElementById('deleteModal').style.display = 'flex';
-    };
-
-    window.confirmDelete = function() {
-      if (deleteId) {
-        remove(ref(db, 'tokens/' + deleteId));
-        deleteId = null;
-        closeDeleteModal();
-        loadTokens();
+  // Ambil dan tampilkan data
+  function fetchData() {
+    db.on("value", (snapshot) => {
+      const data = snapshot.val();
+      const tableBody = document.getElementById("tableBody");
+      tableBody.innerHTML = "";
+      let no = 1;
+      for (let key in data) {
+        const item = data[key];
+        const row = `
+          <tr>
+            <td>${no++}</td>
+            <td>${item.mapel}</td>
+            <td>${item.kelas}</td>
+            <td>${item.token}</td>
+            <td><a href="${item.link}" target="_blank">Link</a></td>
+            <td>${item.buka}</td>
+            <td>${item.tutup}</td>
+            <td>
+              <button onclick="editData('${key}', ${JSON.stringify(item).replace(/"/g, '&quot;')})">Edit</button>
+              <button onclick="deleteData('${key}')">Hapus</button>
+            </td>
+          </tr>`;
+        tableBody.innerHTML += row;
       }
+    });
+  }
+
+  // Tambah data
+  function addToken() {
+    const mapel = document.getElementById("mapel").value;
+    const kelas = document.getElementById("kelas").value;
+    const token = document.getElementById("token").value;
+    const link = document.getElementById("link").value;
+    const buka = document.getElementById("buka").value;
+    const tutup = document.getElementById("tutup").value;
+
+    if (mapel && kelas && token) {
+      db.push({ mapel, kelas, token, link, buka, tutup });
+      document.getElementById("tokenForm").reset();
+    } else {
+      alert("Mapel, Kelas, dan Token wajib diisi.");
+    }
+  }
+
+  // Hapus data
+  function deleteData(key) {
+    if (confirm("Yakin ingin menghapus data ini?")) {
+      db.child(key).remove();
+    }
+  }
+
+  // Edit data - buka modal
+  function editData(key, data) {
+    document.getElementById("editKey").value = key;
+    document.getElementById("editMapel").value = data.mapel;
+    document.getElementById("editKelas").value = data.kelas;
+    document.getElementById("editToken").value = data.token;
+    document.getElementById("editLink").value = data.link;
+    document.getElementById("editBuka").value = data.buka;
+    document.getElementById("editTutup").value = data.tutup;
+    document.getElementById("editModal").style.display = "block";
+  }
+
+  function closeEditModal() {
+    document.getElementById("editModal").style.display = "none";
+  }
+
+  // Simpan perubahan edit
+  function updateToken() {
+    const key = document.getElementById("editKey").value;
+    const updatedData = {
+      mapel: document.getElementById("editMapel").value,
+      kelas: document.getElementById("editKelas").value,
+      token: document.getElementById("editToken").value,
+      link: document.getElementById("editLink").value,
+      buka: document.getElementById("editBuka").value,
+      tutup: document.getElementById("editTutup").value
     };
+    db.child(key).update(updatedData);
+    closeEditModal();
+  }
 
-    window.closeDeleteModal = function() {
-      document.getElementById('deleteModal').style.display = 'none';
-      deleteId = null;
-    };
+  // Inisialisasi
+  fetchData();
+</script>
 
-    // Realtime Jam & Tanggal
-    function updateTime() {
-  const now = new Date();
-  
-  const tanggal = now.toLocaleDateString('id-ID', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
-  });
+<!-- ===== CSS (STYLE MODAL & TABEL) ===== -->
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
 
-  const waktu = now.toLocaleTimeString('id-ID', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
+  h2 {
+    margin-bottom: 10px;
+  }
 
-  const display = `${tanggal} pukul ${waktu}`;
-  document.getElementById("currentTime").innerText = display;
-  document.getElementById("adminDateTime").innerText = display;
-}
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 10px;
+  }
 
-setInterval(updateTime, 1000);
-updateTime();
-  </script>
-</body>
-</html>
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+
+  button {
+    padding: 6px 12px;
+    margin: 2px;
+    cursor: pointer;
+  }
+
+  input[type="text"], input[type="datetime-local"] {
+    padding: 6px;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  #editModal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 8px;
+  }
+
+  .modal-content h3 {
+    margin-top: 0;
+  }
+
+  .modal-buttons {
+    text-align: right;
+  }
+
+  .modal-buttons button {
+    margin-left: 10px;
+  }
+
+  .filter-container {
+    margin-top: 20px;
+  }
+
+  .filter-container input {
+    width: auto;
+    display: inline-block;
+    margin-right: 10px;
+  }
+</style>
+
