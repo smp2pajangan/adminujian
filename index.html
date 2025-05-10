@@ -199,6 +199,7 @@
       }
       #filterKelas {
         width: 100%;
+        margin-bottom: 5px;
       }
     }
   </style>
@@ -249,11 +250,17 @@
 
     <h3>Daftar Token</h3>
     <div>
-      Filter Mapel: <input type="text" id="filterMapel" onkeyup="filterTable()" placeholder="Cari Mapel">
-      Filter Kelas:
-      <select id="filterKelas" onchange="filterTable()">
+      Filter Mapel:
+      <select id="filterMapel">
         <option value="">Tampilkan Semua</option>
       </select>
+      <br>
+      Filter Kelas:
+      <select id="filterKelas">
+        <option value="">Tampilkan Semua</option>
+      </select>
+      <br>
+      <button type="button" onclick="applyFilters()">Terapkan</button>
     </div>
     <table>
       <thead>
@@ -311,7 +318,7 @@
   </div>
 
   <script type="module">
-    import {initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
     const firebaseConfig = {
@@ -342,6 +349,7 @@
         tbody.innerHTML = '';
         tokenCache = [];
         const uniqueClasses = new Set();
+        const uniqueSubjects = new Set();
         let counter = 0;
 
         snapshot.forEach(child => {
@@ -349,6 +357,7 @@
           data.key = child.key;
           tokenCache.push(data);
           uniqueClasses.add(data.kelas);
+          uniqueSubjects.add(data.subject);
         });
 
         // Sort tokenCache by kelas in ascending order
@@ -370,6 +379,20 @@
           option.value = kelas;
           option.textContent = kelas;
           filterKelasSelect.appendChild(option);
+        });
+
+        const filterMapelSelect = document.getElementById('filterMapel');
+        // Clear existing options except "Tampilkan Semua"
+        while (filterMapelSelect.options.length > 1) {
+          filterMapelSelect.remove(filterMapelSelect.options.length - 1);
+        }
+
+        // Add unique subjects to the filter dropdown
+        [...uniqueSubjects].sort().forEach(subject => {
+          const option = document.createElement('option');
+          option.value = subject;
+          option.textContent = subject;
+          filterMapelSelect.appendChild(option);
         });
 
         counter = 1;
@@ -399,14 +422,14 @@
           `;
           tbody.appendChild(row);
         });
-        filterTable(); // Initial filter after loading
+        applyFilters(); // Initial filter after loading
       });
     }
 
-    function filterTable() {
-      const filterMapelInput = document.getElementById("filterMapel");
+    function applyFilters() {
+      const filterMapelSelect = document.getElementById("filterMapel");
       const filterKelasSelect = document.getElementById("filterKelas");
-      const filterMapelValue = filterMapelInput.value.toUpperCase();
+      const filterMapelValue = filterMapelSelect.value;
       const filterKelasValue = filterKelasSelect.value;
       const table = document.getElementById("tokenTableBody");
       const rows = table.getElementsByTagName("tr");
@@ -415,9 +438,9 @@
         const tdMapel = rows[i].getElementsByTagName("td")[1]; // Kolom Mapel (indeks 1)
         const tdKelas = rows[i].getElementsByTagName("td")[2]; // Kolom Kelas (indeks 2)
         if (tdMapel && tdKelas) {
-          const mapelText = tdMapel.textContent.toUpperCase();
+          const mapelText = tdMapel.textContent;
           const kelasText = tdKelas.textContent;
-          const mapelMatch = mapelText.indexOf(filterMapelValue) > -1;
+          const mapelMatch = filterMapelValue === "" || mapelText === filterMapelValue;
           const kelasMatch = filterKelasValue === "" || kelasText === filterKelasValue;
           if (mapelMatch && kelasMatch) {
             rows[i].style.display = "";
@@ -476,7 +499,7 @@
           errorMsg.innerText = "Gagal menyimpan token: " + err.message;
         })
         .finally(() => {
-          loadTokens(); // Reload tokens to reflect the new order
+          loadTokens(); // Reload tokens to update filter options
         });
     });
 
@@ -535,7 +558,7 @@
             errorEl.innerText = "Gagal menyimpan perubahan: " + err.message;
           })
           .finally(() => {
-            loadTokens(); // Reload tokens to reflect potential class changes
+            loadTokens(); // Reload tokens to update filter options
           });
       }
     });
@@ -590,4 +613,3 @@
   </script>
 </body>
 </html>
-
