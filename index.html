@@ -360,8 +360,6 @@
           tbody.appendChild(row);
         });
 
-        // Urutkan ulang setelah data dimuat
-        // tokenCache.sort((a, b) => parseInt(a.kelas, 10) - parseInt(b.kelas, 10));
         const newTbody = document.createElement('tbody');
         let sortedCounter = 1;
         tokenCache.forEach(data => {
@@ -436,6 +434,7 @@
       push(ref(db, 'tokens'), tokenData)
         .then(() => {
           this.reset();
+          loadTokens(); // Panggil loadTokens setelah berhasil menambah
         })
         .catch(err => {
           errorMsg.innerText = "Gagal menyimpan token: " + err.message;
@@ -492,6 +491,7 @@
         update(ref(db, 'tokens/' + currentTokenId), updatedData)
           .then(() => {
             closeEditModal();
+            loadTokens(); // Panggil loadTokens setelah berhasil mengedit
           })
           .catch(err => {
             errorEl.innerText = "Gagal menyimpan perubahan: " + err.message;
@@ -548,3 +548,4 @@
   </script>
 </body>
 </html>
+
