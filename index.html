@@ -5,14 +5,13 @@
   <title>Panel Admin Ujian</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    /* ... CSS Anda ... */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      background-color: #0066cc;
+      background-color: #0066cc; /* Set warna biru sebagai background body */
     }
     .header {
-      background-color: transparent;
+      background-color: transparent; /* Header jadi transparan */
       color: white;
       padding: 15px;
       text-align: center;
@@ -28,7 +27,7 @@
       background: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Tambah efek bayangan */
     }
     input, select {
       padding: 10px;
@@ -37,7 +36,7 @@
       box-sizing: border-box;
       font-size: 16px;
     }
-    button {
+    button { /* Tombol umum */
       padding: 10px 20px;
       margin: 10px auto;
       display: block;
@@ -49,7 +48,7 @@
       border-radius: 5px;
     }
     button:hover {
-      background-color: #0056b3;
+        background-color: #0056b3;
     }
     .error {
       color: red;
@@ -60,7 +59,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
-      margin-top: 10px;
+      margin-top: 10px; /* Beri jarak sedikit dari filter */
     }
     th, td {
       border: 1px solid #ccc;
@@ -69,7 +68,7 @@
       text-align: left;
     }
     td:last-child {
-      text-align: center;
+        text-align: center;
     }
     th {
       background-color: #f4f4f4;
@@ -102,54 +101,64 @@
       width: 90%;
       max-width: 400px;
     }
-    .modal button {
+    .modal button { /* Tombol di dalam modal */
       margin: 5px;
       display: inline-block;
       width: auto;
     }
     .login-link {
-      color: #007BFF;
-      text-decoration: underline;
-      font-weight: bold;
+     color: #007BFF;
+     text-decoration: underline;
+     font-weight: bold;
     }
     .login-link:hover {
-      color: darkorange;
-      cursor: pointer;
+     color: darkorange;
+     cursor: pointer;
     }
     .login-link:active {
-      color: red;
+     color: red;
     }
+
+    /* --- CSS untuk Tombol Aksi di Tabel --- */
     .action-buttons {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
+     display: flex;
+     gap: 8px; /* Sedikit menambah jarak antar ikon */
+     justify-content: center;
+     align-items: center; /* Menyamakan tinggi ikon jika beda */
+     flex-wrap: wrap;
     }
+
+    /* Gaya untuk tombol ikon */
     .action-button-icon {
-      background: none;
-      border: none;
-      padding: 0;
-      margin: 0;
+      background: none; /* Hapus background default button */
+      border: none;     /* Hapus border default button */
+      padding: 0;       /* Hapus padding default button */
+      margin: 0;        /* Hapus margin default button */
       cursor: pointer;
-      display: inline-flex;
+      display: inline-flex; /* Agar bisa diatur alignmentnya */
       align-items: center;
       justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 4px;
+      width: 28px; /* Lebar tombol, sesuaikan jika perlu */
+      height: 28px; /* Tinggi tombol, sesuaikan jika perlu */
+      border-radius: 4px; /* Sedikit rounded corner */
     }
+
     .action-button-icon img {
-      width: 20px;
-      height: 20px;
-      display: block;
+      width: 20px;  /* Ukuran ikon, bisa disesuaikan */
+      height: 20px; /* Ukuran ikon, bisa disesuaikan */
+      display: block; /* Untuk menghilangkan spasi ekstra di bawah gambar */
     }
+
     .action-button-icon:hover {
-      background-color: #e0e0e0;
+      background-color: #e0e0e0; /* Efek hover ringan */
     }
     .action-button-icon:active {
-      background-color: #c0c0c0;
+      background-color: #c0c0c0; /* Efek klik */
     }
+
+    /* --- Akhir CSS Tombol Aksi --- */
+
+    /* --- Media Query untuk Layar Kecil --- */
     @media (max-width: 600px) {
       .container {
         margin: 10px;
@@ -170,16 +179,17 @@
       th, td {
         padding: 6px;
       }
-      thead th:nth-child(5),
+      /* Mungkin sembunyikan beberapa kolom di tabel jika tidak muat */
+      thead th:nth-child(5), /* Link */
       tbody td:nth-child(5),
-      thead th:nth-child(6),
+      thead th:nth-child(6), /* Token Dibuka */
       tbody td:nth-child(6),
-      thead th:nth-child(7),
+      thead th:nth-child(7), /* Token Ditutup */
       tbody td:nth-child(7) {
         display: none;
       }
       .action-buttons {
-        flex-direction: row;
+        flex-direction: row; /* Atur tombol aksi menjadi satu baris */
         justify-content: center;
       }
     }
@@ -192,20 +202,23 @@
   </div>
 
   <div class="container" id="loginSection">
-    <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
-    <input type="text" id="username" placeholder="Masukan Username (admin)" />
-    <input type="password" id="password" placeholder="Masukan Password" />
-    <button onclick="login()">Login</button>
-    <p style="text-align: center; font-size: 14px; margin-top: 10px;">
-      Halaman login ujian siswa?
-      <a href="http://smp2pajangan.github.io/loginujian" class="login-link">Loginujian</a>
-    </p>
-    <div class="footer">
-      <div>@Admin SMPN 2 Pajangan</div>
-      <div id="currentTime" class="date-time"></div>
-    </div>
-    <p id="loginError" class="error"></p>
+  <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
+  <input type="text" id="username" placeholder="Masukan Username (admin)" />
+  <input type="password" id="password" placeholder="Masukan Password" />
+  <button onclick="login()">Login</button>
+
+  <p style="text-align: center; font-size: 14px; margin-top: 10px;">
+    Halaman login ujian siswa?
+    <a href="http://smp2pajangan.github.io/loginujian" class="login-link">Loginujian</a>
+  </p>
+
+  <div class="footer">
+    <div>@Admin SMPN 2 Pajangan</div>
+    <div id="currentTime" class="date-time"></div>
   </div>
+
+  <p id="loginError" class="error"></p>
+</div>
 
   <div class="container" id="adminPanel" style="display:none;">
     <h3>Tambah / Edit Token</h3>
@@ -250,27 +263,29 @@
   </div>
 
   <div id="editModal" class="modal">
-    <div class="modal-content">
-      <h4>Edit Token</h4>
-      <form id="modalForm">
-        <label>Mata Pelajaran</label>
-        <input type="text" id="editSubject" required />
-        <label>Kelas</label>
-        <input type="text" id="editKelas" required />
-        <label>Token Ujian</label>
-        <input type="text" id="editToken" required />
-        <label>Link Ujian</label>
-        <input type="url" id="editUrl" required />
-        <label>Waktu Token Dibuka</label>
-        <input type="datetime-local" id="editStartTime" required />
-        <label>Waktu Token Ditutup</label>
-        <input type="datetime-local" id="editEndTime" required />
-        <p id="editErrorMsg" class="error"></p>
-        <button type="submit">Simpan</button>
-        <button type="button" onclick="closeEditModal()">Batal</button>
-      </form>
-    </div>
+  <div class="modal-content">
+    <h4>Edit Token</h4>
+    <form id="modalForm">
+      <label>Mata Pelajaran</label>
+      <input type="text" id="editSubject" required />
+      <label>Kelas</label>
+      <input type="text" id="editKelas" required />
+      <label>Token Ujian</label>
+      <input type="text" id="editToken" required />
+      <label>Link Ujian</label>
+      <input type="url" id="editUrl" required />
+      <label>Waktu Token Dibuka</label>
+      <input type="datetime-local" id="editStartTime" required />
+      <label>Waktu Token Ditutup</label>
+      <input type="datetime-local" id="editEndTime" required />
+
+      <p id="editErrorMsg" class="error"></p>
+
+      <button type="submit">Simpan</button>
+      <button type="button" onclick="closeEditModal()">Batal</button>
+    </form>
   </div>
+</div>
 
   <div id="deleteModal" class="modal">
     <div class="modal-content">
@@ -421,7 +436,6 @@
       push(ref(db, 'tokens'), tokenData)
         .then(() => {
           this.reset();
-          loadTokens(); // Muat ulang daftar token setelah menambah
         })
         .catch(err => {
           errorMsg.innerText = "Gagal menyimpan token: " + err.message;
@@ -478,7 +492,6 @@
         update(ref(db, 'tokens/' + currentTokenId), updatedData)
           .then(() => {
             closeEditModal();
-            loadTokens(); // Muat ulang daftar token setelah mengedit
           })
           .catch(err => {
             errorEl.innerText = "Gagal menyimpan perubahan: " + err.message;
