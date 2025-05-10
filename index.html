@@ -103,6 +103,17 @@
     .login-link:active {
      color: red;
     }
+    .action-buttons {
+     display: flex;
+     gap: 4px;
+     justify-content: center;
+     flex-wrap: wrap;
+    }
+
+.action-buttons button {
+  padding: 4px 8px;
+  font-size: 12px;
+}
   </style>
 </head>
 <body>
@@ -258,9 +269,11 @@
             <td>${data.startTime}</td>
             <td>${data.endTime}</td>
             <td>
-              <button onclick="editToken('${data.key}')">Edit</button>
-              <button onclick="promptDelete('${data.key}')">Hapus</button>
-            </td>
+  <div class="action-buttons">
+    <button onclick="editToken('${data.key}')">Edit</button>
+    <button onclick="promptDelete('${data.key}')">Hapus</button>
+  </div>
+</td>
           `;
           tbody.appendChild(row);
         });
