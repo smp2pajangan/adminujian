@@ -192,6 +192,20 @@
         justify-content: center;
       }
     }
+
+    /* CSS untuk notifikasi */
+    #notification {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px;
+      border-radius: 5px;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
@@ -294,6 +308,10 @@
     </div>
   </div>
 
+  <div id="notification">
+    <span id="notificationMessage"></span>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
@@ -319,6 +337,16 @@
     // URLs untuk ikon
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Hapus.png";
+
+    function showNotification(message) {
+      const notificationDiv = document.getElementById('notification');
+      const notificationMessageSpan = document.getElementById('notificationMessage');
+      notificationMessageSpan.innerText = message;
+      notificationDiv.style.display = 'block';
+      setTimeout(() => {
+        notificationDiv.style.display = 'none';
+      }, 3000); // Notifikasi akan hilang setelah 3 detik
+    }
 
 
     window.login = function() {
@@ -419,6 +447,7 @@
       push(ref(db, 'tokens'), tokenData)
         .then(() => {
           this.reset();
+          showNotification('Token berhasil ditambahkan!');
         })
         .catch(err => {
           errorMsg.innerText = "Gagal menyimpan token: " + err.message;
@@ -475,6 +504,7 @@
         update(ref(db, 'tokens/' + currentTokenId), updatedData)
           .then(() => {
             closeEditModal();
+            showNotification('Token berhasil diedit!');
           })
           .catch(err => {
             errorEl.innerText = "Gagal menyimpan perubahan: " + err.message;
@@ -502,6 +532,7 @@
           })
           .finally(() => {
             closeDeleteModal();
+            showNotification('Token berhasil dihapus!');
           });
       }
     };
@@ -531,4 +562,3 @@
   </script>
 </body>
 </html>
-
