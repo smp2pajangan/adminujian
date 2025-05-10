@@ -361,8 +361,8 @@
         });
 
         // Urutkan ulang setelah data dimuat
-        tokenCache.sort((a, b) => parseInt(a.kelas, 10) - parseInt(b.kelas, 10));
-        const sortedTbody = document.createElement('tbody');
+        // tokenCache.sort((a, b) => parseInt(a.kelas, 10) - parseInt(b.kelas, 10));
+        const newTbody = document.createElement('tbody');
         let sortedCounter = 1;
         tokenCache.forEach(data => {
           const row = document.createElement('tr');
@@ -387,9 +387,9 @@
               </div>
             </td>
           `;
-          sortedTbody.appendChild(row);
+          newTbody.appendChild(row);
         });
-        document.querySelector('#adminPanel table tbody').replaceWith(sortedTbody);
+        document.querySelector('#adminPanel table tbody').replaceWith(newTbody);
       });
     }
 
@@ -548,4 +548,3 @@
   </script>
 </body>
 </html>
-
