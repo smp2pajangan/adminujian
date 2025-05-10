@@ -59,6 +59,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
+      margin-top: 10px; /* Beri jarak sedikit dari filter */
     }
     th, td {
       border: 1px solid #ccc;
@@ -191,6 +192,13 @@
         flex-direction: row; /* Atur tombol aksi menjadi satu baris */
         justify-content: center;
       }
+      /* Gaya untuk input filter di layar kecil */
+      #filterMapel, #filterKelas {
+        width: calc(50% - 10px); /* Agar berdampingan jika cukup ruang */
+        display: inline-block;
+        margin-right: 5px;
+        margin-bottom: 5px;
+      }
     }
   </style>
 </head>
@@ -239,6 +247,10 @@
     </form>
 
     <h3>Daftar Token</h3>
+    <div>
+      Filter Mapel: <input type="text" id="filterMapel" onkeyup="filterTable()" placeholder="Cari Mapel">
+      Filter Kelas: <input type="text" id="filterKelas" onkeyup="filterTable()" placeholder="Cari Kelas">
+    </div>
     <table>
       <thead>
         <tr>
@@ -320,6 +332,30 @@
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Hapus.png";
 
+    function filterTable() {
+      const filterMapelInput = document.getElementById("filterMapel");
+      const filterKelasInput = document.getElementById("filterKelas");
+      const filterMapelValue = filterMapelInput.value.toUpperCase();
+      const filterKelasValue = filterKelasInput.value;
+      const table = document.getElementById("tokenTableBody");
+      const rows = table.getElementsByTagName("tr");
+
+      for (let i = 0; i < rows.length; i++) {
+        const tdMapel = rows[i].getElementsByTagName("td")[1]; // Kolom Mapel (indeks 1)
+        const tdKelas = rows[i].getElementsByTagName("td")[2]; // Kolom Kelas (indeks 2)
+        if (tdMapel && tdKelas) {
+          const mapelText = tdMapel.textContent.toUpperCase();
+          const kelasText = tdKelas.textContent;
+          const mapelMatch = mapelText.indexOf(filterMapelValue) > -1;
+          const kelasMatch = kelasText.indexOf(filterKelasValue) > -1;
+          if (mapelMatch && kelasMatch) {
+            rows[i].style.display = "";
+          } else {
+            rows[i].style.display = "none";
+          }
+        }
+      }
+    }
 
     window.login = function() {
       const username = document.getElementById("username").value.trim();
@@ -371,6 +407,7 @@
           `;
           tbody.appendChild(row);
         });
+        filterTable(); // Panggil filterTable setelah data dimuat
       });
     }
 
@@ -420,7 +457,6 @@
       document.getElementById('editKelas').value = tokenToEdit.kelas;
       document.getElementById('editToken').value = tokenToEdit.token;
       document.getElementById('editUrl').value = tokenToEdit.url;
-      document.getElementById
       document.getElementById('editStartTime').value = tokenToEdit.startTime;
       document.getElementById('editEndTime').value = tokenToEdit.endTime;
 
@@ -518,3 +554,4 @@
   </script>
 </body>
 </html>
+
