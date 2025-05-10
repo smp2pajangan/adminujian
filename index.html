@@ -305,13 +305,13 @@
   }
 
   const now = new Date();
-  if (new Date(startTime) <= now || new Date(endTime) <= now) {
-    errorMsg.innerText = "Waktu mulai dan selesai harus di masa depan!";
+  if (new Date(endTime) <= now) {
+    errorMsg.innerText = "Waktu Token Ditutup harus di masa depan!";
     return;
   }
 
   if (new Date(startTime) >= new Date(endTime)) {
-    errorMsg.innerText = "Waktu mulai harus sebelum waktu selesai!";
+    errorMsg.innerText = "Waktu token dibuka harus sebelum waktu token ditutup!";
     return;
   }
 
@@ -369,13 +369,13 @@ document.getElementById('modalForm').addEventListener('submit', function(e) {
   }
 
   const now = new Date();
-  if (new Date(updated.startTime) <= now || new Date(updated.endTime) <= now) {
-    errorEl.innerText = "Waktu mulai dan selesai harus dimasa depan!";
+  if (new Date(updated.endTime) <= now) {
+    errorEl.innerText = "Waktu token ditutup harus dimasa depan!";
     return;
   }
 
   if (new Date(updated.startTime) >= new Date(updated.endTime)) {
-    errorEl.innerText = "Waktu mulai harus sebelum waktu selesai!";
+    errorEl.innerText = "Waktu token dibuka harus sebelum waktu token ditutup!";
     return;
   }
 
