@@ -333,19 +333,32 @@
       }
     };
 
-    function loadTokens() {
+        function loadTokens() {
       onValue(ref(db, 'tokens'), (snapshot) => {
         const tbody = document.getElementById('tokenTableBody');
         tbody.innerHTML = '';
         tokenCache = [];
-        let counter = 0;
-
         snapshot.forEach(child => {
-          counter++;
           const data = child.val();
           data.key = child.key;
           tokenCache.push(data);
+        });
 
+        // Urutkan tokenCache berdasarkan kelas
+        tokenCache.sort((a, b) => {
+          // Jika kelas berupa angka, urutkan secara numerik
+          const kelasA = parseInt(a.kelas);
+          const kelasB = parseInt(b.kelas);
+          if (!isNaN(kelasA) && !isNaN(kelasB)) {
+            return kelasA - kelasB;
+          }
+          // Jika bukan angka atau campuran, urutkan sebagai string
+          return a.kelas.localeCompare(b.kelas);
+        });
+
+        let counter = 0;
+        tokenCache.forEach(data => {
+          counter++;
           const row = document.createElement('tr');
           const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
@@ -373,6 +386,7 @@
         });
       });
     }
+
 
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
