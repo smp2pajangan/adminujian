@@ -409,7 +409,7 @@
       e.preventDefault();
       const subject = document.getElementById('subject').value.trim().toUpperCase();
       const kelas = document.getElementById('kelas').value.trim();
-      const token = document.getElementById('token').value.trim().toUpperCase();
+      const token = document.getElementById('token').trim().toUpperCase();
       const url = document.getElementById('url').value.trim();
       const startTime = document.getElementById('startTime').value;
       const endTime = document.getElementById('endTime').value;
@@ -436,6 +436,7 @@
       push(ref(db, 'tokens'), tokenData)
         .then(() => {
           this.reset();
+          loadTokens(); // Muat ulang daftar token
         })
         .catch(err => {
           errorMsg.innerText = "Gagal menyimpan token: " + err.message;
@@ -492,6 +493,7 @@
         update(ref(db, 'tokens/' + currentTokenId), updatedData)
           .then(() => {
             closeEditModal();
+            loadTokens(); // Muat ulang daftar token
           })
           .catch(err => {
             errorEl.innerText = "Gagal menyimpan perubahan: " + err.message;
@@ -548,4 +550,3 @@
   </script>
 </body>
 </html>
-
