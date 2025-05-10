@@ -405,7 +405,7 @@
       }
     };
 
-    document.getElementById('tokenForm').addEventListener('submit', function(e) {
+        document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const subject = document.getElementById('subject').value.trim().toUpperCase();
       const kelas = document.getElementById('kelas').value.trim();
@@ -439,24 +439,11 @@
         })
         .catch(err => {
           errorMsg.innerText = "Gagal menyimpan token: " + err.message;
+        })
+        .finally(() => {
+          loadTokens(); // Panggil loadTokens setelah menambahkan
         });
     });
-
-    window.editToken = function(id) {
-      const tokenToEdit = tokenCache.find(t => t.key === id);
-      if (!tokenToEdit) return;
-
-      currentTokenId = id;
-      document.getElementById('editSubject').value = tokenToEdit.subject;
-      document.getElementById('editKelas').value = tokenToEdit.kelas;
-      document.getElementById('editToken').value = tokenToEdit.token;
-      document.getElementById('editUrl').value = tokenToEdit.url;
-      document.getElementById('editStartTime').value = tokenToEdit.startTime;
-      document.getElementById('editEndTime').value = tokenToEdit.endTime;
-
-      document.getElementById('editErrorMsg').innerText = "";
-      document.getElementById('editModal').style.display = 'flex';
-    };
 
     document.getElementById('modalForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -495,33 +482,13 @@
           })
           .catch(err => {
             errorEl.innerText = "Gagal menyimpan perubahan: " + err.message;
+          })
+          .finally(() => {
+            loadTokens(); // Panggil loadTokens setelah mengedit
           });
       }
     });
 
-    window.closeEditModal = function() {
-      document.getElementById('editModal').style.display = 'none';
-      document.getElementById('editErrorMsg').innerText = "";
-      currentTokenId = null;
-    };
-
-    let deleteId = null;
-    window.promptDelete = function(id) {
-      deleteId = id;
-      document.getElementById('deleteModal').style.display = 'flex';
-    };
-
-    window.confirmDelete = function() {
-      if (deleteId) {
-        remove(ref(db, 'tokens/' + deleteId))
-          .catch(err => {
-            alert("Gagal menghapus token: " + err.message);
-          })
-          .finally(() => {
-            loadTokens(); // Muat ulang agar urutan terbaru terlihat
-          });
-      }
-    };
 
     window.closeDeleteModal = function() {
       document.getElementById('deleteModal').style.display = 'none';
