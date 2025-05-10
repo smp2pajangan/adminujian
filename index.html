@@ -192,15 +192,6 @@
         flex-direction: row; /* Atur tombol aksi menjadi satu baris */
         justify-content: center;
       }
-      /* Gaya untuk input filter di layar kecil */
-      #filterMapel {
-        width: 100%;
-        margin-bottom: 5px;
-      }
-      #filterKelas {
-        width: 100%;
-        margin-bottom: 5px;
-      }
     }
   </style>
 </head>
@@ -249,19 +240,6 @@
     </form>
 
     <h3>Daftar Token</h3>
-    <div>
-      Filter Mapel:
-      <select id="filterMapel">
-        <option value="">Tampilkan Semua</option>
-      </select>
-      <br>
-      Filter Kelas:
-      <select id="filterKelas">
-        <option value="">Tampilkan Semua</option>
-      </select>
-      <br>
-      <button type="button" onclick="applyFilters()">Terapkan</button>
-    </div>
     <table>
       <thead>
         <tr>
@@ -348,61 +326,20 @@
         const tbody = document.getElementById('tokenTableBody');
         tbody.innerHTML = '';
         tokenCache = [];
-        const uniqueClasses = new Set();
-        const uniqueSubjects = new Set();
         let counter = 0;
 
         snapshot.forEach(child => {
+          counter++;
           const data = child.val();
           data.key = child.key;
           tokenCache.push(data);
-          uniqueClasses.add(data.kelas);
-          uniqueSubjects.add(data.subject);
-        });
 
-        // Sort tokenCache by kelas in ascending order
-        tokenCache.sort((a, b) => {
-          const kelasA = parseInt(a.kelas, 10);
-          const kelasB = parseInt(b.kelas, 10);
-          return kelasA - kelasB;
-        });
-
-        const filterKelasSelect = document.getElementById('filterKelas');
-        // Clear existing options except "Tampilkan Semua"
-        while (filterKelasSelect.options.length > 1) {
-          filterKelasSelect.remove(filterKelasSelect.options.length - 1);
-        }
-
-        // Add unique classes to the filter dropdown
-        [...uniqueClasses].sort((a, b) => parseInt(a, 10) - parseInt(b, 10)).forEach(kelas => {
-          const option = document.createElement('option');
-          option.value = kelas;
-          option.textContent = kelas;
-          filterKelasSelect.appendChild(option);
-        });
-
-        const filterMapelSelect = document.getElementById('filterMapel');
-        // Clear existing options except "Tampilkan Semua"
-        while (filterMapelSelect.options.length > 1) {
-          filterMapelSelect.remove(filterMapelSelect.options.length - 1);
-        }
-
-        // Add unique subjects to the filter dropdown
-        [...uniqueSubjects].sort().forEach(subject => {
-          const option = document.createElement('option');
-          option.value = subject;
-          option.textContent = subject;
-          filterMapelSelect.appendChild(option);
-        });
-
-        counter = 1;
-        tokenCache.forEach(data => {
           const row = document.createElement('tr');
           const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
 
           row.innerHTML = `
-            <td>${counter++}</td>
+            <td>${counter}</td>
             <td>${data.subject}</td>
             <td>${data.kelas}</td>
             <td>${data.token}</td>
@@ -422,33 +359,38 @@
           `;
           tbody.appendChild(row);
         });
-        applyFilters(); // Initial filter after loading
+
+        // Urutkan ulang setelah data dimuat
+        tokenCache.sort((a, b) => parseInt(a.kelas, 10) - parseInt(b.kelas, 10));
+        const sortedTbody = document.createElement('tbody');
+        let sortedCounter = 1;
+        tokenCache.forEach(data => {
+          const row = document.createElement('tr');
+          const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+          const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+          row.innerHTML = `
+            <td>${sortedCounter++}</td>
+            <td>${data.subject}</td>
+            <td>${data.kelas}</td>
+            <td>${data.token}</td>
+            <td><a href="${data.url}" target="_blank">Link</a></td>
+            <td>${startTimeFormatted}</td>
+            <td>${endTimeFormatted}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-button-icon" onclick="editToken('${data.key}')" title="Edit Token">
+                  <img src="${EDIT_ICON_URL}" alt="Edit">
+                </button>
+                <button class="action-button-icon" onclick="promptDelete('${data.key}')" title="Hapus Token">
+                  <img src="${DELETE_ICON_URL}" alt="Hapus">
+                </button>
+              </div>
+            </td>
+          `;
+          sortedTbody.appendChild(row);
+        });
+        document.querySelector('#adminPanel table tbody').replaceWith(sortedTbody);
       });
-    }
-
-    function applyFilters() {
-      const filterMapelSelect = document.getElementById("filterMapel");
-      const filterKelasSelect = document.getElementById("filterKelas");
-      const filterMapelValue = filterMapelSelect.value;
-      const filterKelasValue = filterKelasSelect.value;
-      const table = document.getElementById("tokenTableBody");
-      const rows = table.getElementsByTagName("tr");
-
-      for (let i = 0; i < rows.length; i++) {
-        const tdMapel = rows[i].getElementsByTagName("td")[1]; // Kolom Mapel (indeks 1)
-        const tdKelas = rows[i].getElementsByTagName("td")[2]; // Kolom Kelas (indeks 2)
-        if (tdMapel && tdKelas) {
-          const mapelText = tdMapel.textContent;
-          const kelasText = tdKelas.textContent;
-          const mapelMatch = filterMapelValue === "" || mapelText === filterMapelValue;
-          const kelasMatch = filterKelasValue === "" || kelasText === filterKelasValue;
-          if (mapelMatch && kelasMatch) {
-            rows[i].style.display = "";
-          } else {
-            rows[i].style.display = "none";
-          }
-        }
-      }
     }
 
     window.login = function() {
@@ -497,9 +439,6 @@
         })
         .catch(err => {
           errorMsg.innerText = "Gagal menyimpan token: " + err.message;
-        })
-        .finally(() => {
-          loadTokens(); // Reload tokens to update filter options
         });
     });
 
@@ -556,9 +495,6 @@
           })
           .catch(err => {
             errorEl.innerText = "Gagal menyimpan perubahan: " + err.message;
-          })
-          .finally(() => {
-            loadTokens(); // Reload tokens to update filter options
           });
       }
     });
@@ -582,8 +518,7 @@
             alert("Gagal menghapus token: " + err.message);
           })
           .finally(() => {
-            loadTokens(); // Reload tokens after deletion
-            closeDeleteModal();
+            loadTokens(); // Muat ulang agar urutan terbaru terlihat
           });
       }
     };
@@ -613,3 +548,4 @@
   </script>
 </body>
 </html>
+
