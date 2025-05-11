@@ -362,43 +362,23 @@
               .catch(error => console.error(`Gagal hapus ${data.key}: `, error));
             return;
           }
-
-          counter++;
-          const row = document.createElement('tr');
-          const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-          const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-
-          row.innerHTML = `
-            <td>${counter}</td>
-            <td>${data.subject}</td>
-            <td>${data.kelas}</td>
-            <td>${data.token}</td>
-            <td><a href="${data.url}" target="_blank">Link</a></td>
-            <td>${startTimeFormatted}</td>
-            <td>${endTimeFormatted}</td>
-            <td>
-              <div class="action-buttons">
-                <button class="action-button-icon" onclick="editToken('${data.key}')" title="Edit Token">
-                  <img src="${EDIT_ICON_URL}" alt="Edit">
-                </button>
-                <button class="action-button-icon" onclick="promptDelete('${data.key}')" title="Hapus Token">
-                  <img src="${DELETE_ICON_URL}" alt="Hapus">
-                </button>
-              </div>
-            </td>
-          `;
-          tbody.appendChild(row);
         });
 
         tokenCache.sort((a, b) => {
           const kelasA = parseInt(a.kelas);
           const kelasB = parseInt(b.kelas);
-          if (!isNaN(kelasA) && !isNaN(kelasB)) return kelasA - kelasB;
-          return a.kelas.localeCompare(b.kelas);
+
+          if (!isNaN(kelasA) && !isNaN(kelasB)) {
+            if (kelasA !== kelasB) return kelasA - kelasB;
+          } else if (typeof a.kelas === 'string' && typeof b.kelas === 'string' && a.kelas !== b.kelas) {
+            return a.kelas.localeCompare(b.kelas);
+          }
+
+          const timeA = new Date(a.startTime).getTime();
+          const timeB = new Date(b.startTime).getTime();
+          return timeA - timeB;
         });
 
-        // Setelah data diurutkan, kita buat ulang tabelnya
-        tbody.innerHTML = '';
         let sortedCounter = 0;
         tokenCache.forEach(data => {
           sortedCounter++;
@@ -425,7 +405,7 @@
               </div>
             </td>
           `;
-          tbody.appendChild(row);
+          document.getElementById('tokenTableBody').appendChild(row);
         });
       });
     }
@@ -438,7 +418,7 @@
       const u = document.getElementById('url').value.trim();
       const st = document.getElementById('startTime').value;
       const et = document.getElementById('endTime').value;
-      const em = document.getElementById('errorMsg');
+      const em= document.getElementById('errorMsg');
       em.innerText = "";
 
       if (!s || !k || !t || !u || !st || !et) {
@@ -569,4 +549,3 @@
   </script>
 </body>
 </html>
-
