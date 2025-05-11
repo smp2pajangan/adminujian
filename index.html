@@ -382,7 +382,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, update, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
@@ -520,7 +520,16 @@
         return;
       }
 
-      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now() };
+      const data = {
+        subject: s,
+        kelas: k,
+        token: t,
+        url: u,
+        startTime: st,
+        endTime: et,
+        createdAt: Date.now(),
+        serverTime: serverTimestamp() // Tambahkan serverTime di sini
+      };
       push(ref(db, 'tokens'), data)
         .then(() => {
           this.reset();
@@ -574,7 +583,15 @@
       }
 
       if (currentTokenId) {
-        const updates = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et };
+        const updates = {
+          subject: s,
+          kelas: k,
+          token: t,
+          url: u,
+          startTime: st,
+          endTime: et,
+          serverTime: serverTimestamp() // Tambahkan/perbarui serverTime di sini
+        };
         update(ref(db, 'tokens/' + currentTokenId), updates)
           .then(() => {
             closeEditModal();
