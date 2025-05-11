@@ -656,35 +656,23 @@
       // Merge cell untuk judul agar rata tengah di seluruh lebar tabel
       ws['!merges'] = [{ s: { c: 0, r: 0 }, e: { c: visibleHeaderCount - 1, r: 0 } }];
 
-      // Tambahkan border ke semua sel data
+      // Tambahkan border ke seluruh rentang tabel data dan header
       const range = XLSX.utils.decode_range(ws['!ref']);
-      for (let R = 3; R <= range.e.r; ++R) {
+      const borderStyle = {
+        top: { style: 'thin', color: { auto: 1 } },
+        bottom: { style: 'thin', color: { auto: 1 } },
+        left: { style: 'thin', color: { auto: 1 } },
+        right: { style: 'thin', color: { auto: 1 } },
+      };
+
+      for (let R = 2; R <= range.e.r; ++R) { // Mulai dari baris header
         for (let C = 0; C < visibleHeaderCount; ++C) {
           const cellAddress = XLSX.utils.encode_cell({ c: C, r: R });
           if (!ws[cellAddress]) continue;
-          ws[cellAddress].s = {
-            border: {
-              top: { style: 'thin', color: { auto: 1 } },
-              bottom: { style: 'thin', color: { auto: 1 } },
-              left: { style: 'thin', color: { auto: 1 } },
-              right: { style: 'thin', color: { auto: 1 } },
-            },
-          };
+          if (!ws[cellAddress].s) ws[cellAddress].s = {};
+          ws[cellAddress].s.border = borderStyle;
         }
       }
-      // Tambahkan border ke header juga
-      for (let C = 0; C < visibleHeaderCount; ++C) {
-        const cellAddress = XLSX.utils.encode_cell({ c: C, r: 3 });
-        if (!ws[cellAddress]) continue;
-        if (!ws[cellAddress].s) ws[cellAddress].s = {};
-        ws[cellAddress].s.border = {
-          top: { style: 'thin', color: { auto: 1 } },
-          bottom: { style: 'thin', color: { auto: 1 } },
-          left: { style: 'thin', color: { auto: 1 } },
-          right: { style: 'thin', color: { auto: 1 } },
-        };
-      }
-
 
       XLSX.utils.book_append_sheet(wb, ws, "Daftar Token");
       XLSX.writeFile(wb, `${judul.replace(/\s+/g, '_')}.xlsx`);
@@ -718,9 +706,10 @@
       // Tambahkan header tabel
       const headers = [];
       const tableHeaders = document.querySelectorAll('#tokenTable thead th');
+      const visibleHeaders = [];
       for (let i = 0; i < tableHeaders.length; i++) {
         if (i !== 4 && i !== 7) {
-          headers.push(tableHeaders[i].innerText);
+          visibleHeaders.push(tableHeaders[i].innerText);
         }
       }
 
@@ -737,14 +726,24 @@
         data.push(rowData);
       });
 
-      // Kita akan menggunakan autoTable plugin untuk membuat tabel lebih mudah
       pdf.autoTable({
-        head: [headers],
+        head: [visibleHeaders],
         body: data,
         startY: yPosition + 5,
         margin: { left: margin, right: margin, top: yPosition, bottom: margin },
-        styles: { fontSize: 9, lineWidth: 0.5, lineColor: [0, 0, 0] },
+        styles: { fontSize: 9 },
         columnStyles: { 0: { cellWidth: 10 } },
+        drawCell: function(hookData) {
+          const doc = hookData.doc;
+          const x = hookData.table.columns[hookData.column.index].x;
+          const y = hookData.row.y;
+          const width = hookData.column.width;
+          const height = hookData.row.height;
+
+          doc.setLineWidth(0.5);
+          doc.setDrawColor(0);
+          doc.rect(x, y, width, height);
+        },
         didDrawPage: function(data) {
           const pageNumber = pdf.internal.getNumberOfPages();
           pdf.setFontSize(10);
