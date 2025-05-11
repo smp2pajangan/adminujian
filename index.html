@@ -336,6 +336,7 @@
   </div>
 
   <div class="container" id="adminPanel" style="display:none;">
+    <button onclick="logout()">Logout</button>
     <h3>TAMBAH / EDIT TOKEN</h3>
     <form id="tokenForm">
       <label>Mata Pelajaran</label>
@@ -445,7 +446,7 @@
       databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
       projectId: "ujian-online-berbasis-android",
       storageBucket: "ujian-online-berbasis-android.appspot.com",
- messagingSenderId: "923446282537",
+      messagingSenderId: "923446282537",
       appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
     };
 
@@ -460,6 +461,8 @@
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Hapus.png";
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
+    let inactivityTimer;
+    const INACTIVITY_TIMEOUT = 2 * 60 * 60 * 1000; // 2 jam dalam milidetik
 
     function showNotification(message) {
       const n = document.getElementById('notification');
@@ -474,9 +477,11 @@
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value.trim();
       if(u === ADMIN_USER && p === ADMIN_PASS) {
+        localStorage.setItem('isAdminLoggedIn', 'true'); // Simpan status login
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();
+        resetInactivityTimer(); // Mulai timer setelah login
       } else {
         document.getElementById("loginError").innerText = "Username atau password salah.";
       }
@@ -730,6 +735,55 @@
         // Tidak perlu kembali secara manual karena window.open membuka tab baru
       }, 1500);
       closePrintModal();
+    };
+
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(logoutDueToInactivity, INACTIVITY_TIMEOUT);
+    }
+
+    function logoutDueToInactivity() {
+      localStorage.removeItem('isAdminLoggedIn');
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+      showNotification('Anda telah logout karena tidak ada aktivitas selama 2 jam.');
+    }
+
+    // Tambahkan event listener untuk mendeteksi aktivitas
+    window.addEventListener('mousemove', resetInactivityTimer);
+    window.addEventListener('keypress', resetInactivityTimer);
+    window.addEventListener('scroll', resetInactivityTimer);
+    window.addEventListener('click', resetInactivityTimer); // Untuk touch events juga
+
+    // Set timer awal saat halaman dimuat (setelah login berhasil atau saat sudah login)
+    function startInactivityTimerOnLoad() {
+      if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+        resetInactivityTimer();
+      }
+    }
+
+    // Panggil fungsi ini saat halaman dimuat
+    window.addEventListener('load', startInactivityTimerOnLoad);
+
+    window.logout = () => {
+      localStorage.removeItem('isAdminLoggedIn');
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+      clearTimeout(inactivityTimer); // Hentikan timer saat logout manual
+      showNotification('Anda telah berhasil logout.');
+    };
+
+    // Periksa status login saat halaman dimuat
+    window.onload = function() {
+      if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadTokens();
+        resetInactivityTimer(); // Mulai timer saat sudah login
+      } else {
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('adminPanel').style.display = 'none';
+      }
     };
 
     let statusCheckInterval;
