@@ -426,7 +426,7 @@
         tokenCache.forEach(data => {
           sortedCounter++;
           const row = document.createElement('tr');
-          const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+          const startTimeFormatted = data? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
 
           row.innerHTML = `
