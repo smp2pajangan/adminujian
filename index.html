@@ -5,6 +5,8 @@
   <title>Panel Admin Ujian</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://unpkg.com/xlsx/xlsx.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.7.1/jspdf.plugin.autotable.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -423,7 +425,7 @@
           if (data.createdAt && (Date.now() - data.createdAt) > THIRTY_DAYS_IN_MS) {
             remove(ref(db, 'tokens/' + data.key))
               .then(() => console.log(`Token ${data.key} dihapus.`))
-              .catch(error => console.error(`Gagal hapus ${data.key}:${data.key}: `, error));
+              .catch(error => console.error(`Gagal hapus ${data.key}: `, error));
             return;
           }
         });
@@ -661,10 +663,70 @@
       downloadExcel(title);
     };
 
+    function downloadPdf(judul) {
+      const pdf = new jspdf.jsPDF({
+        orientation: 'landscape', // Lebih cocok untuk tabel lebar
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const margin = 10;
+      let yPosition = margin + 10; // Posisi awal Y setelah margin dan sedikit ruang untuk judul
+      const pageWidth = pdf.internal.pageSize.getWidth() - 2 * margin;
+
+      // Tambahkan judul
+      pdf.setFontSize(16);
+      const titleWidth = pdf.getTextWidth(judul);
+      const titleX = (pageWidth + 2 * margin - titleWidth) / 2; // Center judul
+      pdf.text(judul, titleX, yPosition);
+      yPosition += 10; // Ruang setelah judul
+      yPosition += 5; // Tambah jarak antara judul dan tabel
+
+      // Tambahkan header tabel
+      const headers = [];
+      const tableHeaders = document.querySelectorAll('#tokenTable thead th');
+      for (let i = 0; i < tableHeaders.length; i++) {
+        if (i !== 4 && i !== 7) {
+          headers.push(tableHeaders[i].innerText);
+        }
+      }
+
+      const data = [];
+      const tableRows = document.querySelectorAll('#tokenTable tbody tr');
+      tableRows.forEach(row => {
+        const rowData = [];
+        const cells = row.querySelectorAll('td');
+        for (let i = 0; i < cells.length; i++) {
+          if (i !== 4 && i !== 7) {
+            rowData.push(cells[i].innerText);
+          }
+        }
+        data.push(rowData);
+      });
+
+      // Kita akan menggunakan autoTable plugin untuk membuat tabel lebih mudah
+      pdf.autoTable({
+        head: [headers],
+        body: data,
+        startY: yPosition + 5,
+        margin: { left: margin, right: margin, top: yPosition, bottom: margin },
+        styles: { fontSize: 9 },
+        columnStyles: { 0: { cellWidth: 10 } }, // Contoh lebar kolom pertama
+        didDrawPage: function(data) {
+          // Tambahkan footer nomor halaman jika perlu
+          const pageNumber = pdf.internal.getNumberOfPages();
+          pdf.setFontSize(10);
+          pdf.text(`Halaman ${pageNumber}`, pageWidth + margin - 20, pdf.internal.pageSize.getHeight() - margin);
+        }
+      });
+
+      pdf.save(`${judul.replace(/\s+/g, '_')}.pdf`);
+    }
+
     window.exportToPdf = function() {
       const title = document.getElementById('exportTitle').value.trim();
       closeExportModal();
-      downloadPdf(title); // Kita akan buat fungsi ini selanjutnya
+      downloadPdf(title);
     };
 
     function updateTime() {
@@ -685,4 +747,3 @@
   </script>
 </body>
 </html>
-
