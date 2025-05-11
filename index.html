@@ -193,7 +193,7 @@
       }
     }
 
-    /* ... CSS sebelumnya ... */
+    /* CSS untuk notifikasi */
     #notification {
       display: none;
       position: fixed;
@@ -205,7 +205,7 @@
       padding: 15px;
       border-radius: 5px;
       z-index: 1000;
-      text-align: center; /* Tambahkan ini untuk membuat teks rata tengah */
+      text-align: center; /* Teks notifikasi rata tengah */
     }
   </style>
 </head>
@@ -217,6 +217,7 @@
 
   <div class="container" id="loginSection">
   <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
+  <p id="loginError" class="error"></p>
   <input type="text" id="username" placeholder="Masukan Username (admin)" />
   <input type="password" id="password" placeholder="Masukan Password" />
   <button onclick="login()">Login</button>
@@ -230,12 +231,13 @@
     <div>@Admin SMPN 2 Pajangan</div>
     <div id="currentTime" class="date-time"></div>
   </div>
-
-  <p id="loginError" class="error"></p>
 </div>
 
   <div class="container" id="adminPanel" style="display:none;">
     <h3>Tambah / Edit Token</h3>
+    <p style="font-size: 12px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
+      Token akan terhapus otomatis setelah 30 hari.
+    </p>
     <form id="tokenForm">
       <label>Mata Pelajaran</label>
       <input type="text" id="subject" placeholder="Gunakan kapital" required />
@@ -334,6 +336,7 @@
     const ADMIN_PASS = "12345";
     let currentTokenId = null;
     let tokenCache = [];
+    const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
 
     // URLs untuk ikon
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Edit.png";
@@ -367,26 +370,33 @@
         const tbody = document.getElementById('tokenTableBody');
         tbody.innerHTML = '';
         tokenCache = [];
+        let counter = 0;
+
+        if (!snapshot.exists()) {
+          const emptyRow = document.createElement('tr');
+          const colspan = document.querySelector('#tokenTable thead tr').childElementCount;
+          emptyRow.innerHTML = `<td colspan="${colspan}" style="text-align: center;">Belum ada daftar token yang ditambah</td>`;
+          tbody.appendChild(emptyRow);
+          return;
+        }
+
         snapshot.forEach(child => {
           const data = child.val();
           data.key = child.key;
           tokenCache.push(data);
-        });
 
-        // Urutkan tokenCache berdasarkan kelas
-        tokenCache.sort((a, b) => {
-          // Jika kelas berupa angka, urutkan secara numerik
-          const kelasA = parseInt(a.kelas);
-          const kelasB = parseInt(b.kelas);
-          if (!isNaN(kelasA) && !isNaN(kelasB)) {
-            return kelasA - kelasB;
+          // Periksa dan hapus token yang sudah lebih dari 30 hari
+          if (data.createdAt && (Date.now() - data.createdAt) > THIRTY_DAYS_IN_MS) {
+            remove(ref(db, 'tokens/' + data.key))
+              .then(() => {
+                console.log(`Token dengan key ${data.key} telah dihapus karena sudah lebih dari 30 hari.`);
+              })
+              .catch(error => {
+                console.error(`Gagal menghapus token ${data.key}: `, error);
+              });
+            return; // Skip token yang dihapus agar tidak ditampilkan
           }
-          // Jika bukan angka atau campuran, urutkan sebagai string
-          return a.kelas.localeCompare(b.kelas);
-        });
 
-        let counter = 0;
-        tokenCache.forEach(data => {
           counter++;
           const row = document.createElement('tr');
           const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
@@ -444,7 +454,7 @@
         return;
       }
 
-      const tokenData = { subject, kelas, token, url, startTime, endTime };
+      const tokenData = { subject, kelas, token, url, startTime, endTime, createdAt: Date.now() }; // Tambahkan createdAt
       push(ref(db, 'tokens'), tokenData)
         .then(() => {
           this.reset();
