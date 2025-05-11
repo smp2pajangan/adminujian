@@ -1,3 +1,4 @@
+Tentu, berikut adalah kode lengkap panel admin dengan fitur status token yang otomatis berubah sesuai waktu buka dan tutup:
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -440,7 +441,7 @@
       projectId: "ujian-online-berbasis-android",
       storageBucket: "ujian-online-berbasis-android.appspot.com",
       messagingSenderId: "923446282537",
-      appId: "1:92344628257:web:60d374dde8aca61f6a0f38"
+      appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -547,6 +548,10 @@
           `;
           document.getElementById('tokenTableBody').appendChild(row);
         });
+        // Setelah memuat token, mulai atau restart interval pemeriksaan status
+        clearInterval(statusCheckInterval); // Clear interval sebelumnya jika ada
+        statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 60000);
+        periksaAndUpdateStatusToken(); // Panggil segera setelah load
       });
     }
 
@@ -577,11 +582,11 @@
         return;
       }
 
-      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now(), isActive: true };
+      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now(), isActive: false }; // Default nonaktif saat ditambahkan
       push(ref(db, 'tokens'), data)
         .then(() => {
           this.reset();
-          showNotification('Token berhasil ditambahkan!');
+          showNotification('Token berhasil ditambahkan! Status akan otomatis aktif sesuai waktu.');
         })
         .catch(err => {
           em.innerText = "Gagal menyimpan token: " + err.message;
@@ -718,22 +723,26 @@
       closePrintModal();
     };
 
-    window.toggleTokenStatus = (tokenId, isActive) => {
-      update(ref(db, 'tokens/' + tokenId), { isActive: isActive })
-        .then(() => {
-          const statusText = isActive ? 'diaktifkan' : 'dinonaktifkan';
-          showNotification(`Token berhasil ${statusText}!`);
-        })
-        .catch(error => {
-          console.error("Gagal memperbarui status token: ", error);
-          showNotification('Gagal memperbarui status token.');
-          // Jika gagal, kembalikan status switch ke sebelumnya
-          const switchElement = document.querySelector(`#tokenTableBody tr[data-token-key="${tokenId}"] input[type="checkbox"]`);
-          if (switchElement) {
-            switchElement.checked = !isActive;
+    let statusCheckInterval;
+
+    async function periksaAndUpdateStatusToken() {
+      const now = new Date();
+      for (const tokenData of tokenCache) {
+        const startTime = new Date(tokenData.startTime);
+        const endTime = new Date(tokenData.endTime);
+        let shouldBeActive = now >= startTime && now <= endTime;
+
+        if (tokenData.isActive !== shouldBeActive) {
+          try {
+            await update(ref(db, 'tokens/' + tokenData.key), { isActive: shouldBeActive });
+            console.log(`Token ${tokenData.key} status diperbarui menjadi ${shouldBeActive ? 'aktif' : 'nonaktif'}.`);
+            // Tidak perlu memanggil loadTokens() di sini, onValue akan menangani perubahan
+          } catch (error) {
+            console.error(`Gagal memperbarui status token ${tokenData.key}: `, error);
           }
-        });
-    };
+        }
+      }
+    }
 
     function updateTime() {
       const now = new Date();
