@@ -148,46 +148,6 @@
     .action-button-icon:active {
       background-color: #c0c0c0;
     }
-    /* Style untuk dropdown export */
-    .dropdown {
-      position: relative;
-      display: inline-block;
-      text-align: right; /* Agar dropdown berada di pojok kanan */
-    }
-
-    .dropbtn {
-      background-color: #f4f4f4;
-      color: #333;
-      padding: 10px 15px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #f9f9f9;
-      min-width: 160px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
-      right: 0; /* Agar dropdown keluar dari kanan */
-    }
-
-    .dropdown-content a {
-      color: black;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-    }
-
-    .dropdown-content a:hover {background-color: #ddd;}
-
-    .dropdown:hover .dropdown-content {display: block;}
-
-    .dropdown:hover .dropbtn {background-color: #e0e0e0;}
-
     @media (max-width: 600px) {
       .container {
         margin: 10px;
@@ -259,10 +219,25 @@
   </div>
 
   <div class="container" id="adminPanel" style="display:none;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-      <h3>Daftar Token</h3>
-      <button onclick="openPrintPage()" class="dropbtn" style="margin-left: auto;">Cetak</button>
-    </div>
+    <h3>Tambah / Edit Token</h3>
+    <form id="tokenForm">
+      <label>Mata Pelajaran</label>
+      <input type="text" id="subject" placeholder="Gunakan kapital" required />
+      <label>Kelas</label>
+      <input type="text" id="kelas" placeholder="Berupa angka saja" required />
+      <label>Token Ujian</label>
+      <input type="text" id="token" placeholder="Berupa huruf/angka (gunakan kapital)" required />
+      <label>Link Ujian</label>
+      <input type="url" id="url" placeholder="Gunakan http://" required />
+      <label>Waktu Token Dibuka</label>
+      <input type="datetime-local" id="startTime" required />
+      <label>Waktu Token Ditutup</label>
+      <input type="datetime-local" id="endTime" required />
+      <button type="submit">Tambah</button>
+      <p id="errorMsg" class="error"></p>
+    </form>
+
+    <h3>Daftar Token</h3>
     <p style="font-size: 12px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
       Token akan terhapus otomatis 30 hari setelah ditambahkan.
     </p>
@@ -281,24 +256,6 @@
       </thead>
       <tbody id="tokenTableBody"></tbody>
     </table>
-
-    <h3>Tambah / Edit Token</h3>
-    <form id="tokenForm">
-      <label>Mata Pelajaran</label>
-      <input type="text" id="subject" placeholder="Gunakan kapital" required />
-      <label>Kelas</label>
-      <input type="text" id="kelas" placeholder="Berupa angka saja" required />
-      <label>Token Ujian</label>
-      <input type="text" id="token" placeholder="Berupa huruf/angka (gunakan kapital)" required />
-      <label>Link Ujian</label>
-      <input type="url" id="url" placeholder="Gunakan http://" required />
-      <label>Waktu Token Dibuka</label>
-      <input type="datetime-local" id="startTime" required />
-      <label>Waktu Token Ditutup</label>
-      <input type="datetime-local" id="endTime" required />
-      <button type="submit">Tambah</button>
-      <p id="errorMsg" class="error"></p>
-    </form>
 
     <div class="footer">
       <div>@Admin SMPN 2 Pajangan</div>
@@ -426,7 +383,7 @@
         tokenCache.forEach(data => {
           sortedCounter++;
           const row = document.createElement('tr');
-          const startTimeFormatted = data? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+          const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
 
           row.innerHTML = `
@@ -574,93 +531,6 @@
       deleteId = null;
     };
 
-    window.openPrintPage = function() {
-      const printWindow = window.open('', '_blank');
-      const table = document.getElementById('tokenTableBody');
-      let tableHTML = `
-        <table>
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Mapel</th>
-              <th>Kelas</th>
-              <th>Token</th>
-              <th>Token Dibuka</th>
-              <th>Token Ditutup</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${table.innerHTML.replace(/<td[^>]*><a[^>]*>.*?<\/a><\/td>/g, '') // Hapus kolom Link
-                               .replace(/<td[^>]*><div[^>]*>.*?<\/div><\/td>/g, '')} // Hapus kolom Aksi
-          </tbody>
-        </table>
-      `;
-
-      const printDocument = `
-        <html>
-        <head>
-          <title>Cetak Daftar Token</title>
-          <style>
-            @page {
-              size: A4 portrait;
-              margin: 10mm;
-            }
-            body {
-              background-color: #f0f0f0;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              min-height: 100vh;
-              margin: 0;
-            }
-            .page {
-              background-color: white;
-              width: 210mm;
-              min-height: 297mm;
-              box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-              padding: 20mm;
-              box-sizing: border-box;
-            }
-            h2 {
-              text-align: center;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-top: 20px;
-            }
-            th, td {
-              border: 1px solid black;
-              padding: 8px;
-              text-align: left;
-              font-size: 10pt;
-            }
-            th {
-              background-color: #f4f4f4;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="page">
-            <h2>Daftar Token</h2>
-            ${tableHTML}
-          </div>
-          <script>
-            window.onload = function() {
-              window.print();
-              window.onafterprint = function() {
-                window.close();
-              };
-            };
-          </script>
-        </body>
-        </html>
-      `;
-
-      printWindow.document.write(printDocument);
-      printWindow.document.close();
-    };
-
     function updateTime() {
       const now = new Date();
       const dateOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
@@ -679,4 +549,3 @@
   </script>
 </body>
 </html>
-
