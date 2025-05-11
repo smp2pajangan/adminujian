@@ -201,7 +201,7 @@
       text-align: center;
     }
     .print-button-container {
-      display: flex;
+      display: none; /* Sembunyikan kontainer tombol cetak yang lama */
       justify-content: flex-end;
       margin-bottom: 10px;
     }
@@ -250,7 +250,7 @@
     }
     @media (max-width: 600px) {
       .print-button-container-mobile {
-        display: flex;
+        display: none; /* Sembunyikan tombol cetak mobile yang lama */
         justify-content: flex-end;
         margin-bottom: 5px;
       }
@@ -311,6 +311,16 @@
     input:checked + .slider:before {
       transform: translateX(20px);
     }
+    .cetak-link {
+      color: #007bff;
+      text-decoration: underline;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    .cetak-link:hover {
+      color: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -355,13 +365,7 @@
     </form>
 
     <div class="admin-panel-header">
-      <div class="print-button-container-mobile" style="display: none;">
-        <button onclick="openPrintModal()">Cetak</button>
-      </div>
-      <h3>DAFTAR TOKEN</h3>
-      <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px;">
-        <button onclick="openPrintModal()">Cetak</button>
-      </div>
+      <h3>DAFTAR TOKEN <span class="cetak-link" onclick="openPrintModal()">cetakpdf</span></h3>
     </div>
     <p style="font-size: 11px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
       Token yang ditambahkan akan dihapus otomatis setelah 30 hari!
@@ -439,7 +443,8 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
-    const firebaseConfig = {      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
+    const firebaseConfig = {
+      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
       authDomain: "ujian-online-berbasis-android.firebaseapp.com",
       databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
       projectId: "ujian-online-berbasis-android",
@@ -693,16 +698,7 @@
     });
 
     function updatePrintButtonVisibility() {
-      const mobilePrintButtonContainer = document.querySelector('.print-button-container-mobile');
-      const desktopPrintButtonContainer = document.querySelector('.admin-panel-header > div:nth-child(2)');
-
-      if (window.innerWidth <= 600) {
-        if (mobilePrintButtonContainer) mobilePrintButtonContainer.style.display = 'flex';
-        if (desktopPrintButtonContainer) desktopPrintButtonContainer.style.display = 'none';
-      } else {
-        if (mobilePrintButtonContainer) mobilePrintButtonContainer.style.display = 'none';
-        if (desktopPrintButtonContainer) desktopPrintButtonContainer.style.display = 'flex';
-      }
+      // Tidak diperlukan lagi karena tombol cetak sudah diganti teks
     }
 
     window.openPrintModal = () => {
@@ -818,10 +814,10 @@
     }
 
     // Panggil saat halaman pertama kali dimuat
-    updatePrintButtonVisibility();
+    // updatePrintButtonVisibility(); // Tidak diperlukan lagi
 
     // Panggil lagi saat ukuran jendela berubah
-    window.addEventListener('resize', updatePrintButtonVisibility);
+    window.addEventListener('resize', () => {}); // Fungsi ini tidak melakukan apa-apa sekarang
     setInterval(updateTime, 1000);
     updateTime();
   </script>
