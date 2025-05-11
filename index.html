@@ -382,7 +382,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
@@ -426,12 +426,6 @@
         document.getElementById("loginError").innerText = "Username atau password salah.";
       }
     };
-
-    function getWIBTimestamp() {
-      const utcTimestamp = Date.now();
-      const wibOffset = 7 * 60 * 60 * 1000;
-      return utcTimestamp + wibOffset;
-    }
 
     function loadTokens() {
       onValue(ref(db, 'tokens'), (snapshot) => {
@@ -526,16 +520,7 @@
         return;
       }
 
-      const data = {
-        subject: s,
-        kelas: k,
-        token: t,
-        url: u,
-        startTime: st,
-        endTime: et,
-        createdAt: Date.now(),
-        serverTimeWIB: getWIBTimestamp() // Simpan waktu server dalam WIB
-      };
+      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now() };
       push(ref(db, 'tokens'), data)
         .then(() => {
           this.reset();
@@ -589,15 +574,7 @@
       }
 
       if (currentTokenId) {
-        const updates = {
-          subject: s,
-          kelas: k,
-          token: t,
-          url: u,
-          startTime: st,
-          endTime: et,
-          serverTimeWIB: getWIBTimestamp() // Perbarui waktu server dalam WIB
-        };
+        const updates = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et };
         update(ref(db, 'tokens/' + currentTokenId), updates)
           .then(() => {
             closeEditModal();
