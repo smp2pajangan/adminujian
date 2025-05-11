@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <title>Panel Admin Ujian</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://unpkg.com/xlsx/xlsx.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.7.1/jspdf.plugin.autotable.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -151,46 +148,6 @@
     .action-button-icon:active {
       background-color: #c0c0c0;
     }
-    /* Style untuk dropdown export */
-    .dropdown {
-      position: relative;
-      display: inline-block;
-      text-align: right; /* Agar dropdown berada di pojok kanan */
-    }
-
-    .dropbtn {
-      background-color: #f4f4f4;
-      color: #333;
-      padding: 10px 15px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #f9f9f9;
-      min-width: 160px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
-      right: 0; /* Agar dropdown keluar dari kanan */
-    }
-
-    .dropdown-content a {
-      color: black;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-    }
-
-    .dropdown-content a:hover {background-color: #ddd;}
-
-    .dropdown:hover .dropdown-content {display: block;}
-
-    .dropdown:hover .dropbtn {background-color: #e0e0e0;}
-
     @media (max-width: 600px) {
       .container {
         margin: 10px;
@@ -262,35 +219,6 @@
   </div>
 
   <div class="container" id="adminPanel" style="display:none;">
-    <h3>Daftar Token</h3>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-      <p style="font-size: 12px; color: #555; margin-top: -10px; margin-bottom: 0; text-align: left;">
-        Token akan terhapus otomatis 30 hari setelah ditambahkan.
-      </p>
-      <div class="dropdown" style="text-align: right;">
-        <button class="dropbtn">Ekspor Data</button>
-        <div class="dropdown-content">
-          <a href="#" onclick="openExportModal('excel')">Ekspor ke Excel</a>
-          <a href="#" onclick="openExportModal('pdf')">Ekspor ke PDF</a>
-        </div>
-      </div>
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Mapel</th>
-          <th>Kelas</th>
-          <th>Token</th>
-          <th>Link</th>
-          <th>Token Dibuka</th>
-          <th>Token Ditutup</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="tokenTableBody"></tbody>
-    </table>
-
     <h3>Tambah / Edit Token</h3>
     <form id="tokenForm">
       <label>Mata Pelajaran</label>
@@ -308,6 +236,26 @@
       <button type="submit">Tambah</button>
       <p id="errorMsg" class="error"></p>
     </form>
+
+    <h3>Daftar Token</h3>
+    <p style="font-size: 12px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
+      Token akan terhapus otomatis 30 hari setelah ditambahkan.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Mapel</th>
+          <th>Kelas</th>
+          <th>Token</th>
+          <th>Link</th>
+          <th>Token Dibuka</th>
+          <th>Token Ditutup</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tokenTableBody"></tbody>
+    </table>
 
     <div class="footer">
       <div>@Admin SMPN 2 Pajangan</div>
@@ -346,19 +294,6 @@
     </div>
   </div>
 
-  <div id="exportModal" class="modal">
-    <div class="modal-content">
-      <h4>Ekspor Daftar Token</h4>
-      <label for="exportTitle">Judul:</label>
-      <input type="text" id="exportTitle" placeholder="Masukkan Judul Daftar Token" value="Daftar Token"/>
-      <div style="display: flex; justify-content: space-around; margin-top: 15px;">
-        <button onclick="exportToExcel()">Ekspor ke Excel</button>
-        <button onclick="exportToPdf()">Ekspor ke PDF</button>
-        <button onclick="closeExportModal()">Batal</button>
-      </div>
-    </div>
-  </div>
-
   <div id="notification">
     <span id="notificationMessage"></span>
   </div>
@@ -387,7 +322,6 @@
     const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Hapus.png";
-    let exportType = '';
 
     function showNotification(message) {
       const n = document.getElementById('notification');
@@ -421,6 +355,7 @@
           const data = child.val();
           data.key = child.key;
           tokenCache.push(data);
+
           if (data.createdAt && (Date.now() - data.createdAt) > THIRTY_DAYS_IN_MS) {
             remove(ref(db, 'tokens/' + data.key))
               .then(() => console.log(`Token ${data.key} dihapus.`))
@@ -483,7 +418,7 @@
       const u = document.getElementById('url').value.trim();
       const st = document.getElementById('startTime').value;
       const et = document.getElementById('endTime').value;
-      const em = document.getElementById('errorMsg');
+      const em= document.getElementById('errorMsg');
       em.innerText = "";
 
       if (!s || !k || !t || !u || !st || !et) {
@@ -594,170 +529,6 @@
     window.closeDeleteModal = () => {
       document.getElementById('deleteModal').style.display = 'none';
       deleteId = null;
-    };
-
-    window.openExportModal = function(type) {
-      exportType = type;
-      document.getElementById('exportModal').style.display = 'flex';
-      document.getElementById('exportTitle').value = "Daftar Token"; // Set default judul
-    };
-
-    window.closeExportModal = function() {
-      document.getElementById('exportModal').style.display = 'none';
-      exportType = '';
-    };
-
-    function downloadExcel(judul) {
-      const wb = XLSX.utils.book_new();
-      const ws_data = [];
-
-      // Tambahkan judul dengan font lebih besar
-      ws_data.push([judul]);
-      ws_data.push([]); // Baris kosong setelah judul
-      ws_data.push([]); // Tambah satu baris kosong lagi
-
-      // Tambahkan header tabel (tanpa kolom Link dan Aksi)
-      const headerRow = [];
-      const tableHeaders = document.querySelectorAll('#tokenTable thead th');
-      let visibleHeaderCount = 0;
-      const headerIndices = [];
-      for (let i = 0; i < tableHeaders.length; i++) {
-        if (i !== 4 && i !== 7) { // Skip kolom Link (index 4) dan Aksi (index 7)
-          headerRow.push(tableHeaders[i].innerText);
-          headerIndices.push(i);
-          visibleHeaderCount++;
-        }
-      }
-      ws_data.push(headerRow);
-
-      // Tambahkan data dari setiap baris tabel (tanpa kolom Link dan Aksi)
-      const tableRows = document.querySelectorAll('#tokenTable tbody tr');
-      const dataRows = [];
-      tableRows.forEach(row => {
-        const rowData = [];
-        const cells = row.querySelectorAll('td');
-        headerIndices.forEach(index => {
-          rowData.push(cells[index].innerText);
-        });
-        dataRows.push(rowData);
-        ws_data.push(rowData);
-      });
-
-      const ws = XLSX.utils.aoa_to_sheet(ws_data);
-
-      // Gaya untuk judul (rata tengah, tebal, ukuran font lebih besar)
-      const headerCellStyle = { font: { bold: true, sz: 16 }, alignment: { horizontal: "center" } };
-      const headerRange = XLSX.utils.decode_range(ws['!ref']);
-      for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
-        const header_address = XLSX.utils.encode_cell({ c: C, r: 0 });
-        if (!ws[header_address]) continue;
-        ws[header_address].s = headerCellStyle;
-      }
-      // Merge cell untuk judul agar rata tengah di seluruh lebar tabel
-      ws['!merges'] = [{ s: { c: 0, r: 0 }, e: { c: visibleHeaderCount - 1, r: 0 } }];
-
-      // Tambahkan border ke seluruh rentang tabel data dan header
-      const range = XLSX.utils.decode_range(ws['!ref']);
-      const borderStyle = {
-        top: { style: 'thin', color: { auto: 1 } },
-        bottom: { style: 'thin', color: { auto: 1 } },
-        left: { style: 'thin', color: { auto: 1 } },
-        right: { style: 'thin', color: { auto: 1 } },
-      };
-
-      for (let R = 2; R <= range.e.r; ++R) { // Mulai dari baris header
-        for (let C = 0; C < visibleHeaderCount; ++C) {
-          const cellAddress = XLSX.utils.encode_cell({ c: C, r: R });
-          if (!ws[cellAddress]) continue;
-          if (!ws[cellAddress].s) ws[cellAddress].s = {};
-          ws[cellAddress].s.border = borderStyle;
-        }
-      }
-
-      XLSX.utils.book_append_sheet(wb, ws, "Daftar Token");
-      XLSX.writeFile(wb, `${judul.replace(/\s+/g, '_')}.xlsx`);
-    }
-
-    window.exportToExcel = function() {
-      const title = document.getElementById('exportTitle').value.trim();
-      closeExportModal();
-      downloadExcel(title);
-    };
-
-    function downloadPdf(judul) {
-      const pdf = new jspdf.jsPDF({
-        orientation: 'landscape', // Lebih cocok untuk tabel lebar
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const margin = 10;
-      let yPosition = margin + 10; // Posisi awal Y setelah margin dan sedikit ruang untuk judul
-      const pageWidth = pdf.internal.pageSize.getWidth() - 2 * margin;
-
-      // Tambahkan judul
-      pdf.setFontSize(16);
-      const titleWidth = pdf.getTextWidth(judul);
-      const titleX = (pageWidth + 2 * margin - titleWidth) / 2; // Center judul
-      pdf.text(judul, titleX, yPosition);
-      yPosition += 10; // Ruang setelah judul
-      yPosition += 5; // Tambah jarak antara judul dan tabel
-
-      // Tambahkan header tabel
-      const headers = [];
-      const tableHeaders = document.querySelectorAll('#tokenTable thead th');
-      const visibleHeaders = [];
-      for (let i = 0; i < tableHeaders.length; i++) {
-        if (i !== 4 && i !== 7) {
-          visibleHeaders.push(tableHeaders[i].innerText);
-        }
-      }
-
-      const data = [];
-      const tableRows = document.querySelectorAll('#tokenTable tbody tr');
-      tableRows.forEach(row => {
-        const rowData = [];
-        const cells = row.querySelectorAll('td');
-        for (let i = 0; i < cells.length; i++) {
-          if (i !== 4 && i !== 7) {
-            rowData.push(cells[i].innerText);
-          }
-        }
-        data.push(rowData);
-      });
-
-      pdf.autoTable({
-        head: [visibleHeaders],
-        body: data,
-        startY: yPosition + 5,
-        margin: { left: margin, right: margin, top: yPosition, bottom: margin },
-        styles: { fontSize: 9 },
-        columnStyles: { 0: { cellWidth: 10 } },
-        drawCell: function(hookData) {
-          const doc = hookData.doc;
-          const x = hookData.table.columns[hookData.column.index].x;
-          const y = hookData.row.y;
-          const width = hookData.column.width;
-          const height = hookData.row.height;
-
-          doc.setLineWidth(0.5);
-          doc.setDrawColor(0);
-          doc.rect(x, y, width, height);
-        },
-        didDrawPage: function(data) {
-          const pageNumber = pdf.internal.getNumberOfPages();
-          pdf.setFontSize(10);
-          pdf.text(`Halaman ${pageNumber}`, pageWidth + margin - 20, pdf.internal.pageSize.getHeight() - margin);
-        }
-      });
-
-      pdf.save(`${judul.replace(/\s+/g, '_')}.pdf`);
-    }
-
-    window.exportToPdf = function() {
-      const title = document.getElementById('exportTitle').value.trim();
-      closeExportModal();
-      downloadPdf(title);
     };
 
     function updateTime() {
