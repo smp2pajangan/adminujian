@@ -353,7 +353,8 @@
   <div id="printModal" class="modal">
     <div class="modal-content">
       <h3>Judul Daftar Token</h3>
-      <input type="text" id="printTitleInput" placeholder="Tulis dengan huruf kapital" />
+      <div id="printTitleError" class="error" style="text-align: center; margin-bottom: 5px;"></div>
+      <textarea id="printTitleInput" placeholder="Tulis dengan huruf kapital" style="width: calc(100% - 20px); padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; height: 80px;"></textarea>
       <button class="print-button" onclick="printTokenList()">Cetak</button>
       <button class="cancel-button" onclick="closePrintModal()">Batal</button>
     </div>
@@ -593,26 +594,38 @@
       deleteId = null;
     };
 
+    document.getElementById('printTitleInput').addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+    });
+
     window.openPrintModal = () => {
       document.getElementById('printModal').style.display = 'flex';
     };
 
     window.closePrintModal = () => {
       document.getElementById('printModal').style.display = 'none';
-      document.getElementById('printTitleInput').value = ''; // Reset input judul
+      document.getElementById('printTitleInput').value = '';
+      document.getElementById('printTitleError').innerText = ""; // Bersihkan pesan error saat modal ditutup
     };
 
     window.printTokenList = () => {
-      const printTitle = document.getElementById('printTitleInput').value.trim();
+      const printTitleElement = document.getElementById('printTitleInput');
+      const printTitle = printTitleElement.value.trim();
+      const printTitleError = document.getElementById('printTitleError');
+      printTitleError.innerText = ""; // Bersihkan pesan kesalahan sebelumnya
+
+      if (!printTitle) {
+        printTitleError.innerText = 'Judul daftar token tidak boleh kosong!';
+        return;
+      }
+
       const printUrlWithTitle = `${PRINT_PAGE_URL}?title=${encodeURIComponent(printTitle)}`;
       window.open(printUrlWithTitle, '_blank');
 
-      // Optional: Kembali ke halaman admin setelah beberapa saat (memberi waktu untuk mencetak)
       setTimeout(() => {
         // Tidak perlu kembali secara manual karena window.open membuka tab baru
-        // window.location.reload();
-      }, 1500); // Misalnya 1.5 detik
-      closePrintModal(); // Tutup modal setelah tombol cetak ditekan
+      }, 1500);
+      closePrintModal();
     };
 
     function updateTime() {
@@ -633,3 +646,4 @@
   </script>
 </body>
 </html>
+
