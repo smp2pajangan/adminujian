@@ -194,6 +194,54 @@
       z-index: 1000;
       text-align: center;
     }
+    .print-button-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+    }
+    #printModal {
+      display: none;
+      position: fixed;
+      z-index: 11;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    #printModal .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    #printModal .modal-content input[type="text"] {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    #printModal .modal-content button {
+      padding: 10px 15px;
+      margin: 5px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
+    #printModal .print-button {
+      background-color: #28a745;
+      color: white;
+    }
+    #printModal .cancel-button {
+      background-color: #dc3545;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -236,6 +284,10 @@
       <button type="submit">Tambah</button>
       <p id="errorMsg" class="error"></p>
     </form>
+
+    <div class="print-button-container">
+      <button onclick="openPrintModal()">Cetak Daftar Token</button>
+    </div>
 
     <h3>Daftar Token</h3>
     <p style="font-size: 12px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
@@ -298,6 +350,15 @@
     <span id="notificationMessage"></span>
   </div>
 
+  <div id="printModal" class="modal">
+    <div class="modal-content">
+      <h3>Cetak Daftar Token</h3>
+      <input type="text" id="printTitleInput" placeholder="Masukkan Judul Daftar Token" />
+      <button class="print-button" onclick="printTokenList()">Cetak</button>
+      <button class="cancel-button" onclick="closePrintModal()">Batal</button>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
@@ -322,6 +383,7 @@
     const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Hapus.png";
+    const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
 
     function showNotification(message) {
       const n = document.getElementById('notification');
@@ -529,6 +591,28 @@
     window.closeDeleteModal = () => {
       document.getElementById('deleteModal').style.display = 'none';
       deleteId = null;
+    };
+
+    window.openPrintModal = () => {
+      document.getElementById('printModal').style.display = 'flex';
+    };
+
+    window.closePrintModal = () => {
+      document.getElementById('printModal').style.display = 'none';
+      document.getElementById('printTitleInput').value = ''; // Reset input judul
+    };
+
+    window.printTokenList = () => {
+      const printTitle = document.getElementById('printTitleInput').value.trim();
+      const printUrlWithTitle = `${PRINT_PAGE_URL}?title=${encodeURIComponent(printTitle)}`;
+      window.open(printUrlWithTitle, '_blank');
+
+      // Optional: Kembali ke halaman admin setelah beberapa saat (memberi waktu untuk mencetak)
+      setTimeout(() => {
+        // Tidak perlu kembali secara manual karena window.open membuka tab baru
+        // window.location.reload();
+      }, 1500); // Misalnya 1.5 detik
+      closePrintModal(); // Tutup modal setelah tombol cetak ditekan
     };
 
     function updateTime() {
