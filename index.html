@@ -427,6 +427,12 @@
       }
     };
 
+    function getWIBTimestamp() {
+      const utcTimestamp = Date.now();
+      const wibOffset = 7 * 60 * 60 * 1000;
+      return utcTimestamp + wibOffset;
+    }
+
     function loadTokens() {
       onValue(ref(db, 'tokens'), (snapshot) => {
         const tbody = document.getElementById('tokenTableBody');
@@ -528,7 +534,7 @@
         startTime: st,
         endTime: et,
         createdAt: Date.now(),
-        serverTime: serverTimestamp() // Tambahkan serverTime di sini
+        serverTimeWIB: getWIBTimestamp() // Simpan waktu server dalam WIB
       };
       push(ref(db, 'tokens'), data)
         .then(() => {
@@ -590,7 +596,7 @@
           url: u,
           startTime: st,
           endTime: et,
-          serverTime: serverTimestamp() // Tambahkan/perbarui serverTime di sini
+          serverTimeWIB: getWIBTimestamp() // Perbarui waktu server dalam WIB
         };
         update(ref(db, 'tokens/' + currentTokenId), updates)
           .then(() => {
