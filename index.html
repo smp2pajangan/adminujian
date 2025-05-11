@@ -445,7 +445,7 @@
       databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
       projectId: "ujian-online-berbasis-android",
       storageBucket: "ujian-online-berbasis-android.appspot.com",
-      messagingSenderId: "923446282537",
+ messagingSenderId: "923446282537",
       appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
     };
 
@@ -521,16 +521,20 @@
         tokenCache.forEach(data => {
           sortedCounter++;
           const row = document.createElement('tr');
-          row.dataset.tokenKey = data.key; // Tambahkan data-token-key
+          row.dataset.tokenKey = data.key;
           const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           const isActiveChecked = data.isActive ? 'checked' : '';
+          let tokenDisplay = data.token;
+          if (data.isActive) {
+            tokenDisplay = `<strong style="color: blue;">${data.token}</strong>`;
+          }
 
           row.innerHTML = `
             <td>${sortedCounter}</td>
             <td>${data.subject}</td>
             <td>${data.kelas}</td>
-            <td>${data.token}</td>
+            <td>${tokenDisplay}</td>
             <td><a href="${data.url}" target="_blank">Link</a></td>
             <td>${startTimeFormatted}</td>
             <td>${endTimeFormatted}</td>
