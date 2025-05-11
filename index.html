@@ -336,7 +336,6 @@
   </div>
 
   <div class="container" id="adminPanel" style="display:none;">
-    <button onclick="logout()">Logout</button>
     <h3>TAMBAH / EDIT TOKEN</h3>
     <form id="tokenForm">
       <label>Mata Pelajaran</label>
@@ -440,8 +439,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
+    const firebaseConfig = {      apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
       authDomain: "ujian-online-berbasis-android.firebaseapp.com",
       databaseURL: "https://ujian-online-berbasis-android-default-rtdb.firebaseio.com",
       projectId: "ujian-online-berbasis-android",
@@ -765,14 +763,6 @@
     // Panggil fungsi ini saat halaman dimuat
     window.addEventListener('load', startInactivityTimerOnLoad);
 
-    window.logout = () => {
-      localStorage.removeItem('isAdminLoggedIn');
-      document.getElementById('adminPanel').style.display = 'none';
-      document.getElementById('loginSection').style.display = 'block';
-      clearTimeout(inactivityTimer); // Hentikan timer saat logout manual
-      showNotification('Anda telah berhasil logout.');
-    };
-
     // Periksa status login saat halaman dimuat
     window.onload = function() {
       if (localStorage.getItem('isAdminLoggedIn') === 'true') {
@@ -790,16 +780,23 @@
 
     async function periksaAndUpdateStatusToken() {
       const now = new Date();
+      const earlyStart = new Date(now.getTime() + 10000); // Tambah 10 detik untuk start
+
       for (const tokenData of tokenCache) {
         const startTime = new Date(tokenData.startTime);
         const endTime = new Date(tokenData.endTime);
-        let shouldBeActive = now >= startTime && now <= endTime;
+
+        // Aktif jika waktu saat ini (ditambah 10 detik) setelah atau sama dengan startTime
+        const shouldBeActiveStart = earlyStart >= startTime;
+        // Nonaktif jika waktu saat ini setelah atau sama dengan endTime
+        const shouldBeInactiveEnd = now >= endTime;
+        const shouldBeActive = shouldBeActiveStart && !shouldBeInactiveEnd;
 
         if (tokenData.isActive !== shouldBeActive) {
           try {
             await update(ref(db, 'tokens/' + tokenData.key), { isActive: shouldBeActive });
             console.log(`Token ${tokenData.key} status diperbarui menjadi ${shouldBeActive ? 'aktif' : 'nonaktif'}.`);
-            // Tidak perlu memanggil loadTokens() di sini, onValue akan menangani perubahan
+            loadTokens(); // Panggil kembali loadTokens untuk memperbarui tampilan
           } catch (error) {
             console.error(`Gagal memperbarui status token ${tokenData.key}: `, error);
           }
