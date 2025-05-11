@@ -312,14 +312,11 @@
       transform: translateX(20px);
     }
     .cetak-link {
-      color: #007bff;
+      color: #007bff; /* Tetapkan warna biru */
       text-decoration: underline;
       cursor: pointer;
       font-weight: bold;
-      margin-left: 10px;
-    }
-    .cetak-link:hover {
-      color: #0056b3;
+      /* margin-left: 10px; Hapus margin dari sini */
     }
   </style>
 </head>
@@ -365,7 +362,7 @@
     </form>
 
     <div class="admin-panel-header">
-      <h3>DAFTAR TOKEN <span class="cetak-link" onclick="openPrintModal()">cetakpdf</span></h3>
+      <h3>DAFTAR TOKEN <span style="margin-left: 5px;">(<span class="cetak-link" onclick="openPrintModal()">cetakpdf</span>)</span></h3>
     </div>
     <p style="font-size: 11px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
       Token yang ditambahkan akan dihapus otomatis setelah 30 hari!
@@ -814,6 +811,7 @@
     }
 
     // Panggil saat halaman pertama kali dimuat
+    // updatePrintButtonVisibility
     // updatePrintButtonVisibility(); // Tidak diperlukan lagi
 
     // Panggil lagi saat ukuran jendela berubah
