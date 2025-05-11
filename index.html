@@ -8,10 +8,10 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      background-color: #0066cc; /* Set warna biru sebagai background body */
+      background-color: #0066cc;
     }
     .header {
-      background-color: transparent; /* Header jadi transparan */
+      background-color: transparent;
       color: white;
       padding: 15px;
       text-align: center;
@@ -27,7 +27,7 @@
       background: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Tambah efek bayangan */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     input, select {
       padding: 10px;
@@ -36,7 +36,7 @@
       box-sizing: border-box;
       font-size: 16px;
     }
-    button { /* Tombol umum */
+    button {
       padding: 10px 20px;
       margin: 10px auto;
       display: block;
@@ -48,7 +48,7 @@
       border-radius: 5px;
     }
     button:hover {
-        background-color: #0056b3;
+      background-color: #0056b3;
     }
     .error {
       color: red;
@@ -67,7 +67,7 @@
       text-align: left;
     }
     td:last-child {
-        text-align: center;
+      text-align: center;
     }
     th {
       background-color: #f4f4f4;
@@ -100,64 +100,54 @@
       width: 90%;
       max-width: 400px;
     }
-    .modal button { /* Tombol di dalam modal */
+    .modal button {
       margin: 5px;
       display: inline-block;
       width: auto;
     }
     .login-link {
-     color: #007BFF;
-     text-decoration: underline;
-     font-weight: bold;
+      color: #007BFF;
+      text-decoration: underline;
+      font-weight: bold;
     }
     .login-link:hover {
-     color: darkorange;
-     cursor: pointer;
+      color: darkorange;
+      cursor: pointer;
     }
     .login-link:active {
-     color: red;
+      color: red;
     }
-
-    /* --- CSS untuk Tombol Aksi di Tabel --- */
     .action-buttons {
-     display: flex;
-     gap: 8px; /* Sedikit menambah jarak antar ikon */
-     justify-content: center;
-     align-items: center; /* Menyamakan tinggi ikon jika beda */
-     flex-wrap: wrap;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
     }
-
-    /* Gaya untuk tombol ikon */
     .action-button-icon {
-      background: none; /* Hapus background default button */
-      border: none;     /* Hapus border default button */
-      padding: 0;       /* Hapus padding default button */
-      margin: 0;        /* Hapus margin default button */
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
       cursor: pointer;
-      display: inline-flex; /* Agar bisa diatur alignmentnya */
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 28px; /* Lebar tombol, sesuaikan jika perlu */
-      height: 28px; /* Tinggi tombol, sesuaikan jika perlu */
-      border-radius: 4px; /* Sedikit rounded corner */
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
     }
-
     .action-button-icon img {
-      width: 20px;  /* Ukuran ikon, bisa disesuaikan */
-      height: 20px; /* Ukuran ikon, bisa disesuaikan */
-      display: block; /* Untuk menghilangkan spasi ekstra di bawah gambar */
+      width: 20px;
+      height: 20px;
+      display: block;
     }
-
     .action-button-icon:hover {
-      background-color: #e0e0e0; /* Efek hover ringan */
+      background-color: #e0e0e0;
     }
     .action-button-icon:active {
-      background-color: #c0c0c0; /* Efek klik */
+      background-color: #c0c0c0;
     }
-
-    /* --- Akhir CSS Tombol Aksi --- */
-
-    /* --- Media Query untuk Layar Kecil --- */
     @media (max-width: 600px) {
       .container {
         margin: 10px;
@@ -178,22 +168,19 @@
       th, td {
         padding: 6px;
       }
-      /* Mungkin sembunyikan beberapa kolom di tabel jika tidak muat */
-      thead th:nth-child(5), /* Link */
+      thead th:nth-child(5),
       tbody td:nth-child(5),
-      thead th:nth-child(6), /* Token Dibuka */
+      thead th:nth-child(6),
       tbody td:nth-child(6),
-      thead th:nth-child(7), /* Token Ditutup */
+      thead th:nth-child(7),
       tbody td:nth-child(7) {
         display: none;
       }
       .action-buttons {
-        flex-direction: row; /* Atur tombol aksi menjadi satu baris */
+        flex-direction: row;
         justify-content: center;
       }
     }
-
-    /* CSS untuk notifikasi */
     #notification {
       display: none;
       position: fixed;
@@ -205,7 +192,7 @@
       padding: 15px;
       border-radius: 5px;
       z-index: 1000;
-      text-align: center; /* Teks notifikasi rata tengah */
+      text-align: center;
     }
   </style>
 </head>
@@ -216,22 +203,20 @@
   </div>
 
   <div class="container" id="loginSection">
-  <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
-  <p id="loginError" class="error"></p>
-  <input type="text" id="username" placeholder="Masukan Username (admin)" />
-  <input type="password" id="password" placeholder="Masukan Password" />
-  <button onclick="login()">Login</button>
-
-  <p style="text-align: center; font-size: 14px; margin-top: 10px;">
-    Halaman login ujian siswa?
-    <a href="http://smp2pajangan.github.io/loginujian" class="login-link">Loginujian</a>
-  </p>
-
-  <div class="footer">
-    <div>@Admin SMPN 2 Pajangan</div>
-    <div id="currentTime" class="date-time"></div>
+    <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
+    <p id="loginError" class="error"></p>
+    <input type="text" id="username" placeholder="Masukan Username (admin)" />
+    <input type="password" id="password" placeholder="Masukan Password" />
+    <button onclick="login()">Login</button>
+    <p style="text-align: center; font-size: 14px; margin-top: 10px;">
+      Halaman login ujian siswa?
+      <a href="http://smp2pajangan.github.io/loginujian" class="login-link">Loginujian</a>
+    </p>
+    <div class="footer">
+      <div>@Admin SMPN 2 Pajangan</div>
+      <div id="currentTime" class="date-time"></div>
+    </div>
   </div>
-</div>
 
   <div class="container" id="adminPanel" style="display:none;">
     <h3>Tambah / Edit Token</h3>
@@ -279,29 +264,27 @@
   </div>
 
   <div id="editModal" class="modal">
-  <div class="modal-content">
-    <h4>Edit Token</h4>
-    <form id="modalForm">
-      <label>Mata Pelajaran</label>
-      <input type="text" id="editSubject" required />
-      <label>Kelas</label>
-      <input type="text" id="editKelas" required />
-      <label>Token Ujian</label>
-      <input type="text" id="editToken" required />
-      <label>Link Ujian</label>
-      <input type="url" id="editUrl" required />
-      <label>Waktu Token Dibuka</label>
-      <input type="datetime-local" id="editStartTime" required />
-      <label>Waktu Token Ditutup</label>
-      <input type="datetime-local" id="editEndTime" required />
-
-      <p id="editErrorMsg" class="error"></p>
-
-      <button type="submit">Simpan</button>
-      <button type="button" onclick="closeEditModal()">Batal</button>
-    </form>
+    <div class="modal-content">
+      <h4>Edit Token</h4>
+      <form id="modalForm">
+        <label>Mata Pelajaran</label>
+        <input type="text" id="editSubject" required />
+        <label>Kelas</label>
+        <input type="text" id="editKelas" required />
+        <label>Token Ujian</label>
+        <input type="text" id="editToken" required />
+        <label>Link Ujian</label>
+        <input type="url" id="editUrl" required />
+        <label>Waktu Token Dibuka</label>
+        <input type="datetime-local" id="editStartTime" required />
+        <label>Waktu Token Ditutup</label>
+        <input type="datetime-local" id="editEndTime" required />
+        <p id="editErrorMsg" class="error"></p>
+        <button type="submit">Simpan</button>
+        <button type="button" onclick="closeEditModal()">Batal</button>
+      </form>
+    </div>
   </div>
-</div>
 
   <div id="deleteModal" class="modal">
     <div class="modal-content">
@@ -337,26 +320,22 @@
     let currentTokenId = null;
     let tokenCache = [];
     const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
-
-    // URLs untuk ikon
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Hapus.png";
 
     function showNotification(message) {
-      const notificationDiv = document.getElementById('notification');
-      const notificationMessageSpan = document.getElementById('notificationMessage');
-      notificationMessageSpan.innerText = message;
-      notificationDiv.style.display = 'block';
+      const n = document.getElementById('notification');
+      n.innerText = message;
+      n.style.display = 'block';
       setTimeout(() => {
-        notificationDiv.style.display = 'none';
-      }, 3000); // Notifikasi akan hilang setelah 3 detik
+        n.style.display = 'none';
+      }, 3000);
     }
 
-
-    window.login = function() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      if (username === ADMIN_USER && password === ADMIN_PASS) {
+    window.login = () => {
+      const u = document.getElementById("username").value.trim();
+      const p = document.getElementById("password").value.trim();
+      if (u === ADMIN_USER && p === ADMIN_PASS) {
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();
@@ -365,36 +344,23 @@
       }
     };
 
-        function loadTokens() {
+    function loadTokens() {
       onValue(ref(db, 'tokens'), (snapshot) => {
         const tbody = document.getElementById('tokenTableBody');
         tbody.innerHTML = '';
         tokenCache = [];
         let counter = 0;
 
-        if (!snapshot.exists()) {
-          const emptyRow = document.createElement('tr');
-          const colspan = document.querySelector('#tokenTable thead tr').childElementCount;
-          emptyRow.innerHTML = `<td colspan="${colspan}" style="text-align: center;">Belum ada daftar token yang ditambah</td>`;
-          tbody.appendChild(emptyRow);
-          return;
-        }
-
         snapshot.forEach(child => {
           const data = child.val();
           data.key = child.key;
           tokenCache.push(data);
 
-          // Periksa dan hapus token yang sudah lebih dari 30 hari
           if (data.createdAt && (Date.now() - data.createdAt) > THIRTY_DAYS_IN_MS) {
             remove(ref(db, 'tokens/' + data.key))
-              .then(() => {
-                console.log(`Token dengan key ${data.key} telah dihapus karena sudah lebih dari 30 hari.`);
-              })
-              .catch(error => {
-                console.error(`Gagal menghapus token ${data.key}: `, error);
-              });
-            return; // Skip token yang dihapus agar tidak ditampilkan
+              .then(() => console.log(`Token ${data.key} dihapus.`))
+              .catch(error => console.error(`Gagal hapus ${data.key}: `, error));
+            return;
           }
 
           counter++;
@@ -423,124 +389,156 @@
           `;
           tbody.appendChild(row);
         });
+
+        tokenCache.sort((a, b) => {
+          const kelasA = parseInt(a.kelas);
+          const kelasB = parseInt(b.kelas);
+          if (!isNaN(kelasA) && !isNaN(kelasB)) return kelasA - kelasB;
+          return a.kelas.localeCompare(b.kelas);
+        });
+
+        // Setelah data diurutkan, kita buat ulang tabelnya
+        tbody.innerHTML = '';
+        let sortedCounter = 0;
+        tokenCache.forEach(data => {
+          sortedCounter++;
+          const row = document.createElement('tr');
+          const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+          const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+
+          row.innerHTML = `
+            <td>${sortedCounter}</td>
+            <td>${data.subject}</td>
+            <td>${data.kelas}</td>
+            <td>${data.token}</td>
+            <td><a href="${data.url}" target="_blank">Link</a></td>
+            <td>${startTimeFormatted}</td>
+            <td>${endTimeFormatted}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-button-icon" onclick="editToken('${data.key}')" title="Edit Token">
+                  <img src="${EDIT_ICON_URL}" alt="Edit">
+                </button>
+                <button class="action-button-icon" onclick="promptDelete('${data.key}')" title="Hapus Token">
+                  <img src="${DELETE_ICON_URL}" alt="Hapus">
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
       });
     }
 
-
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const subject = document.getElementById('subject').value.trim().toUpperCase();
-      const kelas = document.getElementById('kelas').value.trim();
-      const token = document.getElementById('token').value.trim().toUpperCase();
-      const url = document.getElementById('url').value.trim();
-      const startTime = document.getElementById('startTime').value;
-      const endTime = document.getElementById('endTime').value;
-      const errorMsg = document.getElementById('errorMsg');
-      errorMsg.innerText = "";
+      const s = document.getElementById('subject').value.trim().toUpperCase();
+      const k = document.getElementById('kelas').value.trim();
+      const t = document.getElementById('token').value.trim().toUpperCase();
+      const u = document.getElementById('url').value.trim();
+      const st = document.getElementById('startTime').value;
+      const et = document.getElementById('endTime').value;
+      const em = document.getElementById('errorMsg');
+      em.innerText = "";
 
-      if (!subject || !kelas || !token || !url || !startTime || !endTime) {
-        errorMsg.innerText = "Semua field harus diisi!";
+      if (!s || !k || !t || !u || !st || !et) {
+        em.innerText = "Semua field harus diisi!";
         return;
       }
 
-      if (new Date(startTime) >= new Date(endTime)) {
-        errorMsg.innerText = "Waktu token dibuka harus sebelum waktu token ditutup!";
+      if (new Date(st) >= new Date(et)) {
+        em.innerText = "Waktu token dibuka harus sebelum waktu token ditutup!";
         return;
       }
 
-      const isTokenDup = tokenCache.some(t => t.token === token && t.key !== currentTokenId);
-      if (isTokenDup) {
-        errorMsg.innerText = "Token sudah ada!";
+      const isDup = tokenCache.some(item => item.token === t && item.key !== currentTokenId);
+      if (isDup) {
+        em.innerText = "Token sudah ada!";
         return;
       }
 
-      const tokenData = { subject, kelas, token, url, startTime, endTime, createdAt: Date.now() }; // Tambahkan createdAt
-      push(ref(db, 'tokens'), tokenData)
+      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now() };
+      push(ref(db, 'tokens'), data)
         .then(() => {
           this.reset();
           showNotification('Token berhasil ditambahkan!');
         })
         .catch(err => {
-          errorMsg.innerText = "Gagal menyimpan token: " + err.message;
+          em.innerText = "Gagal menyimpan token: " + err.message;
         });
     });
 
-    window.editToken = function(id) {
-      const tokenToEdit = tokenCache.find(t => t.key === id);
-      if (!tokenToEdit) return;
+    window.editToken = (id) => {
+      const token = tokenCache.find(item => item.key === id);
+      if (!token) return;
 
       currentTokenId = id;
-      document.getElementById('editSubject').value = tokenToEdit.subject;
-      document.getElementById('editKelas').value = tokenToEdit.kelas;
-      document.getElementById('editToken').value = tokenToEdit.token;
-      document.getElementById('editUrl').value = tokenToEdit.url;
-      document.getElementById('editStartTime').value = tokenToEdit.startTime;
-      document.getElementById('editEndTime').value = tokenToEdit.endTime;
-
+      document.getElementById('editSubject').value = token.subject;
+      document.getElementById('editKelas').value = token.kelas;
+      document.getElementById('editToken').value = token.token;
+      document.getElementById('editUrl').value = token.url;
+      document.getElementById('editStartTime').value = token.startTime;
+      document.getElementById('editEndTime').value = token.endTime;
       document.getElementById('editErrorMsg').innerText = "";
       document.getElementById('editModal').style.display = 'flex';
     };
 
     document.getElementById('modalForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const updatedData = {
-        subject: document.getElementById('editSubject').value.trim().toUpperCase(),
-        kelas: document.getElementById('editKelas').value.trim(),
-        token: document.getElementById('editToken').value.trim().toUpperCase(),
-        url: document.getElementById('editUrl').value.trim(),
-        startTime: document.getElementById('editStartTime').value,
-        endTime: document.getElementById('editEndTime').value
-      };
+      const s = document.getElementById('editSubject').value.trim().toUpperCase();
+      const k = document.getElementById('editKelas').value.trim();
+      const t = document.getElementById('editToken').value.trim().toUpperCase();
+      const u = document.getElementById('editUrl').value.trim();
+      const st = document.getElementById('editStartTime').value;
+      const et = document.getElementById('editEndTime').value;
+      const em = document.getElementById('editErrorMsg');
+      em.innerText = "";
 
-      const errorEl = document.getElementById('editErrorMsg');
-      errorEl.innerText = "";
-
-      if (!updatedData.subject || !updatedData.kelas || !updatedData.token || !updatedData.url || !updatedData.startTime || !updatedData.endTime) {
-        errorEl.innerText = "Semua field harus diisi!";
+      if (!s || !k || !t || !u || !st || !et) {
+        em.innerText = "Semua field harus diisi!";
         return;
       }
 
-      if (new Date(updatedData.startTime) >= new Date(updatedData.endTime)) {
-        errorEl.innerText = "Waktu token dibuka harus sebelum waktu token ditutup!";
+      if (new Date(st) >= new Date(et)) {
+        em.innerText = "Waktu token dibuka harus sebelum waktu token ditutup!";
         return;
       }
 
-      const isTokenDup = tokenCache.some(t => t.token === updatedData.token && t.key !== currentTokenId);
-      if (isTokenDup) {
-        errorEl.innerText = "Token sudah digunakan oleh data lain!";
+      const isDup = tokenCache.some(item => item.token === t && item.key !== currentTokenId);
+      if (isDup) {
+        em.innerText = "Token sudah digunakan oleh data lain!";
         return;
       }
 
       if (currentTokenId) {
-        update(ref(db, 'tokens/' + currentTokenId), updatedData)
+        const updates = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et };
+        update(ref(db, 'tokens/' + currentTokenId), updates)
           .then(() => {
             closeEditModal();
             showNotification('Token berhasil diedit!');
           })
           .catch(err => {
-            errorEl.innerText = "Gagal menyimpan perubahan: " + err.message;
+            em.innerText = "Gagal menyimpan perubahan: " + err.message;
           });
       }
     });
 
-    window.closeEditModal = function() {
+    window.closeEditModal = () => {
       document.getElementById('editModal').style.display = 'none';
       document.getElementById('editErrorMsg').innerText = "";
       currentTokenId = null;
     };
 
     let deleteId = null;
-    window.promptDelete = function(id) {
+    window.promptDelete = (id) => {
       deleteId = id;
       document.getElementById('deleteModal').style.display = 'flex';
     };
 
-    window.confirmDelete = function() {
+    window.confirmDelete = () => {
       if (deleteId) {
         remove(ref(db, 'tokens/' + deleteId))
-          .catch(err => {
-            alert("Gagal menghapus token: " + err.message);
-          })
+          .catch(err => alert("Gagal menghapus token: " + err.message))
           .finally(() => {
             closeDeleteModal();
             showNotification('Token berhasil dihapus!');
@@ -548,24 +546,22 @@
       }
     };
 
-    window.closeDeleteModal = function() {
+    window.closeDeleteModal = () => {
       document.getElementById('deleteModal').style.display = 'none';
       deleteId = null;
     };
 
     function updateTime() {
       const now = new Date();
-      const optionsDate = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
-      const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-      const tanggal = now.toLocaleDateString('id-ID', optionsDate);
-      const waktu = now.toLocaleTimeString('id-ID', optionsTime).replace(/\./g, ':');
+      const dateOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+      const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+      const tanggal = now.toLocaleDateString('id-ID', dateOptions);
+      const waktu = now.toLocaleTimeString('id-ID', timeOptions).replace(/\./g, ':');
       const display = `${tanggal} pukul ${waktu}`;
-
-      const currentTimeEl = document.getElementById("currentTime");
-      if (currentTimeEl) currentTimeEl.innerText = display;
-
-      const adminDateTimeEl = document.getElementById("adminDateTime");
-      if (adminDateTimeEl) adminDateTimeEl.innerText = display;
+      const ct = document.getElementById("currentTime");
+      if (ct) ct.innerText = display;
+      const adt = document.getElementById("adminDateTime");
+      if (adt) adt.innerText = display;
     }
 
     setInterval(updateTime, 1000);
@@ -573,3 +569,4 @@
   </script>
 </body>
 </html>
+
