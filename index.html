@@ -257,6 +257,54 @@
         margin-bottom: 5px; /* Beri jarak antara tombol dan judul */
       }
     }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
   </style>
 </head>
 <body>
@@ -323,6 +371,7 @@
           <th>Link</th>
           <th>Token Dibuka</th>
           <th>Token Ditutup</th>
+          <th>Status</th>
           <th>Aksi</th>
         </tr>
       </thead>
@@ -391,7 +440,7 @@
       projectId: "ujian-online-berbasis-android",
       storageBucket: "ujian-online-berbasis-android.appspot.com",
       messagingSenderId: "923446282537",
-      appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
+      appId: "1:92344628257:web:60d374dde8aca61f6a0f38"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -466,8 +515,10 @@
         tokenCache.forEach(data => {
           sortedCounter++;
           const row = document.createElement('tr');
+          row.dataset.tokenKey = data.key; // Tambahkan data-token-key
           const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+          const isActiveChecked = data.isActive ? 'checked' : '';
 
           row.innerHTML = `
             <td>${sortedCounter}</td>
@@ -477,6 +528,12 @@
             <td><a href="${data.url}" target="_blank">Link</a></td>
             <td>${startTimeFormatted}</td>
             <td>${endTimeFormatted}</td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" ${isActiveChecked} onchange="toggleTokenStatus('${data.key}', this.checked)">
+                <span class="slider round"></span>
+              </label>
+            </td>
             <td>
               <div class="action-buttons">
                 <button class="action-button-icon" onclick="editToken('${data.key}')" title="Edit Token">
@@ -520,7 +577,7 @@
         return;
       }
 
-      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now() };
+      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now(), isActive: true };
       push(ref(db, 'tokens'), data)
         .then(() => {
           this.reset();
@@ -659,6 +716,23 @@
         // Tidak perlu kembali secara manual karena window.open membuka tab baru
       }, 1500);
       closePrintModal();
+    };
+
+    window.toggleTokenStatus = (tokenId, isActive) => {
+      update(ref(db, 'tokens/' + tokenId), { isActive: isActive })
+        .then(() => {
+          const statusText = isActive ? 'diaktifkan' : 'dinonaktifkan';
+          showNotification(`Token berhasil ${statusText}!`);
+        })
+        .catch(error => {
+          console.error("Gagal memperbarui status token: ", error);
+          showNotification('Gagal memperbarui status token.');
+          // Jika gagal, kembalikan status switch ke sebelumnya
+          const switchElement = document.querySelector(`#tokenTableBody tr[data-token-key="${tokenId}"] input[type="checkbox"]`);
+          if (switchElement) {
+            switchElement.checked = !isActive;
+          }
+        });
     };
 
     function updateTime() {
