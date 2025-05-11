@@ -180,9 +180,6 @@
         flex-direction: row;
         justify-content: center;
       }
-      .print-button-container-mobile {
-        justify-content: flex-start !important;
-      }
     }
     #notification {
       display: none;
@@ -245,6 +242,21 @@
       background-color: #dc3545;
       color: white;
     }
+    @media (max-width: 600px) {
+      .print-button-container-mobile {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 5px;
+      }
+      .admin-panel-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* Agar judul rata kiri */
+      }
+      .admin-panel-header h3 {
+        margin-bottom: 5px; /* Beri jarak antara tombol dan judul */
+      }
+    }
   </style>
 </head>
 <body>
@@ -284,18 +296,16 @@
       <input type="datetime-local" id="startTime" required />
       <label>Waktu Token Ditutup</label>
       <input type="datetime-local" id="endTime" required />
-      <div style="text-align: left;">
-        <button type="submit">Tambah</button>
-      </div>
+      <button type="submit">Tambah</button>
       <p id="errorMsg" class="error"></p>
     </form>
 
     <div class="admin-panel-header">
-      <div class="print-button-container-mobile" style="display: none; justify-content: flex-start;">
+      <div class="print-button-container-mobile" style="display: none;">
         <button onclick="openPrintModal()">Cetak</button>
       </div>
       <h3>DAFTAR TOKEN</h3>
-      <div style="text-align: left; margin-bottom: 10px;">
+      <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px;">
         <button onclick="openPrintModal()">Cetak</button>
       </div>
     </div>
@@ -408,7 +418,7 @@
     window.login = () => {
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value.trim();
-      if (u === ADMIN_USER && p === ADMIN_PASS) {
+      if(u === ADMIN_USER && p === ADMIN_PASS) {
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();
@@ -610,14 +620,14 @@
 
     function updatePrintButtonVisibility() {
       const mobilePrintButtonContainer = document.querySelector('.print-button-container-mobile');
-      const desktopPrintButtonContainer = document.querySelector('.admin-panel-header > div:nth-child(3)'); // Mengambil div tombol cetak desktop
+      const desktopPrintButtonContainer = document.querySelector('.admin-panel-header > div:nth-child(2)');
 
       if (window.innerWidth <= 600) {
         if (mobilePrintButtonContainer) mobilePrintButtonContainer.style.display = 'flex';
         if (desktopPrintButtonContainer) desktopPrintButtonContainer.style.display = 'none';
       } else {
         if (mobilePrintButtonContainer) mobilePrintButtonContainer.style.display = 'none';
-        if (desktopPrintButtonContainer) desktopPrintButtonContainer.style.display = 'block';
+        if (desktopPrintButtonContainer) desktopPrintButtonContainer.style.display = 'flex';
       }
     }
 
@@ -674,4 +684,3 @@
   </script>
 </body>
 </html>
-
