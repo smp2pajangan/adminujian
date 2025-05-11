@@ -421,7 +421,6 @@
           const data = child.val();
           data.key = child.key;
           tokenCache.push(data);
-
           if (data.createdAt && (Date.now() - data.createdAt) > THIRTY_DAYS_IN_MS) {
             remove(ref(db, 'tokens/' + data.key))
               .then(() => console.log(`Token ${data.key} dihapus.`))
@@ -620,23 +619,27 @@
       // Tambahkan header tabel (tanpa kolom Link dan Aksi)
       const headerRow = [];
       const tableHeaders = document.querySelectorAll('#tokenTable thead th');
+      let visibleHeaderCount = 0;
+      const headerIndices = [];
       for (let i = 0; i < tableHeaders.length; i++) {
         if (i !== 4 && i !== 7) { // Skip kolom Link (index 4) dan Aksi (index 7)
           headerRow.push(tableHeaders[i].innerText);
+          headerIndices.push(i);
+          visibleHeaderCount++;
         }
       }
       ws_data.push(headerRow);
 
       // Tambahkan data dari setiap baris tabel (tanpa kolom Link dan Aksi)
       const tableRows = document.querySelectorAll('#tokenTable tbody tr');
+      const dataRows = [];
       tableRows.forEach(row => {
         const rowData = [];
         const cells = row.querySelectorAll('td');
-        for (let i = 0; i < cells.length; i++) {
-          if (i !== 4 && i !== 7) { // Skip kolom Link (index 4) dan Aksi (index 7)
-            rowData.push(cells[i].innerText);
-          }
-        }
+        headerIndices.forEach(index => {
+          rowData.push(cells[index].innerText);
+        });
+        dataRows.push(rowData);
         ws_data.push(rowData);
       });
 
@@ -651,7 +654,37 @@
         ws[header_address].s = headerCellStyle;
       }
       // Merge cell untuk judul agar rata tengah di seluruh lebar tabel
-      ws['!merges'] = [{ s: { c: 0, r: 0 }, e: { c: headerRow.length - 1, r: 0 } }];
+      ws['!merges'] = [{ s: { c: 0, r: 0 }, e: { c: visibleHeaderCount - 1, r: 0 } }];
+
+      // Tambahkan border ke semua sel data
+      const range = XLSX.utils.decode_range(ws['!ref']);
+      for (let R = 3; R <= range.e.r; ++R) {
+        for (let C = 0; C < visibleHeaderCount; ++C) {
+          const cellAddress = XLSX.utils.encode_cell({ c: C, r: R });
+          if (!ws[cellAddress]) continue;
+          ws[cellAddress].s = {
+            border: {
+              top: { style: 'thin', color: { auto: 1 } },
+              bottom: { style: 'thin', color: { auto: 1 } },
+              left: { style: 'thin', color: { auto: 1 } },
+              right: { style: 'thin', color: { auto: 1 } },
+            },
+          };
+        }
+      }
+      // Tambahkan border ke header juga
+      for (let C = 0; C < visibleHeaderCount; ++C) {
+        const cellAddress = XLSX.utils.encode_cell({ c: C, r: 3 });
+        if (!ws[cellAddress]) continue;
+        if (!ws[cellAddress].s) ws[cellAddress].s = {};
+        ws[cellAddress].s.border = {
+          top: { style: 'thin', color: { auto: 1 } },
+          bottom: { style: 'thin', color: { auto: 1 } },
+          left: { style: 'thin', color: { auto: 1 } },
+          right: { style: 'thin', color: { auto: 1 } },
+        };
+      }
+
 
       XLSX.utils.book_append_sheet(wb, ws, "Daftar Token");
       XLSX.writeFile(wb, `${judul.replace(/\s+/g, '_')}.xlsx`);
@@ -710,10 +743,9 @@
         body: data,
         startY: yPosition + 5,
         margin: { left: margin, right: margin, top: yPosition, bottom: margin },
-        styles: { fontSize: 9 },
-        columnStyles: { 0: { cellWidth: 10 } }, // Contoh lebar kolom pertama
+        styles: { fontSize: 9, lineWidth: 0.5, lineColor: [0, 0, 0] },
+        columnStyles: { 0: { cellWidth: 10 } },
         didDrawPage: function(data) {
-          // Tambahkan footer nomor halaman jika perlu
           const pageNumber = pdf.internal.getNumberOfPages();
           pdf.setFontSize(10);
           pdf.text(`Halaman ${pageNumber}`, pageWidth + margin - 20, pdf.internal.pageSize.getHeight() - margin);
