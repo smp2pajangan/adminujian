@@ -28,6 +28,7 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      position: relative; /* Tambahkan ini agar positioning absolute di dalamnya relatif terhadap container */
     }
     input, select {
       padding: 10px;
@@ -342,7 +343,11 @@
     </div>
   </div>
 
-  <div class="container" id="adminPanel" style="display:none;">
+  <div class="container" id="adminPanel" style="display:none; position: relative;">
+    <button onclick="logout()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; display: flex; align-items: center;">
+      <img src="https://raw.githubusercontent.com/smp2pajangan/customlink/refs/heads/main/Keluar.png" alt="Keluar" style="width: 24px; height: 24px; margin-right: 5px;">
+      Keluar
+    </button>
     <h3>TAMBAH / EDIT TOKEN</h3>
     <form id="tokenForm">
       <label>Mata Pelajaran</label>
@@ -428,7 +433,7 @@
 
   <div id="printModal" class="modal">
     <div class="modal-content">
-      <h3>Judul Daftar Token</h3>
+      <h4 style="font-size: 1em; font-weight: normal; color: #555; margin-bottom: 10px;">Berikan judul pada tabel token</h4>
       <div id="printTitleError" class="error" style="text-align: center; margin-bottom: 5px;"></div>
       <textarea id="printTitleInput" placeholder="Tulis dengan huruf kapital" style="width: calc(100% - 20px); padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; height: 80px;"></textarea>
       <button class="print-button" onclick="printTokenList()">Cetak</button>
@@ -485,6 +490,13 @@
       } else {
         document.getElementById("loginError").innerText = "Username atau password salah.";
       }
+    };
+
+    window.logout = () => {
+      localStorage.removeItem('isAdminLoggedIn');
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+      showNotification('Anda telah logout.');
     };
 
     function loadTokens() {
@@ -783,7 +795,7 @@
         const shouldBeActiveStart = earlyStart >= startTime;
         // Nonaktif jika waktu saat ini setelah atau sama dengan endTime
         const shouldBeInactiveEnd = now >= endTime;
-        const shouldBeActive = shouldBeActiveStart && !shouldBeInactiveEnd;
+        const shouldBeActive = shouldBeActiveStart && ! shouldBeInactiveEnd;
 
         if (tokenData.isActive !== shouldBeActive) {
           try {
@@ -811,7 +823,6 @@
     }
 
     // Panggil saat halaman pertama kali dimuat
-    // updatePrintButtonVisibility
     // updatePrintButtonVisibility(); // Tidak diperlukan lagi
 
     // Panggil lagi saat ukuran jendela berubah
