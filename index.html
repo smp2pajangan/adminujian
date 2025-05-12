@@ -28,7 +28,7 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      position: relative; /* Tambahkan ini agar positioning absolute di dalamnya relatif terhadap container */
+      position: relative;
     }
     input, select {
       padding: 10px;
@@ -74,8 +74,8 @@
       background-color: #f4f4f4;
       text-align: center;
     }
-    th:nth-child(8), /* Menyembunyikan header kolom ke-8 (Status) */
-    td:nth-child(8) { /* Menyembunyikan data kolom ke-8 (Status) */
+    th:nth-child(8),
+    td:nth-child(8) {
       display: none;
     }
     .footer {
@@ -202,7 +202,7 @@
       text-align: center;
     }
     .print-button-container {
-      display: none; /* Sembunyikan kontainer tombol cetak yang lama */
+      display: none;
       justify-content: flex-end;
       margin-bottom: 10px;
     }
@@ -251,17 +251,17 @@
     }
     @media (max-width: 600px) {
       .print-button-container-mobile {
-        display: none; /* Sembunyikan tombol cetak mobile yang lama */
+        display: none;
         justify-content: flex-end;
         margin-bottom: 5px;
       }
       .admin-panel-header {
         display: flex;
         flex-direction: column;
-        align-items: flex-start; /* Agar judul rata kiri */
+        align-items: flex-start;
       }
       .admin-panel-header h3 {
-        margin-bottom: 5px; /* Beri jarak antara tombol dan judul */
+        margin-bottom: 5px;
       }
     }
     .switch {
@@ -313,11 +313,10 @@
       transform: translateX(20px);
     }
     .cetak-link {
-      color: #007bff; /* Tetapkan warna biru */
+      color: #007bff;
       text-decoration: underline;
       cursor: pointer;
       font-weight: bold;
-      /* margin-left: 10px; Hapus margin dari sini */
     }
   </style>
 </head>
@@ -467,7 +466,7 @@
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Hapus.png";
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
     let inactivityTimer;
-    const INACTIVITY_TIMEOUT = 2 * 60 * 60 * 1000; // 2 jam dalam milidetik
+    const INACTIVITY_TIMEOUT = 2 * 60 * 60 * 1000;
 
     function showNotification(message) {
       const n = document.getElementById('notification');
@@ -482,11 +481,11 @@
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value.trim();
       if(u === ADMIN_USER && p === ADMIN_PASS) {
-        localStorage.setItem('isAdminLoggedIn', 'true'); // Simpan status login
+        localStorage.setItem('isAdminLoggedIn', 'true');
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();
-        resetInactivityTimer(); // Mulai timer setelah login
+        resetInactivityTimer();
       } else {
         document.getElementById("loginError").innerText = "Username atau password salah.";
       }
@@ -574,10 +573,9 @@
           `;
           document.getElementById('tokenTableBody').appendChild(row);
         });
-        // Setelah memuat token, mulai atau restart interval pemeriksaan status
-        clearInterval(statusCheckInterval); // Clear interval sebelumnya jika ada
+        clearInterval(statusCheckInterval);
         statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 60000);
-        periksaAndUpdateStatusToken(); // Panggil segera setelah load
+        periksaAndUpdateStatusToken();
       });
     }
 
@@ -608,7 +606,7 @@
         return;
       }
 
-      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now(), isActive: false }; // Default nonaktif saat ditambahkan
+      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now(), isActive: false };
       push(ref(db, 'tokens'), data)
         .then(() => {
           this.reset();
@@ -706,10 +704,6 @@
       this.value = this.value.toUpperCase();
     });
 
-    function updatePrintButtonVisibility() {
-      // Tidak diperlukan lagi karena tombol cetak sudah diganti teks
-    }
-
     window.openPrintModal = () => {
       document.getElementById('printModal').style.display = 'flex';
     };
@@ -717,14 +711,14 @@
     window.closePrintModal = () => {
       document.getElementById('printModal').style.display = 'none';
       document.getElementById('printTitleInput').value = '';
-      document.getElementById('printTitleError').innerText = ""; // Bersihkan pesan error saat modal ditutup
+      document.getElementById('printTitleError').innerText = "";
     };
 
     window.printTokenList = () => {
       const printTitleElement = document.getElementById('printTitleInput');
       const printTitle = printTitleElement.value.trim();
       const printTitleError = document.getElementById('printTitleError');
-      printTitleError.innerText = ""; // Bersihkan pesan kesalahan sebelumnya
+      printTitleError.innerText = "";
 
       if (!printTitle) {
         printTitleError.innerText = 'Judul daftar token tidak boleh kosong!';
@@ -734,9 +728,7 @@
       const printUrlWithTitle = `${PRINT_PAGE_URL}?title=${encodeURIComponent(printTitle)}`;
       window.open(printUrlWithTitle, '_blank');
 
-      setTimeout(() => {
-        // Tidak perlu kembali secara manual karena window.open membuka tab baru
-      }, 1500);
+      setTimeout(() => {}, 1500);
       closePrintModal();
     };
 
@@ -752,29 +744,25 @@
       showNotification('Anda telah logout karena tidak ada aktivitas selama 2 jam.');
     }
 
-    // Tambahkan event listener untuk mendeteksi aktivitas
     window.addEventListener('mousemove', resetInactivityTimer);
     window.addEventListener('keypress', resetInactivityTimer);
     window.addEventListener('scroll', resetInactivityTimer);
-    window.addEventListener('click', resetInactivityTimer); // Untuk touch events juga
+    window.addEventListener('click', resetInactivityTimer);
 
-    // Set timer awal saat halaman dimuat (setelah login berhasil atau saat sudah login)
     function startInactivityTimerOnLoad() {
       if (localStorage.getItem('isAdminLoggedIn') === 'true') {
         resetInactivityTimer();
       }
     }
 
-    // Panggil fungsi ini saat halaman dimuat
     window.addEventListener('load', startInactivityTimerOnLoad);
 
-    // Periksa status login saat halaman dimuat
     window.onload = function() {
       if (localStorage.getItem('isAdminLoggedIn') === 'true') {
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();
-        resetInactivityTimer(); // Mulai timer saat sudah login
+        resetInactivityTimer();
       } else {
         document.getElementById('loginSection').style.display = 'block';
         document.getElementById('adminPanel').style.display = 'none';
@@ -785,23 +773,21 @@
 
     async function periksaAndUpdateStatusToken() {
       const now = new Date();
-      const earlyStart = new Date(now.getTime() + 10000); // Tambah 10 detik untuk start
+      const earlyStart = new Date(now.getTime() + 10000);
 
       for (const tokenData of tokenCache) {
         const startTime = new Date(tokenData.startTime);
         const endTime = new Date(tokenData.endTime);
 
-        // Aktif jika waktu saat ini (ditambah 10 detik) setelah atau sama dengan startTime
         const shouldBeActiveStart = earlyStart >= startTime;
-        // Nonaktif jika waktu saat ini setelah atau sama dengan endTime
         const shouldBeInactiveEnd = now >= endTime;
         const shouldBeActive = shouldBeActiveStart && !shouldBeInactiveEnd;
 
         if (tokenData.isActive !== shouldBeActive) {
           try {
             await update(ref(db, 'tokens/' + tokenData.key), { isActive: shouldBeActive });
-            console.log(`Token ${tokenData.key} status diperbarui menjadi ${shouldBeActive ? 'aktif' : 'nonaktif'}.`.`);
-            loadTokens(); // Panggil kembali loadTokens untuk memperbarui tampilan
+            console.log(`Token ${tokenData.key} status diperbarui menjadi ${shouldBeActive ? 'aktif' : 'nonaktif'}.`);
+            loadTokens();
           } catch (error) {
             console.error(`Gagal memperbarui status token ${tokenData.key}: `, error);
           }
@@ -822,14 +808,8 @@
       if (adt) adt.innerText = display;
     }
 
-    // Panggil saat halaman pertama kali dimuat
-    // updatePrintButtonVisibility(); // Tidak diperlukan lagi
-
-    // Panggil lagi saat ukuran jendela berubah
-    window.addEventListener('resize', () => {}); // Fungsi ini tidak melakukan apa-apa sekarang
     setInterval(updateTime, 1000);
     updateTime();
   </script>
 </body>
 </html>
-
