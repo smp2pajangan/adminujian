@@ -321,18 +321,23 @@
     .dropdown-button {
       background-color: #f4f4f4;
       color: #333;
-      padding: 8px 12px;
+      padding: 5px; /* Diubah */
       font-size: 14px;
       border: 1px solid #ccc;
       border-radius: 4px;
       cursor: pointer;
+      display: flex; /* Ditambahkan */
+      align-items: center; /* Ditambahkan */
+      justify-content: center; /* Ditambahkan */
+      width: 30px; /* Ditambahkan agar cukup untuk ikon */
+      height: 30px; /* Ditambahkan agar cukup untuk ikon */
     }
 
     .dropdown-content {
       display: none;
       position: absolute;
       background-color: #f9f9f9;
-      min-width: 100px;
+      min-width: 40px; /* Disesuaikan agar pas dengan ikon */
       box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
       z-index: 1;
       border: 1px solid #ccc;
@@ -341,9 +346,11 @@
 
     .dropdown-content a {
       color: black;
-      padding: 8px 12px;
+      padding: 8px 10px;
       text-decoration: none;
-      display: block;
+      display: flex; /* Diubah */
+      align-items: center; /* Diubah */
+      justify-content: center; /* Diubah */
     }
 
     .dropdown-content a:hover {
@@ -604,15 +611,15 @@
             </td>
             <td>
               <div class="dropdown">
-                <button class="dropdown-button">Aksi</button>
+                <button class="dropdown-button" style="padding: 5px;">
+                  <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/dropdown.png" alt="Aksi" style="width: 20px; height: 20px; vertical-align: middle;">
+                </button>
                 <div class="dropdown-content">
-                  <a href="#" onclick="editToken('${data.key}')">
-                    <img src="${EDIT_ICON_URL}" alt="Edit" style="width: 16px; height: 16px; margin-right: 5px; vertical-align: middle;">
-                    Edit
+                  <a href="#" onclick="editToken('${data.key}')" style="display: flex; align-items: center; padding: 8px 10px;">
+                    <img src="${EDIT_ICON_URL}" alt="Edit" style="width: 16px; height: 16px; margin-right: 10px; vertical-align: middle;">
                   </a>
-                  <a href="#" onclick="promptDelete('${data.key}')">
-                    <img src="${DELETE_ICON_URL}" alt="Hapus" style="width: 16px; height: 16px; margin-right: 5px; vertical-align: middle;">
-                    Hapus
+                  <a href="#" onclick="promptDelete('${data.key}')" style="display: flex; align-items: center; padding: 8px 10px;">
+                    <img src="${DELETE_ICON_URL}" alt="Hapus" style="width: 16px; height: 16px; margin-right: 10px; vertical-align: middle;">
                   </a>
                 </div>
               </div>
