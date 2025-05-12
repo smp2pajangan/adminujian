@@ -322,7 +322,7 @@
 </head>
 <body>
   <div class="header">
-    <img src="https://raw.githubusercontent.com/smp2pajangan/customlink/refs/heads/main/logosmpn2pjg.png" class="logo" alt="Logo SMPN 2 Pajangan">
+    <img src="https://github.com/smp2pajangan/loginujian/blob/main/logosmpn2pjg.png?raw=true" class="logo" alt="Logo SMPN 2 Pajangan">
     <h2>SMP NEGERI 2 PAJANGAN</h2>
   </div>
 
@@ -343,10 +343,8 @@
   </div>
 
   <div class="container" id="adminPanel" style="display:none; position: relative;">
-<button onclick="logout()" style="position: absolute; top: -10px; right: -2px; background: none; border: none; cursor: pointer;">
-  <img src="https://raw.githubusercontent.com/smp2pajangan/customlink/refs/heads/main/Keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
-</button>
-
+    <button onclick="logout()" style="position: absolute; top: 5px; right: 10px; background: none; border: none; cursor: pointer;">
+      <img src="https://raw.githubusercontent.com/smp2pajangan/customlink/refs/heads/main/Keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
     </button>
     <h3>TAMBAH / EDIT TOKEN</h3>
     <form id="tokenForm">
@@ -366,8 +364,13 @@
       <p id="errorMsg" class="error"></p>
     </form>
 
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+      <button onclick="openPrintModal()" style="background: none; border: none; cursor: pointer; display: flex; align-items: center;">
+        <img src="https://raw.githubusercontent.com/smp2pajangan/customlink/refs/heads/main/print.png" alt="Cetak" style="width: 24px; height: 24px;">
+      </button>
+    </div>
     <div class="admin-panel-header">
-      <h3>DAFTAR TOKEN <span style="margin-left: 5px;">(<span class="cetak-link" onclick="openPrintModal()">cetakpdf</span>)</span></h3>
+      <h3>DAFTAR TOKEN</h3>
     </div>
     <p style="font-size: 11px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
       Token yang ditambahkan akan dihapus otomatis setelah 30 hari!
@@ -463,8 +466,8 @@
     let currentTokenId = null;
     let tokenCache = [];
     const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
-    const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/customlink/refs/heads/main/Edit.png";
-    const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/customlink/refs/heads/main/Hapus.png";
+    const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Edit.png";
+    const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/adminujian/refs/heads/main/Hapus.png";
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
     let inactivityTimer;
     const INACTIVITY_TIMEOUT = 2 * 60 * 60 * 1000;
