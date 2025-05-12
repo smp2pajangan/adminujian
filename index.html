@@ -319,18 +319,29 @@
     }
 
     .dropdown-button {
-      background-color: #f4f4f4;
-      color: #333;
-      padding: 5px; /* Diubah */
+      background-color: transparent; /* Latar belakang transparan */
+      color: #333; /* Warna teks (mungkin tidak terlihat karena ikon) */
+      padding: 0; /* Hilangkan padding */
+      margin: 0; /* Hilangkan margin */
       font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      border: none; /* Hilangkan border */
+      border-radius: 0; /* Hilangkan border radius */
       cursor: pointer;
-      display: flex; /* Ditambahkan */
-      align-items: center; /* Ditambahkan */
-      justify-content: center; /* Ditambahkan */
-      width: 30px; /* Ditambahkan agar cukup untuk ikon */
-      height: 30px; /* Ditambahkan agar cukup untuk ikon */
+      display: inline-flex; /* Gunakan flex untuk mengatur ikon di tengah */
+      align-items: center;
+      justify-content: center;
+      width: 24px; /* Sesuaikan dengan ukuran ikon edit/hapus */
+      height: 24px; /* Sesuaikan dengan ukuran ikon edit/hapus */
+    }
+
+    .dropdown-button:hover {
+      background-color: #e0e0e0; /* Efek hover tetap ada */
+    }
+
+    .dropdown-button img {
+      width: 16px; /* Ukuran ikon dropdown */
+      height: 16px; /* Ukuran ikon dropdown */
+      vertical-align: middle;
     }
 
     .dropdown-content {
@@ -359,10 +370,6 @@
 
     .dropdown:hover .dropdown-content {
       display: block;
-    }
-
-    .dropdown-button:hover {
-      background-color: #e0e0e0;
     }
   </style>
 </head>
@@ -611,8 +618,8 @@
             </td>
             <td>
               <div class="dropdown">
-                <button class="dropdown-button" style="padding: 5px;">
-                  <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/dropdown.png" alt="Aksi" style="width: 20px; height: 20px; vertical-align: middle;">
+                <button class="dropdown-button">
+                  <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/dropdown.png" alt="Aksi" style="width: 16px; height: 16px; vertical-align: middle;">
                 </button>
                 <div class="dropdown-content">
                   <a href="#" onclick="editToken('${data.key}')" style="display: flex; align-items: center; padding: 8px 10px;">
