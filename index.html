@@ -344,7 +344,7 @@
   </div>
 
   <div class="container" id="adminPanel" style="display:none; position: relative;">
-    <button onclick="logout()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; display: flex; align-items: center;">
+    <button onclick="logout()" style="position: absolute; top: 5px; right: 5px; background: none; border: none; cursor: pointer; display: flex; align-items: center;">
       <img src="https://raw.githubusercontent.com/smp2pajangan/customlink/refs/heads/main/Keluar.png" alt="Keluar" style="width: 24px; height: 24px; margin-right: 5px;">
       Keluar
     </button>
@@ -795,12 +795,12 @@
         const shouldBeActiveStart = earlyStart >= startTime;
         // Nonaktif jika waktu saat ini setelah atau sama dengan endTime
         const shouldBeInactiveEnd = now >= endTime;
-        const shouldBeActive = shouldBeActiveStart && ! shouldBeInactiveEnd;
+        const shouldBeActive = shouldBeActiveStart && !shouldBeInactiveEnd;
 
         if (tokenData.isActive !== shouldBeActive) {
           try {
             await update(ref(db, 'tokens/' + tokenData.key), { isActive: shouldBeActive });
-            console.log(`Token ${tokenData.key} status diperbarui menjadi ${shouldBeActive ? 'aktif' : 'nonaktif'}.`);
+            console.log(`Token ${tokenData.key} status diperbarui menjadi ${shouldBeActive ? 'aktif' : 'nonaktif'}.`.`);
             loadTokens(); // Panggil kembali loadTokens untuk memperbarui tampilan
           } catch (error) {
             console.error(`Gagal memperbarui status token ${tokenData.key}: `, error);
@@ -832,3 +832,4 @@
   </script>
 </body>
 </html>
+
