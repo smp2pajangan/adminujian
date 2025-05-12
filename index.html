@@ -74,7 +74,6 @@
       background-color: #f4f4f4;
       text-align: center;
     }
-    /* Sembunyikan kolom status default di desktop */
     th:nth-child(8),
     td:nth-child(8) {
       display: none;
@@ -174,19 +173,15 @@
       th, td {
         padding: 6px;
       }
-      /* Sembunyikan kolom Link, Token Dibuka, Token Ditutup pada mobile */
       thead th:nth-child(5),
       tbody td:nth-child(5),
       thead th:nth-child(6),
       tbody td:nth-child(6),
       thead th:nth-child(7),
-      tbody td:nth-child(7) {
-        display: none;
-      }
-      /* Tampilkan kolom Status pada mobile */
+      tbody td:nth-child(7),
       thead th:nth-child(8),
       tbody td:nth-child(8) {
-        display: table-cell;
+        display: none;
       }
       .action-buttons {
         flex-direction: row;
@@ -348,7 +343,7 @@
   </div>
 
   <div class="container" id="adminPanel" style="display:none; position: relative;">
-    <button onclick="logout()" style="position: absolute; top: -10px; right: 0px; background: none; border: none; cursor: pointer;">
+    <button onclick="logout()" style="position: absolute; top: -10px; right: -5px; background: none; border: none; cursor: pointer;">
       <img src="https://raw.githubusercontent.com/smp2pajangan/customlink/refs/heads/main/Keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
     </button>
     <h3>TAMBAH / EDIT TOKEN</h3>
@@ -440,7 +435,7 @@
 
   <div id="printModal" class="modal">
     <div class="modal-content">
-      <h4 style="font-size: 1em; font-weight: normal; color: #555; margin-bottom: 10px;">Berikan judul pada daftar token yang akan dicetak!</h4>
+      <h4 style="font-size: 1em; font-weight: normal; color: #555; margin-bottom: 10px;">Berikan judul pada tabel token</h4>
       <div id="printTitleError" class="error" style="text-align: center; margin-bottom: 5px;"></div>
       <textarea id="printTitleInput" placeholder="Tulis dengan huruf kapital" style="width: calc(100% - 20px); padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; height: 80px;"></textarea>
       <button class="print-button" onclick="printTokenList()">Cetak</button>
@@ -562,7 +557,7 @@
             <td><a href="${data.url}" target="_blank">Link</a></td>
             <td>${startTimeFormatted}</td>
             <td>${endTimeFormatted}</td>
-            <td>
+            <td style="display:none;">
               <label class="switch">
                 <input type="checkbox" ${isActiveChecked} onchange="toggleTokenStatus('${data.key}', this.checked)">
                 <span class="slider round"></span>
@@ -582,7 +577,7 @@
           document.getElementById('tokenTableBody').appendChild(row);
         });
         clearInterval(statusCheckInterval);
-        statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000); // Periksa setiap 10 detik
+        statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 60000);
         periksaAndUpdateStatusToken();
       });
     }
@@ -781,8 +776,7 @@
 
     async function periksaAndUpdateStatusToken() {
       const now = new Date();
-      const earlyStart = new Date(now.getTime() + 60000); // Toleransi 1 menit
-      let hasUpdates = false;
+      const earlyStart = new Date(now.getTime() + 10000);
 
       for (const tokenData of tokenCache) {
         const startTime = new Date(tokenData.startTime);
@@ -796,65 +790,13 @@
           try {
             await update(ref(db, 'tokens/' + tokenData.key), { isActive: shouldBeActive });
             console.log(`Token ${tokenData.key} status diperbarui menjadi ${shouldBeActive ? 'aktif' : 'nonaktif'}.`);
-            // Kita set flag bahwa ada pembaruan
-            hasUpdates = true;
-            // Tidak perlu loadTokens() di sini, kita akan perbarui cache dan tampilan
-            const index = tokenCache.findIndex(item => item.key === tokenData.key);
-            if (index > -1) {
-              tokenCache[index].isActive = shouldBeActive;
-              // Perbarui tampilan baris tabel secara langsung
-              const row = document.querySelector(`tr[data-token-key="${tokenData.key}"]`);
-              if (row) {
-                const tokenCell = row.querySelector('td:nth-child(4)');
-                if (tokenCell) {
-                  const newTokenDisplay = shouldBeActive ? `<strong style="color: blue;">${tokenCache[index].token}</strong>` : tokenCache[index].token;
-                  tokenCell.innerHTML = newTokenDisplay;
-                  // Perbarui status switch juga
-                  const switchInput = row.querySelector('td:nth-child(8) input[type="checkbox"]');
-                  if (switchInput) {
-                    switchInput.checked = shouldBeActive;
-                  }
-                }
-              }
-            }
+            loadTokens();
           } catch (error) {
             console.error(`Gagal memperbarui status token ${tokenData.key}: `, error);
           }
         }
       }
-      // Tidak perlu memanggil loadTokens() lagi di sini karena kita sudah memperbarui tampilan secara langsung
     }
-
-    window.toggleTokenStatus = async (tokenId, isChecked) => {
-      try {
-        await update(ref(db, 'tokens/' + tokenId), { isActive: isChecked });
-        console.log(`Token ${tokenId} status diubah menjadi ${isChecked}.`);
-
-        // Perbarui tampilan baris tabel secara langsung
-        const row = document.querySelector`tr[data-token-key="${tokenId}"]`);
-        if (row) {
-          const tokenCell = row.querySelector('td:nth-child(4)');
-          const tokenData = tokenCache.find(item => item.key === tokenId);
-          if (tokenCell && tokenData) {
-            const newTokenDisplay = isChecked ? `<strong style="color: blue;">${tokenData.token}</strong>` : tokenData.token;
-            tokenCell.innerHTML = newTokenDisplay;
-            // Perbarui status switch
-            const switchInput = row.querySelector('td:nth-child(8) input[type="checkbox"]');
-            if (switchInput) {
-              switchInput.checked = isChecked;
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Gagal memperbarui status token: ", error);
-        // Jika gagal, kembalikan status switch ke sebelumnya
-        const checkbox = document.querySelector(`tr[data-token-key="${tokenId}"] td:nth-child(8) input[type="checkbox"]`);
-        if (checkbox) {
-          checkbox.checked = !isChecked;
-        }
-        showNotification('Gagal memperbarui status token.');
-      }
-    };
 
     function updateTime() {
       const now = new Date();
