@@ -30,70 +30,6 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       position: relative;
     }
-    #loginSection {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    #loginSection .container {
-      width: 90%;
-      max-width: 400px;
-      margin: 0;
-    }
-    #loginSection h3 {
-      text-align: center;
-    }
-    #loginSection input {
-      padding: 10px;
-      margin: 8px 0;
-      width: 100%;
-      box-sizing: border-box;
-      font-size: 16px;
-    }
-    #loginSection button {
-      padding: 10px 20px;
-      margin-top: 15px;
-      font-size: 16px;
-      cursor: pointer;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      width: 100%;
-    }
-    #loginSection button:hover {
-      background-color: #0056b3;
-    }
-    #loginSection .error {
-      color: red;
-      font-size: 14px;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    #loginSection .login-link {
-      color: #007BFF;
-      text-decoration: underline;
-      font-weight: bold;
-    }
-    #loginSection .login-link:hover {
-      color: darkorange;
-      cursor: pointer;
-    }
-    #loginSection .login-link:active {
-      color: red;
-    }
-    #loginSection .footer {
-      text-align: center;
-      margin-top: 20px;
-      color: #555;
-      font-size: 14px;
-    }
-    #adminPanel {
-      display: none;
-    }
     input, select {
       padding: 10px;
       margin: 8px 0;
@@ -126,8 +62,8 @@
       font-size: 14px;
     }
     th, td {
-      border: 1px solid #ddd;
-      padding: 6px;
+      border: 1px solid #ccc;
+      padding: 8px;
       word-wrap: break-word;
       text-align: left;
     }
@@ -170,16 +106,26 @@
       display: inline-block;
       width: auto;
     }
+    .login-link {
+      color: #007BFF;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+    .login-link:hover {
+      color: darkorange;
+      cursor: pointer;
+    }
+    .login-link:active {
+      color: red;
+    }
     .action-buttons {
       display: flex;
-      gap: 4px;
+      gap: 8px;
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
     }
     .action-button-icon {
-      width: 24px;
-      height: 24px;
       background: none;
       border: none;
       padding: 0;
@@ -188,11 +134,13 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      width: 28px;
+      height: 28px;
       border-radius: 4px;
     }
     .action-button-icon img {
-      width: 16px;
-      height: 16px;
+      width: 20px;
+      height: 20px;
       display: block;
     }
     .action-button-icon:hover {
@@ -311,14 +259,18 @@
       }
     }
     .switch {
-      width: 30px;
-      height: 16px;
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
     }
+
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
+
     .slider {
       position: absolute;
       cursor: pointer;
@@ -330,25 +282,29 @@
       transition: .4s;
       border-radius: 34px;
     }
+
     .slider:before {
       position: absolute;
       content: "";
-      height: 10px;
-      width: 10px;
-      left: 2px;
-      bottom: 2px;
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
       background-color: white;
       transition: .4s;
       border-radius: 50%;
     }
+
     input:checked + .slider {
       background-color: #2196F3;
     }
+
     input:focus + .slider {
       box-shadow: 0 0 1px #2196F3;
     }
+
     input:checked + .slider:before {
-      transform: translateX(14px);
+      transform: translateX(20px);
     }
     .cetak-link {
       color: #007bff;
@@ -357,7 +313,6 @@
       font-weight: bold;
     }
   </style>
-
 </head>
 <body>
   <div class="header">
@@ -616,7 +571,7 @@
           document.getElementById('tokenTableBody').appendChild(row);
         });
         clearInterval(statusCheckInterval);
-        statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000);
+        statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000); // Periksa setiap 10 detik
         periksaAndUpdateStatusToken();
       });
     }
@@ -815,7 +770,7 @@
 
     async function periksaAndUpdateStatusToken() {
       const now = new Date();
-      const earlyStart = new Date(now.getTime());
+      const earlyStart = new Date(now.getTime()); // Hilangkan toleransi waktu
 
       for (const tokenData of tokenCache) {
         const startTime = new Date(tokenData.startTime);
