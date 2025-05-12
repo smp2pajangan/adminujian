@@ -156,15 +156,15 @@
       }
       h2, h3 {
         text-align: center;
-        font-size: 1.2em;
+        font-size: 1.5em;
       }
       input, select, button {
-        font-size: 12px;
+        font-size: 14px;
         padding: 8px;
-        margin: 3px 0;
+        margin: 6px 0;
       }
       table {
-        font-size: 11px;
+        font-size: 12px;
       }
       th, td {
         padding: 6px;
@@ -261,8 +261,8 @@
     .switch {
       position: relative;
       display: inline-block;
-      width: 20px;
-      height: 10px;
+      width: 40px;
+      height: 20px;
     }
 
     .switch input {
@@ -280,16 +280,16 @@
       bottom: 0;
       background-color: #ccc;
       transition: .4s;
-      border-radius: 20px;
+      border-radius: 34px;
     }
 
     .slider:before {
       position: absolute;
       content: "";
-      height: 10px;
-      width: 10px;
-      left: 2px;
-      bottom: 2px;
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
       background-color: white;
       transition: .4s;
       border-radius: 50%;
@@ -652,7 +652,7 @@
 
       const isDup = tokenCache.some(item => item.token === t && item.key !== currentTokenId);
       if (isDup) {
-        em.innerText = "Token sudah digunakan!";
+        em.innerText = "Token sudah digunakan oleh data lain!";
         return;
       }
 
@@ -770,7 +770,7 @@
 
     async function periksaAndUpdateStatusToken() {
       const now = new Date();
-      const earlyStart = new Date(now.getTime());
+      const earlyStart = new Date(now.getTime()); // Hilangkan toleransi waktu
 
       for (const tokenData of tokenCache) {
         const startTime = new Date(tokenData.startTime);
