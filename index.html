@@ -571,7 +571,7 @@
           document.getElementById('tokenTableBody').appendChild(row);
         });
         clearInterval(statusCheckInterval);
-        statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 60000);
+        statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000); // Periksa setiap 10 detik
         periksaAndUpdateStatusToken();
       });
     }
@@ -770,7 +770,7 @@
 
     async function periksaAndUpdateStatusToken() {
       const now = new Date();
-      const earlyStart = new Date(now.getTime() + 10000);
+      const earlyStart = new Date(now.getTime()); // Hilangkan toleransi waktu
 
       for (const tokenData of tokenCache) {
         const startTime = new Date(tokenData.startTime);
