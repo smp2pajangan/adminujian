@@ -471,7 +471,7 @@
         <input type="datetime-local" id="editEndTime" required />
         <p id="editErrorMsg" class="error"></p>
         <button type="submit">Simpan</button>
-        <button type="button" onclick="closeEditModal()">Batal</button>
+        < type="button" onclick="closeEditModal()">Batal</button>
       </form>
     </div>
   </div>
@@ -516,7 +516,7 @@
     const db = getDatabase(app);
 
     const ADMIN_USER = "admin";
-    const ADMIN_PASS = "87654321";
+    const ADMIN_PASS = "12345678";
     let currentTokenId = null;
     let tokenCache = [];
     const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
@@ -553,6 +553,7 @@
       localStorage.removeItem('isAdminLoggedIn');
       document.getElementById('adminPanel').style.display = 'none';
       document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('password').value = ''; // Mengosongkan password saat logout
       showNotification('Anda telah logout.');
     };
 
@@ -816,6 +817,7 @@
       localStorage.removeItem('isAdminLoggedIn');
       document.getElementById('adminPanel').style.display = 'none';
       document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('password').value = ''; // Mengosongkan password saat logout otomatis
       showNotification('Anda telah logout karena tidak ada aktivitas selama 30 menit.');
     }
 
