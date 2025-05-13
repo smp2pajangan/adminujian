@@ -524,7 +524,7 @@
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus.png";
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
     let inactivityTimer;
-    const INACTIVITY_TIMEOUT = 1 * 60 * 1000;
+    const INACTIVITY_TIMEOUT = 30 * 60 * 1000;
 
     function showNotification(message) {
       const n = document.getElementById('notification');
@@ -816,7 +816,7 @@
       localStorage.removeItem('isAdminLoggedIn');
       document.getElementById('adminPanel').style.display = 'none';
       document.getElementById('loginSection').style.display = 'block';
-      showNotification('Anda telah logout karena tidak ada aktivitas selama 2 jam.');
+      showNotification('Anda telah logout karena tidak ada aktivitas selama 30 menit.');
     }
 
     window.addEventListener('mousemove', resetInactivityTimer);
