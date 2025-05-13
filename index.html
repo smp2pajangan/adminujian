@@ -264,13 +264,11 @@
       width: 30px;
       height: 16px;
     }
-
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
-
     .slider {
       position: absolute;
       cursor: pointer;
@@ -282,7 +280,6 @@
       transition: .4s;
       border-radius: 34px;
     }
-
     .slider:before {
       position: absolute;
       content: "";
@@ -294,15 +291,12 @@
       transition: .4s;
       border-radius: 50%;
     }
-
     input:checked + .slider {
       background-color: #2196F3;
     }
-
     input:focus + .slider {
       box-shadow: 0 0 1px #2196F3;
     }
-
     input:checked + .slider:before {
       transform: translateX(16px);
     }
@@ -312,12 +306,10 @@
       cursor: pointer;
       font-weight: bold;
     }
-    /* CSS untuk Dropdown */
     .dropdown {
       position: relative;
       display: inline-block;
     }
-
     .dropdown-button {
       background-color: transparent;
       color: #333;
@@ -333,17 +325,14 @@
       width: 24px;
       height: 24px;
     }
-
     .dropdown-button:hover {
       background-color: #e0e0e0;
     }
-
     .dropdown-button img {
       width: 16px;
       height: 16px;
       vertical-align: middle;
     }
-
     .dropdown-content {
       display: none;
       position: absolute;
@@ -355,7 +344,6 @@
       border-radius: 4px;
       padding: 5px 0;
     }
-
     .dropdown-content a {
       color: black;
       padding: 5px 10px;
@@ -364,12 +352,9 @@
       align-items: center;
       justify-content: center;
     }
-
-
     .dropdown-content a:hover {
       background-color: #ddd;
     }
-
     .dropdown:hover .dropdown-content {
       display: block;
     }
@@ -401,7 +386,7 @@
     <button onclick="logout()" style="position: absolute; top: -10px; right: -5px; background: none; border: none; cursor: pointer;">
       <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
     </button>
-    <h3>TAMBAH / EDIT TOKEN</h3>
+    <h3>TAMBAH/EDIT TOKEN</h3>
     <form id="tokenForm">
       <label>Mata Pelajaran</label>
       <input type="text" id="subject" placeholder="Gunakan kapital" required />
@@ -524,7 +509,7 @@
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus.png";
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
     let inactivityTimer;
-    const INACTIVITY_TIMEOUT = 30 * 60 * 1000;
+    const INACTIVITY_TIMEOUT = 20 * 60 * 1000;
 
     function showNotification(message) {
       const n = document.getElementById('notification');
@@ -642,8 +627,7 @@
         periksaAndUpdateStatusToken();
       });
     }
-
-    document.getElementById('tokenForm').addEventListener('submit', function(e) {
+ document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const s = document.getElementById('subject').value.trim().toUpperCase();
       const k = document.getElementById('kelas').value.trim();
@@ -818,7 +802,7 @@
       document.getElementById('adminPanel').style.display = 'none';
       document.getElementById('loginSection').style.display = 'block';
       document.getElementById('password').value = ''; // Mengosongkan password saat logout otomatis
-      showNotification('Anda telah logout karena tidak ada aktivitas selama 30 menit.');
+      showNotification('Anda telah logout otomatis, silahkan masukan password kembali!');
     }
 
     window.addEventListener('mousemove', resetInactivityTimer);
@@ -850,7 +834,7 @@
 
     async function periksaAndUpdateStatusToken() {
       const now = new Date();
-      const earlyStart = new Date(now.getTime()); // Hilangkan toleransi waktu
+      const earlyStart = new Date(now.getTime());
       for (const tokenData of tokenCache) {
         const startTime = new Date(tokenData.startTime);
         const endTime = new Date(tokenData.endTime);
