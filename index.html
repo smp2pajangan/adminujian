@@ -516,7 +516,7 @@
     const db = getDatabase(app);
 
     const ADMIN_USER = "admin";
-    const ADMIN_PASS = "12345";
+    const ADMIN_PASS = "87654321";
     let currentTokenId = null;
     let tokenCache = [];
     const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
@@ -524,7 +524,7 @@
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus.png";
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
     let inactivityTimer;
-    const INACTIVITY_TIMEOUT = 1 * 60 * 1000; // Diubah menjadi 1 menit
+    const INACTIVITY_TIMEOUT = 1 * 60 * 1000;
 
     function showNotification(message) {
       const n = document.getElementById('notification');
@@ -807,17 +807,16 @@
       closePrintModal();
     };
 
-    let inactivityTimer;
-    const INACTIVITY_TIMEOUT = 1 * 60 * 1000; // Diubah menjadi 1 menit
-
     function resetInactivityTimer() {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(logoutDueToInactivity, INACTIVITY_TIMEOUT);
     }
 
     function logoutDueToInactivity() {
-      logout(); // Memanggil fungsi logout yang sudah ada
-      showNotification('Anda telah logout karena tidak ada aktivitas selama 1 menit.');
+      localStorage.removeItem('isAdminLoggedIn');
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+      showNotification('Anda telah logout karena tidak ada aktivitas selama 2 jam.');
     }
 
     window.addEventListener('mousemove', resetInactivityTimer);
