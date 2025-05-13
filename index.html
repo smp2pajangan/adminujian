@@ -321,26 +321,26 @@
     .dropdown-button {
       background-color: transparent;
       color: #333;
-      padding: 0; 
-      margin: 0; 
+      padding: 0;
+      margin: 0;
       font-size: 14px;
-      border: none; 
-      border-radius: 0; 
+      border: none;
+      border-radius: 0;
       cursor: pointer;
-      display: inline-flex; 
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 24px; 
-      height: 24px; 
+      width: 24px;
+      height: 24px;
     }
 
     .dropdown-button:hover {
-      background-color: #e0e0e0; 
+      background-color: #e0e0e0;
     }
 
     .dropdown-button img {
-      width: 16px; 
-      height: 16px; 
+      width: 16px;
+      height: 16px;
       vertical-align: middle;
     }
 
@@ -384,8 +384,8 @@
   <div class="container" id="loginSection">
     <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
     <p id="loginError" class="error"></p>
-    <input type="text" id="username" placeholder="Masukan Username (admin)" />
-    <input type="password" id="password" placeholder="Masukan Password" />
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
     <button onclick="login()">Login</button>
     <p style="text-align: center; font-size: 14px; margin-top: 10px;">
       Halaman login ujian siswa?
@@ -663,9 +663,15 @@
         return;
       }
 
-      const isDup = tokenCache.some(item => item.token === t && item.key !== currentTokenId);
-      if (isDup) {
+      const isTokenDup = tokenCache.some(item => item.token === t);
+      if (isTokenDup) {
         em.innerText = "Token sudah ada!";
+        return;
+      }
+
+      const isUrlDup = tokenCache.some(item => item.url === u);
+      if (isUrlDup) {
+        em.innerText = "URL/Link sudah ada!";
         return;
       }
 
@@ -716,9 +722,15 @@
         return;
       }
 
-      const isDup = tokenCache.some(item => item.token === t && item.key !== currentTokenId);
-      if (isDup) {
+      const isTokenDup = tokenCache.some(item => item.token === t && item.key !== currentTokenId);
+      if (isTokenDup) {
         em.innerText = "Token sudah digunakan oleh data lain!";
+        return;
+      }
+
+      const isUrlDup = tokenCache.some(item => item.url === u && item.key !== currentTokenId);
+      if (isUrlDup) {
+        em.innerText = "URL/Link sudah digunakan oleh data lain!";
         return;
       }
 
@@ -837,7 +849,6 @@
     async function periksaAndUpdateStatusToken() {
       const now = new Date();
       const earlyStart = new Date(now.getTime()); // Hilangkan toleransi waktu
-
       for (const tokenData of tokenCache) {
         const startTime = new Date(tokenData.startTime);
         const endTime = new Date(tokenData.endTime);
@@ -876,4 +887,3 @@
   </script>
 </body>
 </html>
-
