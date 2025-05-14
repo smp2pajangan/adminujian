@@ -484,6 +484,22 @@
     </div>
   </div>
 
+  <div id="forceActiveModal" class="modal">
+    <div class="modal-content">
+      <p>Apakah kamu yakin ingin mengaktifkan paksa token ini?</p>
+      <button onclick="confirmForceActive(true)">Yakin</button>
+      <button onclick="closeForceActiveModal()">Batal</button>
+    </div>
+  </div>
+
+  <div id="forceInactiveModal" class="modal">
+    <div class="modal-content">
+      <p>Nonaktifkan token paksa dan kembalikan ke pengaturan jadwal?</p>
+      <button onclick="confirmForceInactive()">Nonaktifkan</button>
+      <button onclick="closeForceInactiveModal()">Batal</button>
+    </div>
+  </div>
+
   <div id="notification">
     <span id="notificationMessage"></span>
   </div>
@@ -525,6 +541,7 @@
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
     let inactivityTimer;
     const INACTIVITY_TIMEOUT = 60 * 60 * 1000;
+    let currentForceActiveTokenId = null;
 
     function showNotification(message) {
       const n = document.getElementById('notification');
@@ -599,7 +616,6 @@
           row.dataset.tokenKey = data.key;
           const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-          const isActiveChecked = data.isActive ? 'checked' : '';
           let tokenDisplay = data.token;
           if (data.isActive) {
             tokenDisplay = `<strong style="color: blue;">${data.token}</strong>`;
@@ -613,9 +629,10 @@
             <td><a href="${data.url}" target="_blank">Link</a></td>
             <td>${startTimeFormatted}</td>
             <td>${endTimeFormatted}</td>
-            <td>
-              <label class="switch">
-                <input type="checkbox" ${isActiveChecked} onchange="toggleTokenStatus('${data.key}', this.checked)">
+            <td style="text-align: center;">
+              <span style="color: ${data.isActive ? 'green' : 'grey'}; font-weight: bold;">${data.isActive ? 'On' : 'Off'}</span>
+              <label class="switch" style="margin-top: 5px;">
+                <input type="checkbox" data-token-key="${data.key}" onchange="toggleForceActive(this)" ${data.isForceActive ? 'checked' : ''}>
                 <span class="slider round"></span>
               </label>
             </td>
@@ -676,7 +693,7 @@
         return;
       }
 
-      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now(), isActive: false };
+      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now(), isActive: false, isForceActive: false };
       push(ref(db, 'tokens'), data)
         .then(() => {
           this.reset();
@@ -808,6 +825,154 @@
       closePrintModal();
     };
 
+    window.toggleForceActive = (checkbox) => {
+      const tokenId = checkbox.dataset.tokenKey;
+      const isCurrentlyForced = checkbox.checked;
+
+      if (!isCurrentlyForced) {
+        // Kondisi: Switch abu-abu (tidak aktif) -> muncul konfirmasi MENGAKTIFKAN
+        currentForceActiveTokenId = tokenId;
+        document.getElementById('forceActiveModal').style.display = 'flex';
+      } else {
+        // Kondisi: Switch biru (aktif) -> muncul konfirmasi MENONAKTIFKAN
+        currentForceActiveTokenId = tokenId;
+        document.getElementById('forceInactiveModal').style.display = 'flex';
+      }
+    };
+
+    window.confirmForceActive = (force) => {
+      if (currentForceActiveTokenId && force) {
+        update(ref(db, 'tokens/' + currentForceActiveTokenId), { isForceActive: true, isActive: true })
+          .then(() => {
+            showNotification('Token dipaksa aktif!');
+            // Perbarui tampilan baris secara langsung
+            const row = document.querySelector(`#tokenTableBody tr[data-token-key="${currentForceActiveTokenId}"]`);
+            if (row) {
+              const statusSpan = row.querySelector('td:nth-child(8) span');
+              const switchInput = row.querySelector('td:nth-child(8) .switch input');
+              if (statusSpan) {
+                statusSpan.innerText = 'On';
+                statusSpan.style.color = 'green';
+              }
+              if (switchInput) {
+                switchInput.checked = true;
+              }
+            }
+          })
+          .catch(error => {
+            console.error("Gagal mengaktifkan status paksa: ", error);
+            showNotification("Gagal mengaktifkan status paksa.");
+          })
+          .finally(() => {
+            closeForceActiveModal();
+            currentForceActiveTokenId = null;
+          });
+      } else {
+        closeForceActiveModal();
+        // Jika dibatalkan saat akan mengaktifkan, kembalikan status switch ke semula (off)
+        const checkbox = document.querySelector(`#tokenTableBody tr[data-token-key="${currentForceActiveTokenId}"] .switch input`);
+        if (checkbox) {
+          checkbox.checked = false;
+        }
+        currentForceActiveTokenId = null;
+      }
+    };
+
+    window.closeForceActiveModal = () => {
+      document.getElementById('forceActiveModal').style.display = 'none';
+      currentForceActiveTokenId = null;
+      // Jika modal ditutup saat akan mengaktifkan, kembalikan status switch ke semula (off)
+      const checkbox = document.querySelector(`#tokenTableBody tr[data-token-key="${currentForceActiveTokenId}"] .switch input`);
+      if (checkbox && !checkbox.checked) {
+        checkbox.checked = false;
+      }
+    };
+
+    window.confirmForceInactive = () => {
+      if (currentForceActiveTokenId) {
+        update(ref(db, 'tokens/' + currentForceActiveTokenId), { isForceActive: false, isActive: false })
+          .then(() => {
+            showNotification('Token paksa aktif dinonaktifkan!');
+            // Perbarui tampilan baris secara langsung
+            const row = document.querySelector(`#tokenTableBody tr[data-token-key="${currentForceActiveTokenId}"]`);
+            if (row) {
+              const statusSpan = row.querySelector('td:nth-child(8) span');
+              const switchInput = row.querySelector('td:nth-child(8) .switch input');
+              if (statusSpan) {
+                statusSpan.innerText = 'Off';
+                statusSpan.style.color = 'grey';
+              }
+              if (switchInput) {
+                switchInput.checked = false; // Kembalikan switch ke abu-abu
+              }
+            }
+          })
+          .catch(error => {
+            console.error("Gagal menonaktifkan status paksa: ", error);
+            showNotification("Gagal menonaktifkan token paksa.");
+          })
+          .finally(() => {
+            closeForceInactiveModal();
+            currentForceActiveTokenId = null;
+          });
+      }
+    };
+
+    window.closeForceInactiveModal = () => {
+      document.getElementById('forceInactiveModal').style.display = 'none';
+      currentForceActiveTokenId = null;
+    };
+
+    async function periksaAndUpdateStatusToken() {
+      const now = new Date();
+      for (const tokenData of tokenCache) {
+        let newIsActive;
+        if (tokenData.isForceActive) {
+          newIsActive = true;
+        } else {
+          const startTime = new Date(tokenData.startTime);
+          const endTime = new Date(tokenData.endTime);
+          newIsActive = now >= startTime && now < endTime;
+        }
+
+        if (tokenData.isActive !== newIsActive) {
+          try {
+            await update(ref(db, 'tokens/' + tokenData.key), { isActive: newIsActive });
+            console.log(`Token ${tokenData.key} status diperbarui menjadi ${newIsActive ? 'aktif' : 'nonaktif'}.`);
+            // Tidak perlu loadTokens() di sini, onValue akan menangani pembaruan
+            // Kita bisa memperbarui tampilan baris di sini jika perlu sinkronisasi cepat
+            const row = document.querySelector(`#tokenTableBody tr[data-token-key="${tokenData.key}"]`);
+            if (row) {
+              const statusSpan = row.querySelector('td:nth-child(8) span');
+              if (statusSpan) {
+                statusSpan.innerText = newIsActive ? 'On' : 'Off';
+                statusSpan.style.color = newIsActive ? 'green' : 'grey';
+              }
+            }
+          } catch (error) {
+            console.error(`Gagal memperbarui status token ${tokenData.key}: `, error);
+          }
+        }
+      }
+      // Tidak perlu loadTokens() di sini, onValue akan dipanggil secara otomatis
+    }
+
+    function updateTime() {
+      const now = new Date();
+      const dateOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+      const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+      const tanggal = now.toLocaleDateString('id-ID', dateOptions);
+      const waktu = now.toLocaleTimeString('id-ID', timeOptions).replace(/\./g, ':');
+      const display = `${tanggal} pukul ${waktu}`;
+      const ct = document.getElementById("currentTime");
+      if (ct) ct.innerText = display;
+      const adt = document.getElementById("adminDateTime");
+      if (adt) adt.innerText = display;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+
     function resetInactivityTimer() {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(logoutDueToInactivity, INACTIVITY_TIMEOUT);
@@ -847,45 +1012,7 @@
     };
 
     let statusCheckInterval;
-
-    async function periksaAndUpdateStatusToken() {
-      const now = new Date();
-      const earlyStart = new Date(now.getTime()); // Hilangkan toleransi waktu
-      for (const tokenData of tokenCache) {
-        const startTime = new Date(tokenData.startTime);
-        const endTime = new Date(tokenData.endTime);
-
-        const shouldBeActiveStart = earlyStart >= startTime;
-        const shouldBeInactiveEnd = now >= endTime;
-        const shouldBeActive = shouldBeActiveStart && !shouldBeInactiveEnd;
-
-        if (tokenData.isActive !== shouldBeActive) {
-          try {
-            await update(ref(db, 'tokens/' + tokenData.key), { isActive: shouldBeActive });
-            console.log(`Token ${tokenData.key} status diperbarui menjadi ${shouldBeActive ? 'aktif' : 'nonaktif'}.`);
-            loadTokens();
-          } catch (error) {
-            console.error(`Gagal memperbarui status token ${tokenData.key}: `, error);
-          }
-        }
-      }
-    }
-
-    function updateTime() {
-      const now = new Date();
-      const dateOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
-      const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-      const tanggal = now.toLocaleDateString('id-ID', dateOptions);
-      const waktu = now.toLocaleTimeString('id-ID', timeOptions).replace(/\./g, ':');
-      const display = `${tanggal} pukul ${waktu}`;
-      const ct = document.getElementById("currentTime");
-      if (ct) ct.innerText = display;
-      const adt = document.getElementById("adminDateTime");
-      if (adt) adt.innerText = display;
-    }
-
-    setInterval(updateTime, 1000);
-    updateTime();
+    statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000);
   </script>
 </body>
 </html>
