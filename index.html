@@ -381,6 +381,103 @@
     .dropdown:hover .dropdown-content {
       display: block;
     }
+    .logout-button {
+      position: absolute;
+      top: 0px;
+      right: 2px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      margin: 0;
+    }
+
+    .logout-button img {
+      width: 24px;
+      height: 24px;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .print-button-header {
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-left: 10px;
+      margin-right: -10px;
+      padding: 0;
+    }
+
+    .print-button-header img {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+    }
+    .auto-delete-note {
+      font-size: 11px;
+      color: #555;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .dropdown-action-link {
+      display: flex;
+      align-items: center;
+      padding: 6px 8px;
+      color: black;
+      text-decoration: none;
+    }
+
+    .dropdown-action-link img {
+      width: 16px;
+      height: 16px;
+      margin-right: 5px; /* Sedikit ruang antara ikon dan teks (jika ada) */
+      vertical-align: middle;
+    }
+    .print-modal-title {
+      font-size: 1em;
+      font-weight: normal;
+      color: #555;
+      margin-bottom: 10px;
+      text-align: center; /* Tambahkan ini agar judulnya di tengah seperti di HTML sebelumnya */
+    }
+    .print-title-input {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 16px;
+      height: 80px;
+    }
+    #tokenTableBody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .row-removing {
+      opacity: 0.7;
+      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+      transform: translateX(10px);
+    }
+    .pagination button {
+      padding: 8px 12px;
+      margin: 0 5px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: white;
+      color: #333;
+    }
+
+    .pagination button:disabled {
+      background-color: #eee;
+      color: #777;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -406,8 +503,8 @@
   </div>
 
   <div class="container" id="adminPanel" style="display:none; position: relative;">
-    <button onclick="logout()" style="position: absolute; top: -10px; right: -5px; background: none; border: none; cursor: pointer;">
-      <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
+    <button onclick="logout()" class="logout-button">
+      <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar">
     </button>
     <h3>TAMBAH / EDIT TOKEN</h3>
     <form id="tokenForm">
@@ -427,14 +524,14 @@
       <p id="errorMsg" class="error"></p>
     </form>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <div class="panel-header">
       <h3>DAFTAR TOKEN</h3>
-      <button onclick="openPrintModal()" style="background: none; border: none; cursor: pointer; margin-left: 10px; margin-right: -10px;">
-        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/print.png" alt="Cetak" style="width: 24px; height: 24px;">
+      <button onclick="openPrintModal()" class="print-button-header">
+        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/print.png" alt="Cetak">
       </button>
     </div>
 
-    <p style="font-size: 11px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
+    <p class="auto-delete-note">
       Token yang ditambahkan akan dihapus otomatis setelah 30 hari!
     </p>
 
@@ -454,6 +551,12 @@
       </thead>
       <tbody id="tokenTableBody"></tbody>
     </table>
+
+    <div class="pagination" style="display: flex; justify-content: center; margin-top: 10px;">
+      <button id="prevPage" disabled>Sebelumnya</button>
+      <div id="pageNumbers" style="margin: 0 10px;"></div>
+      <button id="nextPage" disabled>Selanjutnya</button>
+    </div>
 
     <div class="footer">
       <div>@Admin SMPN 2 Pajangan</div>
@@ -501,7 +604,7 @@
         <p id="forceActivePasswordError" class="error"></p>
       </div>
       <button onclick="confirmForceActive()">Mengaktifkan</button>
-      <button onclick="closeForceActiveModal()">Batal</button>
+      <button type="button" onclick="closeForceActiveModal()">Batal</button>
     </div>
   </div>
 
@@ -509,7 +612,7 @@
     <div class="modal-content">
       <p>Apakah Anda yakin ingin <b>menonaktifkan token secara paksa</b>? Hal ini akan membuat token kembali ke pengaturan jadwal!</p>
       <button onclick="confirmForceInactive()">Nonaktifkan</button>
-      <button onclick="closeForceInactiveModal()">Batal</button>
+      <button type="button" onclick="closeForceInactiveModal()">Batal</button>
     </div>
   </div>
 
@@ -519,9 +622,9 @@
 
   <div id="printModal" class="modal">
     <div class="modal-content">
-      <h4 style="font-size: 1em; font-weight: normal; color: #555; margin-bottom: 10px;">Berikan judul pada tabel token</h4>
+      <h4 class="print-modal-title">Berikan judul pada tabel token</h4>
       <div id="printTitleError" class="error" style="text-align: center; margin-bottom: 5px;"></div>
-      <textarea id="printTitleInput" placeholder="Tulis dengan huruf kapital" style="width: calc(100% - 20px); padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; height: 80px;"></textarea>
+      <textarea id="printTitleInput" placeholder="Tulis dengan huruf kapital" class="print-title-input"></textarea>
       <button class="print-button" onclick="printTokenList()">Cetak</button>
       <button class="cancel-button" onclick="closePrintModal()">Batal</button>
     </div>
@@ -555,6 +658,9 @@
     let inactivityTimer;
     const INACTIVITY_TIMEOUT = 60 * 60 * 1000;
     let currentForceActiveTokenId = null;
+    let currentPage = 1;
+    const tokensPerPage = 13;
+    let allTokens = [];
 
     function showNotification(message) {
       const n = document.getElementById('notification');
@@ -568,6 +674,9 @@
     window.login = () => {
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value.trim();
+      const loginErrorElement = document.getElementById("loginError");
+      loginErrorElement.innerText = ""; // Clear previous error
+
       if(u === ADMIN_USER && p === ADMIN_PASS) {
         localStorage.setItem('isAdminLoggedIn', 'true');
         document.getElementById('loginSection').style.display = 'none';
@@ -575,7 +684,7 @@
         loadTokens();
         resetInactivityTimer();
       } else {
-        document.getElementById("loginError").innerText = "Username atau password salah.";
+        loginErrorElement.innerText = "Username atau password salah.";
       }
     };
 
@@ -587,27 +696,133 @@
       showNotification('Anda telah logout.');
     };
 
+    function displayTokens(tokens, page) {
+      const tbody = document.getElementById('tokenTableBody');
+      tbody.innerHTML = '';
+      const startIndex = (page - 1) * tokensPerPage;
+      const endIndex = startIndex + tokensPerPage;
+      const currentTokens = tokens.slice(startIndex, endIndex);
+      let counter = startIndex + 1;
+
+      currentTokens.forEach(data => {
+        const row = document.createElement('tr');
+        row.dataset.tokenKey = data.key;
+        const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+        const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+        let tokenDisplay = data.token;
+        if (data.isForceActive) {
+          tokenDisplay = `<strong style="color: blue;">${data.token}</strong>`;
+        } else if (data.isActive) {
+          tokenDisplay = `<strong style="color: green;">${data.token}</strong>`;
+        }
+        let forceActiveIconsHTML = '';
+        if (data.isForceActive) {
+          forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceInactive('${data.key}')">`;
+        } else {
+          if (data.isActive) {
+            forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceInactive('${data.key}')">`;
+          } else {
+            forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/kunci.png" alt="Aktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceActive('${data.key}')">`;
+          }
+        }
+
+        row.innerHTML = `
+          <td>${counter++}</td>
+          <td>${data.subject}</td>
+          <td>${data.kelas}</td>
+          <td>${tokenDisplay}</td>
+          <td><a href="${data.url}" target="_blank">Link</a></td>
+          <td>${startTimeFormatted}</td>
+          <td>${endTimeFormatted}</td>
+          <td style="text-align: center;">
+            <span style="color: ${data.isActive ? 'green' : 'grey'}; font-weight: bold;">${data.isActive ? 'ON' : 'OFF'}</span>
+            ${forceActiveIconsHTML}
+          </td>
+          <td>
+            <div class="dropdown">
+              <button class="dropdown-button">
+                <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/dropdown.png" alt="Aksi" style="width: 16px; height: 16px; vertical-align: middle;">
+              </button>
+              <div class="dropdown-content">
+                <a href="#" onclick="editToken('${data.key}')" class="dropdown-action-link">
+                  <img src="${EDIT_ICON_URL}" alt="Edit">
+                </a>
+                <a href="#" onclick="promptDelete('${data.key}')" class="dropdown-action-link">
+                  <img src="${DELETE_ICON_URL}" alt="Hapus">
+                </a>
+              </div>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function updatePaginationControls() {
+      const totalPages = Math.ceil(allTokens.length / tokensPerPage);
+      const prevButton = document.getElementById('prevPage');
+      const nextButton = document.getElementById('nextPage');
+      const pageNumbersDiv = document.getElementById('pageNumbers');
+      pageNumbersDiv.innerHTML = '';
+
+      if (totalPages <= 1) {
+        prevButton.disabled = true;
+        nextButton.disabled = true;
+        return;
+      }
+
+      for (let i = 1; i <= totalPages; i++) {
+        const pageNumber = document.createElement('span');
+        pageNumber.innerText = i;
+        pageNumber.style.margin = '0 5px';
+        pageNumber.style.cursor = 'pointer';
+        if (i === currentPage) {
+          pageNumber.style.fontWeight = 'bold';
+        }
+        pageNumber.addEventListener('click', () => {
+          currentPage = i;
+          displayTokens(allTokens, currentPage);
+          updatePaginationControls();
+        });
+        pageNumbersDiv.appendChild(pageNumber);
+      }
+
+      prevButton.disabled = currentPage === 1;
+      nextButton.disabled = currentPage === totalPages;
+    }
+
+    window.prevPage = () => {
+      if (currentPage > 1) {
+        currentPage--;
+        displayTokens(allTokens, currentPage);
+        updatePaginationControls();
+      }
+    };
+
+    window.nextPage = () => {
+      const totalPages = Math.ceil(allTokens.length / tokensPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        displayTokens(allTokens, currentPage);
+        updatePaginationControls();
+      }
+    };
+
     function loadTokens() {
       onValue(ref(db, 'tokens'), (snapshot) => {
-        const tbody = document.getElementById('tokenTableBody');
-        tbody.innerHTML = '';
-        tokenCache = [];
-        let counter = 0;
-
+        allTokens = [];
         snapshot.forEach(child => {
           const data = child.val();
           data.key = child.key;
-          tokenCache.push(data);
+          allTokens.push(data);
 
           if (data.createdAt && (Date.now() - data.createdAt) > THIRTY_DAYS_IN_MS) {
-            remove(ref(db, 'tokens/' + data.key))
-              .then(() => console.log(`Token ${data.key} dihapus.`))
-              .catch(error => console.error(`Gagal hapus ${data.key}: `, error));
+            removeToken(data.key, `Token ${data.key} dihapus otomatis.`);
             return;
           }
         });
 
-        tokenCache.sort((a, b) => {
+        allTokens.sort((a, b) => {
           const kelasA = parseInt(a.kelas);
           const kelasB = parseInt(b.kelas);
 
@@ -622,65 +837,26 @@
           return timeA - timeB;
         });
 
-        let sortedCounter = 0;
-        tokenCache.forEach(data => {
-          sortedCounter++;
-          const row = document.createElement('tr');
-          row.dataset.tokenKey = data.key;
-          const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-          const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-          let tokenDisplay = data.token;
-          if (data.isForceActive) {
-            tokenDisplay = `<strong style="color: red;">${data.token}</strong>`;
-          } else if (data.isActive) {
-            tokenDisplay = `<strong style="color: green;">${data.token}</strong>`;
-          }
-          let forceActiveIconsHTML = '';
-          if (data.isForceActive) {
-            forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceInactive('${data.key}')">`;
-          } else {
-            if (data.isActive) {
-              forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceInactive('${data.key}')">`;
-            } else {
-              forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/kunci.png" alt="Aktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceActive('${data.key}')">`;
-            }
-          }
-
-
-          row.innerHTML = `
-            <td>${sortedCounter}</td>
-            <td>${data.subject}</td>
-            <td>${data.kelas}</td>
-            <td>${tokenDisplay}</td>
-            <td><a href="${data.url}" target="_blank">Link</a></td>
-            <td>${startTimeFormatted}</td>
-            <td>${endTimeFormatted}</td>
-            <td style="text-align: center;">
-              <span style="color: ${data.isActive ? 'green' : 'grey'}; font-weight: bold;">${data.isActive ? 'ON' : 'OFF'}</span>
-              ${forceActiveIconsHTML}
-            </td>
-            <td>
-              <div class="dropdown">
-                <button class="dropdown-button">
-                  <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/dropdown.png" alt="Aksi" style="width: 16px; height: 16px; vertical-align: middle;">
-                </button>
-                <div class="dropdown-content">
-                  <a href="#" onclick="editToken('${data.key}')" style="display: flex; align-items: center; padding: 6px 8px;">
-                    <img src="${EDIT_ICON_URL}" alt="Edit" style="width: 16px; height: 16px; margin-right: -1px; vertical-align: middle;">
-                  </a>
-                  <a href="#" onclick="promptDelete('${data.key}')" style="display: flex; align-items: center; padding: 6px 8px;">
-                    <img src="${DELETE_ICON_URL}" alt="Hapus" style="width: 16px; height: 16px; margin-right: 0px; vertical-align: middle;">
-                  </a>
-                </div>
-              </div>
-            </td>
-          `;
-          document.getElementById('tokenTableBody').appendChild(row);
-        });
+        currentPage = 1; // Reset ke halaman pertama setiap kali data di-load
+        displayTokens(allTokens, currentPage);
+        updatePaginationControls();
         clearInterval(statusCheckInterval);
-        statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000); // Periksa setiap 10 detik
+        statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000);
         periksaAndUpdateStatusToken();
       });
+    }
+
+    function validateTokenForm(subject, kelas, token, url, startTime, endTime, errorElement) {
+      errorElement.innerText = "";
+      if (!subject || !kelas || !token || !url || !startTime || !endTime) {
+        errorElement.innerText = "Semua field harus diisi!";
+        return false;
+      }
+      if (new Date(startTime) >= new Date(endTime)) {
+        errorElement.innerText = "Waktu token dibuka harus sebelum waktu token ditutup!";
+        return false;
+      }
+      return true;
     }
 
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
@@ -690,17 +866,10 @@
       const t = document.getElementById('token').value.trim().toUpperCase();
       const u = document.getElementById('url').value.trim();
       const st = document.getElementById('startTime').value;
-      const et = documentgetElementById('endTime').value;
+      const et = document.getElementById('endTime').value;
       const em= document.getElementById('errorMsg');
-      em.innerText = "";
 
-      if (!s || !k || !t || !u || !st || !et) {
-        em.innerText = "Semua field harus diisi!";
-        return;
-      }
-
-      if (new Date(st) >= new Date(et)) {
-        em.innerText = "Waktu token dibuka harus sebelum waktu token ditutup!";
+      if (!validateTokenForm(s, k, t, u, st, et, em)) {
         return;
       }
 
@@ -751,15 +920,8 @@
       const st = document.getElementById('editStartTime').value;
       const et = document.getElementById('editEndTime').value;
       const em = document.getElementById('editErrorMsg');
-      em.innerText = "";
 
-      if (!s || !k || !t || !u || !st || !et) {
-        em.innerText = "Semua field harus diisi!";
-        return;
-      }
-
-      if (new Date(st) >= new Date(et)) {
-        em.innerText = "Waktu token dibuka harus sebelum waktu token ditutup!";
+      if (!validateTokenForm(s, k, t, u, st, et, em)) {
         return;
       }
 
@@ -802,14 +964,46 @@
 
     window.confirmDelete = () => {
       if (deleteId) {
-        remove(ref(db, 'tokens/' + deleteId))
-          .catch(err => alert("Gagal menghapus token: " + err.message))
-          .finally(() => {
-            closeDeleteModal();
-            showNotification('Token berhasil dihapus!');
-          });
+        removeToken(deleteId, 'Token berhasil dihapus!');
       }
     };
+
+    function removeToken(tokenId, successMessage) {
+      const rowToRemove = document.querySelector(`#tokenTableBody tr[data-token-key="${tokenId}"]`);
+      if (rowToRemove) {
+        rowToRemove.classList.add('row-removing');
+        setTimeout(() => {
+          remove(ref(db, 'tokens/' + tokenId))
+            .then(() => {
+              closeDeleteModal();
+              showNotification(successMessage);
+              // loadTokens(); Tidak perlu loadTokens karena onValue akan terpanggil
+            })
+            .catch(err => {
+              showNotification("Gagal menghapus token: " + err.message);
+              if (rowToRemove) {
+                rowToRemove.classList.remove('row-removing'); // Hapus class jika gagal
+              }
+            })
+            .finally(() => {
+              deleteId = null;
+            });
+        }, 300); // Tunggu sebentar agar animasi terlihat
+      } else {
+        remove(ref(db, 'tokens/' + tokenId))
+          .then(() => {
+            closeDeleteModal();
+            showNotification(successMessage);
+            // loadTokens();
+          })
+          .catch(err => {
+            showNotification("Gagal menghapus token: " + err.message);
+          })
+          .finally(() => {
+            deleteId = null;
+          });
+      }
+    }
 
     window.closeDeleteModal = () => {
       document.getElementById('deleteModal').style.display = 'none';
@@ -933,7 +1127,7 @@
 
     async function periksaAndUpdateStatusToken() {
       const now = new Date();
-      for (const tokenData of tokenCache) {
+      for (const tokenData of allTokens) { // Gunakan allTokens di sini
         let newIsActive;
         if (tokenData.isForceActive) {
           newIsActive = true; // Jika diaktifkan paksa, selalu aktif
@@ -1021,6 +1215,10 @@
 
     let statusCheckInterval;
     statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000);
+
+    // Tambahkan event listener untuk tombol pagination
+    document.getElementById('prevPage').addEventListener('click', prevPage);
+    document.getElementById('nextPage').addEventListener('click', nextPage);
   </script>
 </body>
 </html>
