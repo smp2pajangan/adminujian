@@ -829,6 +829,7 @@
       const tokenId = checkbox.dataset.tokenKey;
       const isCurrentlyForced = checkbox.checked;
 
+      // Mencegah perubahan visual switch di sini
       if (!isCurrentlyForced) {
         // Kondisi: Switch abu-abu (tidak aktif) -> muncul konfirmasi MENGAKTIFKAN
         currentForceActiveTokenId = tokenId;
@@ -838,6 +839,8 @@
         currentForceActiveTokenId = tokenId;
         document.getElementById('forceInactiveModal').style.display = 'flex';
       }
+      // Mengembalikan status checkbox agar tidak langsung berubah
+      checkbox.checked = isCurrentlyForced;
     };
 
     window.confirmForceActive = (force) => {
@@ -855,7 +858,7 @@
                 statusSpan.style.color = 'green';
               }
               if (switchInput) {
-                switchInput.checked = true;
+                switchInput.checked = true; // Ubah visual switch hanya setelah konfirmasi
               }
             }
           })
@@ -869,11 +872,6 @@
           });
       } else {
         closeForceActiveModal();
-        // Jika dibatalkan saat akan mengaktifkan, kembalikan status switch ke semula (off)
-        const checkbox = document.querySelector(`#tokenTableBody tr[data-token-key="${currentForceActiveTokenId}"] .switch input`);
-        if (checkbox) {
-          checkbox.checked = false;
-        }
         currentForceActiveTokenId = null;
       }
     };
@@ -881,11 +879,6 @@
     window.closeForceActiveModal = () => {
       document.getElementById('forceActiveModal').style.display = 'none';
       currentForceActiveTokenId = null;
-      // Jika modal ditutup saat akan mengaktifkan, kembalikan status switch ke semula (off)
-      const checkbox = document.querySelector(`#tokenTableBody tr[data-token-key="${currentForceActiveTokenId}"] .switch input`);
-      if (checkbox && !checkbox.checked) {
-        checkbox.checked = false;
-      }
     };
 
     window.confirmForceInactive = () => {
@@ -903,7 +896,7 @@
                 statusSpan.style.color = 'grey';
               }
               if (switchInput) {
-                switchInput.checked = false; // Kembalikan switch ke abu-abu
+                switchInput.checked = false; // Ubah visual switch hanya setelah konfirmasi
               }
             }
           })
