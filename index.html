@@ -471,7 +471,7 @@
         <input type="datetime-local" id="editEndTime" required />
         <p id="editErrorMsg" class="error"></p>
         <button type="submit">Simpan</button>
-                <button type="button" onclick="closeEditModal()">Batal</button>
+        <button type="button" onclick="closeEditModal()">Batal</button>
       </form>
     </div>
   </div>
@@ -675,7 +675,7 @@
       const t = document.getElementById('token').value.trim().toUpperCase();
       const u = document.getElementById('url').value.trim();
       const st = document.getElementById('startTime').value;
-      const et = document.getElementById('endTime').value;
+      const et = documentgetElementById('endTime').value;
       const em= document.getElementById('errorMsg');
       em.innerText = "";
 
@@ -911,7 +911,7 @@
       for (const tokenData of tokenCache) {
         let newIsActive;
         if (tokenData.isForceActive) {
-          newIsActive = true;
+          newIsActive = true; // Jika diaktifkan paksa, selalu aktif
         } else {
           const startTime = new Date(tokenData.startTime);
           const endTime = new Date(tokenData.endTime);
@@ -999,3 +999,4 @@
   </script>
 </body>
 </html>
+
