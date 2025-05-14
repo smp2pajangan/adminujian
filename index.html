@@ -471,7 +471,7 @@
         <input type="datetime-local" id="editEndTime" required />
         <p id="editErrorMsg" class="error"></p>
         <button type="submit">Simpan</button>
-        <button type="button" onclick="closeEditModal()">Batal</button>
+                <button type="button" onclick="closeEditModal()">Batal</button>
       </form>
     </div>
   </div>
@@ -486,15 +486,15 @@
 
   <div id="forceActiveModal" class="modal">
     <div class="modal-content">
-      <p>Apakah kamu yakin ingin mengaktifkan paksa token ini?</p>
-      <button onclick="confirmForceActive(true)">Yakin</button>
+      <p>Apakah Anda yakin ingin <b>mengaktifkan token secara paksa</b>? Hal ini akan membuat token diakses kapanpun!</p>
+      <button onclick="confirmForceActive(true)">Mengaktifkan</button>
       <button onclick="closeForceActiveModal()">Batal</button>
     </div>
   </div>
 
   <div id="forceInactiveModal" class="modal">
     <div class="modal-content">
-      <p>Nonaktifkan token paksa dan kembalikan ke pengaturan jadwal?</p>
+      <p>Apakah Anda yakin ingin <b>menonaktifkan token secara paksa</b>? Hal ini akan membuat token kembali ke pengaturan jadwal!</p>
       <button onclick="confirmForceInactive()">Nonaktifkan</button>
       <button onclick="closeForceInactiveModal()">Batal</button>
     </div>
@@ -621,6 +621,17 @@
             tokenDisplay = `<strong style="color: blue;">${data.token}</strong>`;
           }
 
+          let forceActiveIconsHTML = '';
+          if (data.isForceActive) {
+            forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceInactive('${data.key}')">`;
+          } else {
+            if (data.isActive) {
+              forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceInactive('${data.key}')">`;
+            } else {
+              forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/kunci.png" alt="Aktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceActive('${data.key}')">`;
+            }
+          }
+
           row.innerHTML = `
             <td>${sortedCounter}</td>
             <td>${data.subject}</td>
@@ -630,11 +641,8 @@
             <td>${startTimeFormatted}</td>
             <td>${endTimeFormatted}</td>
             <td style="text-align: center;">
-              <span style="color: ${data.isActive ? 'green' : 'grey'}; font-weight: bold;">${data.isActive ? 'On' : 'Off'}</span>
-              <label class="switch" style="margin-top: 5px;">
-                <input type="checkbox" data-token-key="${data.key}" onchange="toggleForceActive(this)" ${data.isForceActive ? 'checked' : ''}>
-                <span class="slider round"></span>
-              </label>
+              <span style="color: ${data.isActive ? 'green' : 'grey'}; font-weight: bold;">${data.isActive ? 'ON' : 'OFF'}</span>
+              ${forceActiveIconsHTML}
             </td>
             <td>
               <div class="dropdown">
@@ -825,22 +833,14 @@
       closePrintModal();
     };
 
-    window.toggleForceActive = (checkbox) => {
-      const tokenId = checkbox.dataset.tokenKey;
-      const isCurrentlyForced = checkbox.checked;
+    window.promptForceActive = (tokenId) => {
+      currentForceActiveTokenId = tokenId;
+      document.getElementById('forceActiveModal').style.display = 'flex';
+    };
 
-      // Mencegah perubahan visual switch di sini
-      if (!isCurrentlyForced) {
-        // Kondisi: Switch abu-abu (tidak aktif) -> muncul konfirmasi MENGAKTIFKAN
-        currentForceActiveTokenId = tokenId;
-        document.getElementById('forceActiveModal').style.display = 'flex';
-      } else {
-        // Kondisi: Switch biru (aktif) -> muncul konfirmasi MENONAKTIFKAN
-        currentForceActiveTokenId = tokenId;
-        document.getElementById('forceInactiveModal').style.display = 'flex';
-      }
-      // Mengembalikan status checkbox agar tidak langsung berubah
-      checkbox.checked = isCurrentlyForced;
+    window.promptForceInactive = (tokenId) => {
+      currentForceActiveTokenId = tokenId;
+      document.getElementById('forceInactiveModal').style.display = 'flex';
     };
 
     window.confirmForceActive = (force) => {
@@ -848,19 +848,12 @@
         update(ref(db, 'tokens/' + currentForceActiveTokenId), { isForceActive: true, isActive: true })
           .then(() => {
             showNotification('Token dipaksa aktif!');
-            // Perbarui tampilan baris secara langsung
-            const row = document.querySelector(`#tokenTableBody tr[data-token-key="${currentForceActiveTokenId}"]`);
-            if (row) {
-              const statusSpan = row.querySelector('td:nth-child(8) span');
-              const switchInput = row.querySelector('td:nth-child(8) .switch input');
-              if (statusSpan) {
-                statusSpan.innerText = 'On';
-                statusSpan.style.color = 'green';
-              }
-              if (switchInput) {
-                switchInput.checked = true; // Ubah visual switch hanya setelah konfirmasi
-              }
+            // Perbarui tampilan ikon
+            const iconsDiv = document.getElementById(`forceActiveIcons-${currentForceActiveTokenId}`);
+            if (iconsDiv) {
+              iconsDiv.innerHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceInactive('${currentForceActiveTokenId}')">`;
             }
+            // Tidak perlu lagi memperbarui status On/Off di sini karena `isActive` juga diubah
           })
           .catch(error => {
             console.error("Gagal mengaktifkan status paksa: ", error);
@@ -883,20 +876,17 @@
 
     window.confirmForceInactive = () => {
       if (currentForceActiveTokenId) {
-        update(ref(db, 'tokens/' + currentForceActiveTokenId), { isForceActive: false, isActive: false })
+        update(ref(db, 'tokens/' + currentForceActiveTokenId), { isForceActive: false })
           .then(() => {
             showNotification('Token paksa aktif dinonaktifkan!');
-            // Perbarui tampilan baris secara langsung
-            const row = document.querySelector(`#tokenTableBody tr[data-token-key="${currentForceActiveTokenId}"]`);
-            if (row) {
-              const statusSpan = row.querySelector('td:nth-child(8) span');
-              const switchInput = row.querySelector('td:nth-child(8) .switch input');
-              if (statusSpan) {
-                statusSpan.innerText = 'Off';
-                statusSpan.style.color = 'grey';
-              }
-              if (switchInput) {
-                switchInput.checked = false; // Ubah visual switch hanya setelah konfirmasi
+            // Perbarui tampilan ikon
+            const iconsDiv = document.getElementById(`forceActiveIcons-${currentForceActiveTokenId}`);
+            const tokenData = tokenCache.find(item => item.key === currentForceActiveTokenId);
+            if (iconsDiv && tokenData) {
+              if (tokenData.isActive) {
+                iconsDiv.innerHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceInactive('${currentForceActiveTokenId}')">`;
+              } else {
+                iconsDiv.innerHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/kunci.png" alt="Aktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceActive('${currentForceActiveTokenId}')">`;
               }
             }
           })
@@ -938,7 +928,7 @@
             if (row) {
               const statusSpan = row.querySelector('td:nth-child(8) span');
               if (statusSpan) {
-                statusSpan.innerText = newIsActive ? 'On' : 'Off';
+                statusSpan.innerText = newIsActive ? 'ON' : 'OFF';
                 statusSpan.style.color = newIsActive ? 'green' : 'grey';
               }
             }
@@ -1009,4 +999,3 @@
   </script>
 </body>
 </html>
-
