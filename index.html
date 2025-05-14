@@ -630,10 +630,11 @@
           const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           let tokenDisplay = data.token;
-          if (data.isActive) {
-            tokenDisplay = `<strong style="color: blue;">${data.token}</strong>`;
+          if (data.isForceActive) {
+            tokenDisplay = `<strong style="color: red;">${data.token}</strong>`;
+          } else if (data.isActive) {
+            tokenDisplay = `<strong style="color: green;">${data.token}</strong>`;
           }
-
           let forceActiveIconsHTML = '';
           if (data.isForceActive) {
             forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceInactive('${data.key}')">`;
