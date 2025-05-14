@@ -628,14 +628,15 @@
 
           let forceActiveIconsHTML = '';
           if (data.isForceActive) {
-            forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceInactive('${data.key}')">`;
+            forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceInactive('${data.key}')">`;
           } else {
             if (data.isActive) {
-              forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceInactive('${data.key}')">`;
+              forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceInactive('${data.key}')">`;
             } else {
-              forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/kunci.png" alt="Aktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceActive('${data.key}')">`;
+              forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/kunci.png" alt="Aktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceActive('${data.key}')">`;
             }
           }
+
 
           row.innerHTML = `
             <td>${sortedCounter}</td>
