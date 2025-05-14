@@ -484,6 +484,14 @@
     </div>
   </div>
 
+  <div id="forceActiveModal" class="modal">
+    <div class="modal-content">
+      <p>Apakah kamu yakin? Token akan menjadi aktif dan tidak terkait dengan jadwal token yang telah dibuat. Untuk menonaktifkannya harus secara manual!</p>
+      <button onclick="confirmForceActive(true)">Yakin</button>
+      <button onclick="closeForceActiveModal()">Batal</button>
+    </div>
+  </div>
+
   <div id="notification">
     <span id="notificationMessage"></span>
   </div>
@@ -525,6 +533,7 @@
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
     let inactivityTimer;
     const INACTIVITY_TIMEOUT = 60 * 60 * 1000;
+    let currentForceActiveTokenId = null;
 
     function showNotification(message) {
       const n = document.getElementById('notification');
@@ -599,7 +608,6 @@
           row.dataset.tokenKey = data.key;
           const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
           const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-          const isActiveChecked = data.isActive ? 'checked' : '';
           let tokenDisplay = data.token;
           if (data.isActive) {
             tokenDisplay = `<strong style="color: blue;">${data.token}</strong>`;
@@ -613,9 +621,10 @@
             <td><a href="${data.url}" target="_blank">Link</a></td>
             <td>${startTimeFormatted}</td>
             <td>${endTimeFormatted}</td>
-            <td>
-              <label class="switch">
-                <input type="checkbox" ${isActiveChecked} onchange="toggleTokenStatus('${data.key}', this.checked)">
+            <td style="text-align: center;">
+              <span style="color: ${data.isActive ? 'green' : 'grey'}; font-weight: bold;">${data.isActive ? 'On' : 'Off'}</span>
+              <label class="switch" style="margin-top: 5px;">
+                <input type="checkbox" data-token-key="${data.key}" onchange="toggleForceActive(this)" ${data.isForceActive ? 'checked' : ''}>
                 <span class="slider round"></span>
               </label>
             </td>
@@ -676,7 +685,7 @@
         return;
       }
 
-      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now(), isActive: false };
+      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, createdAt: Date.now(), isActive: false, isForceActive: false };
       push(ref(db, 'tokens'), data)
         .then(() => {
           this.reset();
@@ -808,6 +817,87 @@
       closePrintModal();
     };
 
+    window.toggleForceActive = (checkbox) => {
+      currentForceActiveTokenId = checkbox.dataset.tokenKey;
+      document.getElementById('forceActiveModal').style.display = 'flex';
+    };
+
+    window.confirmForceActive = (force) => {
+      if (currentForceActiveTokenId) {
+        update(ref(db, 'tokens/' + currentForceActiveTokenId), { isForceActive: force })
+          .then(() => {
+            showNotification(`Status paksa token berhasil di${force ? 'aktifkan' : 'nonaktifkan'}!`);
+            loadTokens(); // Muat ulang token untuk memperbarui tampilan
+          })
+          .catch(error => {
+            console.error("Gagal memperbarui status paksa: ", error);
+            showNotification("Gagal memperbarui status paksa.");
+          })
+          .finally(() => {
+            closeForceActiveModal();
+            currentForceActiveTokenId = null;
+          });
+      }
+    };
+
+    window.closeForceActiveModal = () => {
+      document.getElementById('forceActiveModal').style.display = 'none';
+      // Mengembalikan status checkbox jika dibatalkan
+      const checkbox = document.querySelector(`#tokenTableBody tr[data-token-key="${currentForceActiveTokenId}"] .switch input`);
+      if (checkbox) {
+        checkbox.checked = !checkbox.checked;
+      }
+      currentForceActiveTokenId = null;
+    };
+
+    async function periksaAndUpdateStatusToken() {
+      const now = new Date();
+      for (const tokenData of tokenCache) {
+        if (tokenData.isForceActive) {
+          // Jika diaktifkan paksa, status selalu aktif
+          if (!tokenData.isActive) {
+            try {
+              await update(ref(db, 'tokens/' + tokenData.key), { isActive: true });
+              console.log(`Token ${tokenData.key} dipaksa aktif.`);
+            } catch (error) {
+              console.error(`Gagal memperbarui status paksa aktif token ${tokenData.key}: `, error);
+            }
+          }
+          continue; // Lewati pengecekan waktu jika diaktifkan paksa
+        }
+
+        const startTime = new Date(tokenData.startTime);
+        const endTime = new Date(tokenData.endTime);
+        const shouldBeActive = now >= startTime && now < endTime;
+
+        if (tokenData.isActive !== shouldBeActive) {
+          try {
+            await update(ref(db, 'tokens/' + tokenData.key), { isActive: shouldBeActive });
+            console.log(`Token ${tokenData.key} status diperbarui menjadi ${shouldBeActive ? 'aktif' : 'nonaktif'} berdasarkan jadwal.`);
+          } catch (error) {
+            console.error(`Gagal memperbarui status token ${tokenData.key}: `, error);
+          }
+        }
+      }
+      loadTokens(); // Muat ulang token setiap kali pengecekan status
+    }
+
+    function updateTime() {
+      const now = new Date();
+      const dateOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+      const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+      const tanggal = now.toLocaleDateString('id-ID', dateOptions);
+      const waktu = now.toLocaleTimeString('id-ID', timeOptions).replace(/\./g, ':');
+      const display = `${tanggal} pukul ${waktu}`;
+      const ct = document.getElementById("currentTime");
+      if (ct) ct.innerText = display;
+      const adt = document.getElementById("adminDateTime");
+      if (adt) adt.innerText = display;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+
     function resetInactivityTimer() {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(logoutDueToInactivity, INACTIVITY_TIMEOUT);
@@ -847,46 +937,7 @@
     };
 
     let statusCheckInterval;
-
-    async function periksaAndUpdateStatusToken() {
-      const now = new Date();
-      const earlyStart = new Date(now.getTime()); // Hilangkan toleransi waktu
-      for (const tokenData of tokenCache) {
-        const startTime = new Date(tokenData.startTime);
-        const endTime = new Date(tokenData.endTime);
-
-        const shouldBeActiveStart = earlyStart >= startTime;
-        const shouldBeInactiveEnd = now >= endTime;
-        const shouldBeActive = shouldBeActiveStart && !shouldBeInactiveEnd;
-
-        if (tokenData.isActive !== shouldBeActive) {
-          try {
-            await update(ref(db, 'tokens/' + tokenData.key), { isActive: shouldBeActive });
-            console.log(`Token ${tokenData.key} status diperbarui menjadi ${shouldBeActive ? 'aktif' : 'nonaktif'}.`);
-            loadTokens();
-          } catch (error) {
-            console.error(`Gagal memperbarui status token ${tokenData.key}: `, error);
-          }
-        }
-      }
-    }
-
-    function updateTime() {
-      const now = new Date();
-      const dateOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
-      const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-      const tanggal = now.toLocaleDateString('id-ID', dateOptions);
-      const waktu = now.toLocaleTimeString('id-ID', timeOptions).replace(/\./g, ':');
-      const display = `${tanggal} pukul ${waktu}`;
-      const ct = document.getElementById("currentTime");
-      if (ct) ct.innerText = display;
-      const adt = document.getElementById("adminDateTime");
-      if (adt) adt.innerText = display;
-    }
-
-    setInterval(updateTime, 1000);
-    updateTime();
+    statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000);
   </script>
 </body>
 </html>
-
