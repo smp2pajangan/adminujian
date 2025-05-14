@@ -487,7 +487,12 @@
   <div id="forceActiveModal" class="modal">
     <div class="modal-content">
       <p>Apakah Anda yakin ingin <b>mengaktifkan token secara paksa</b>? Hal ini akan membuat token diakses kapanpun!</p>
-      <button onclick="confirmForceActive(true)">Mengaktifkan</button>
+      <div>
+        <label for="forceActivePassword">Password:</label>
+        <input type="password" id="forceActivePassword">
+        <p id="forceActivePasswordError" class="error"></p>
+      </div>
+      <button onclick="confirmForceActive()">Mengaktifkan</button>
       <button onclick="closeForceActiveModal()">Batal</button>
     </div>
   </div>
@@ -835,6 +840,8 @@
 
     window.promptForceActive = (tokenId) => {
       currentForceActiveTokenId = tokenId;
+      document.getElementById('forceActivePassword').value = ''; // Kosongkan password sebelumnya
+      document.getElementById('forceActivePasswordError').innerText = ''; // Hapus pesan error sebelumnya
       document.getElementById('forceActiveModal').style.display = 'flex';
     };
 
@@ -843,17 +850,23 @@
       document.getElementById('forceInactiveModal').style.display = 'flex';
     };
 
-    window.confirmForceActive = (force) => {
-      if (currentForceActiveTokenId && force) {
+    window.confirmForceActive = () => {
+      const password = document.getElementById('forceActivePassword').value;
+      const passwordError = document.getElementById('forceActivePasswordError');
+
+      if (password !== ADMIN_PASS) {
+        passwordError.innerText = "Password salah!";
+        return;
+      }
+
+      if (currentForceActiveTokenId) {
         update(ref(db, 'tokens/' + currentForceActiveTokenId), { isForceActive: true, isActive: true })
           .then(() => {
             showNotification('Token dipaksa aktif!');
-            // Perbarui tampilan ikon
             const iconsDiv = document.getElementById(`forceActiveIcons-${currentForceActiveTokenId}`);
             if (iconsDiv) {
               iconsDiv.innerHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceInactive('${currentForceActiveTokenId}')">`;
             }
-            // Tidak perlu lagi memperbarui status On/Off di sini karena `isActive` juga diubah
           })
           .catch(error => {
             console.error("Gagal mengaktifkan status paksa: ", error);
@@ -871,6 +884,8 @@
 
     window.closeForceActiveModal = () => {
       document.getElementById('forceActiveModal').style.display = 'none';
+      document.getElementById('forceActivePassword').value = '';
+      document.getElementById('forceActivePasswordError').innerText = '';
       currentForceActiveTokenId = null;
     };
 
@@ -999,4 +1014,3 @@
   </script>
 </body>
 </html>
-
