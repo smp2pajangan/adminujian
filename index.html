@@ -637,12 +637,13 @@
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();
-        resetInactivityTimer();
         loadSetlokasiSettings(); // Muat pengaturan lokasi saat login
+        resetInactivityTimer(); // Tambahkan ini untuk memulai timer setelah login berhasil
       } else {
         document.getElementById("loginError").innerText = "Username atau password salah.";
       }
     };
+
 
     window.logout = () => {
       localStorage.removeItem('isAdminLoggedIn');
