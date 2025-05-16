@@ -381,6 +381,24 @@
     .dropdown:hover .dropdown-content {
       display: block;
     }
+
+    /* Media query untuk layar dengan lebar minimal 600px (desktop) */
+    @media (min-width: 600px) {
+      #iconBar {
+        top: 10px;
+        left: 10px;
+      }
+      #lokasiButton img {
+        width: 24px;
+        height: 24px;
+      }
+      #iconBar button {
+        margin-left: 0;
+      }
+      #setlokasiStatus {
+        margin-left: 5px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -406,14 +424,14 @@
   </div>
 
   <div class="container" id="adminPanel" style="position: relative;">
-    <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px;">
-      <span id="setlokasiStatus" style="font-weight: bold; margin-right: 5px;"></span>
-      <button id="lokasiButton" style="background: none; border: none; cursor: pointer; margin-right: 10px;" onclick="openSetlokasiModal()">
-        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/lokasi.png" alt="Setlokasi" style="width: 24px; height: 24px;">
-      </button>
+    <div id="iconBar" style="position: absolute; top: -10px; left: 3px; display: flex; align-items: center;">
       <button onclick="logout()" style="background: none; border: none; cursor: pointer;">
         <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
       </button>
+      <button id="lokasiButton" style="background: none; border: none; cursor: pointer; margin-left: -12px;" onclick="openSetlokasiModal()">
+        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/lokasi.png" alt="Setlokasi" style="width: 32px; height: 24px;">
+      </button>
+      <span id="setlokasiStatus" style="font-weight: bold; margin-left: -5px;"></span>
     </div>
     <h3>TAMBAH / EDIT TOKEN</h3>
     <form id="tokenForm">
@@ -769,7 +787,7 @@
         });
     });
 
-    window.editToken = (id)=> {
+    window.editToken = (id) => {
       const token = tokenCache.find(item => item.key === id);
       if (!token) return;
 
@@ -1125,7 +1143,8 @@
       const radiusKm = radiusMeter / 1000;
 
       update(settingsRef, { allowedRadiusKm: radiusKm, isLocationEnabled: true })
-        .then(() => {
+        .then(() =>
+{
           allowedRadiusMeterAdmin = radiusMeter;
           isLocationEnabledAdmin = true;
           updateSetlokasiStatusDisplay();
