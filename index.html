@@ -1088,8 +1088,13 @@
     statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000);
 
     function updateSetlokasiStatusDisplay() {
-      setlokasiStatusElement.textContent = `Setlokasi ${isLocationEnabledAdmin ? 'ON' : 'OFF'}`;
-      setlokasiStatusElement.style.color = isLocationEnabledAdmin ? 'green' : 'red';
+      if (isLocationEnabledAdmin) {
+        setlokasiStatusElement.textContent = `ATURAN LOKASI ON (Radius ${allowedRadiusMeterAdmin}m)`;
+        setlokasiStatusElement.style.color = 'green';
+      } else {
+        setlokasiStatusElement.textContent = `ATURAN LOKASI OFF (Akses bebas)`;
+        setlokasiStatusElement.style.color = 'red';
+      }
     }
 
     window.openSetlokasiModal = () => {
@@ -1147,8 +1152,7 @@
       const radiusKm = radiusMeter / 1000;
 
       update(settingsRef, { allowedRadiusKm: radiusKm, isLocationEnabled: true })
-        .then(() =>
-{
+        .then(() => {
           allowedRadiusMeterAdmin = radiusMeter;
           isLocationEnabledAdmin = true;
           updateSetlokasiStatusDisplay();
@@ -1177,4 +1181,3 @@
   </script>
 </body>
 </html>
-
