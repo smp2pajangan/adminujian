@@ -382,21 +382,25 @@
       display: block;
     }
 
-    /* Media query untuk layar dengan lebar minimal 600px (desktop) */
-    @media (min-width: 600px) {
+        @media (min-width: 600px) {
       #iconBar {
         top: 10px;
-        left: 2px;
+        left: 5px;
+        /* Anda bisa menambahkan atau memodifikasi margin di sini jika perlu mengatur posisi keseluruhan grup */
       }
       #lokasiButton img {
         width: 24px;
         height: 24px;
       }
-      #iconBar button {
-        margin-left: 0;
+      #iconBar > button:first-child { /* Target tombol logout (tombol pertama di dalam #iconBar) */
+        margin-right: 5px; /* Tambah jarak ke kanan tombol logout */
+      }
+      #lokasiButton {
+        /* Anda bisa menambahkan margin kiri atau kanan pada tombol lokasi */
+        margin-right: 5px; /* Tambah jarak ke kanan ikon lokasi */
       }
       #setlokasiStatus {
-        margin-left: 3px;
+        margin-left: 0px; /* Jarak kiri tulisan dari ikon lokasi */
       }
     }
   </style>
