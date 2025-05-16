@@ -15,11 +15,22 @@
       color: white;
       padding: 15px;
       text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
     }
     .logo {
       display: block;
-      margin: 0 auto;
       width: 100px;
+      margin-right: 15px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
     }
     .container {
       max-width: 800px;
@@ -384,12 +395,23 @@
   </style>
 </head>
 <body>
-  <div class="header">
-    <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/logosmpn2pjg.png" class="logo" alt="Logo SMPN 2 Pajangan">
-    <h2>SMP NEGERI 2 PAJANGAN</h2>
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="header-left">
+      <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/logosmpn2pjg.png" class="logo" alt="Logo SMPN 2 Pajangan">
+      <h2>SMP NEGERI 2 PAJANGAN</h2>
+    </div>
+    <div class="header-right" style="display: flex; align-items: center;">
+      <span id="setlokasiStatus" style="font-weight: bold; margin-right: 5px;"></span>
+      <button id="lokasiButton" style="background: none; border: none; cursor: pointer; margin-right: 10px;" onclick="openSetlokasiModal()">
+        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/lokasi.png" alt="Setlokasi" style="width: 24px; height: 24px;">
+      </button>
+      <button onclick="logout()" style="background: none; border: none; cursor: pointer;">
+        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
+      </button>
+    </div>
   </div>
 
-  <div class="container" id="loginSection">
+  <div class="container" id="loginSection" style="display:none;">
     <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
     <p id="loginError" class="error"></p>
     <input type="text" id="username" placeholder="Username" />
@@ -405,10 +427,7 @@
     </div>
   </div>
 
-  <div class="container" id="adminPanel" style="display:none; position: relative;">
-    <button onclick="logout()" style="position: absolute; top: -10px; right: -5px; background: none; border: none; cursor: pointer;">
-      <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
-    </button>
+  <div class="container" id="adminPanel" style="position: relative;">
     <h3>TAMBAH / EDIT TOKEN</h3>
     <form id="tokenForm">
       <label>Mata Pelajaran</label>
@@ -527,6 +546,28 @@
     </div>
   </div>
 
+  <div id="setlokasiModal" class="modal">
+    <div class="modal-content" style="text-align: center;">
+      <h4>Pengaturan Lokasi</h4>
+      <button onclick="aktifkanLokasi()" style="background-color: green; color: white; padding: 10px 15px; border: none; border-radius: 5px; margin: 5px; cursor: pointer;">Aktifkan</button>
+      <button onclick="openGantiRadiusModal()" style="background-color: gold; color: black; padding: 10px 15px; border: none; border-radius: 5px; margin: 5px; cursor: pointer;">Ganti Radius</button>
+      <button onclick="nonaktifkanLokasi()" style="background-color: red; color: white; padding: 10px 15px; border: none; border-radius: 5px; margin: 5px; cursor: pointer;">Nonaktifkan</button>
+      <button onclick="closeSetlokasiModal()" style="margin-top: 10px;">Batal</button>
+    </div>
+  </div>
+
+  <div id="gantiRadiusModal" class="modal">
+    <div class="modal-content">
+      <h4>Ganti Radius Lokasi (meter)</h4>
+      <label for="radiusMeter">Radius (meter):</label>
+      <input type="number" id="radiusMeter" placeholder="Contoh: 75" required />
+      <div style="text-align: center; margin-top: 10px;">
+        <button onclick="gantiRadiusDanAktifkan()" style="background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 5px; margin: 5px; cursor: pointer;">Ganti & Aktifkan</button>
+        <button onclick="closeGantiRadiusModal()">Batal</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
@@ -556,6 +597,19 @@
     const INACTIVITY_TIMEOUT = 60 * 60 * 1000;
     let currentForceActiveTokenId = null;
 
+    // Referensi ke node setlokasi di Firebase
+    const settingsRef = ref(db, 'setlokasi');
+
+    // Variabel untuk menyimpan status lokasi dan radius
+    let isLocationEnabledAdmin = false;
+    let allowedRadiusMeterAdmin = 75; // Default dalam meter
+
+    // Elemen HTML yang baru ditambahkan
+    const setlokasiStatusElement = document.getElementById('setlokasiStatus');
+    const setlokasiModalElement = document.getElementById('setlokasiModal');
+    const gantiRadiusModalElement = document.getElementById('gantiRadiusModal');
+    const radiusMeterInputElement = document.getElementById('radiusMeter');
+
     function showNotification(message) {
       const n = document.getElementById('notification');
       n.innerText = message;
@@ -574,6 +628,7 @@
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();
         resetInactivityTimer();
+        loadSetlokasiSettings(); // Muat pengaturan lokasi saat login
       } else {
         document.getElementById("loginError").innerText = "Username atau password salah.";
       }
@@ -690,7 +745,7 @@
       const t = document.getElementById('token').value.trim().toUpperCase();
       const u = document.getElementById('url').value.trim();
       const st = document.getElementById('startTime').value;
-      const et = documentgetElementById('endTime').value;
+      const et = document.getElementById('endTime').value;
       const em= document.getElementById('errorMsg');
       em.innerText = "";
 
@@ -1012,6 +1067,7 @@
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();
+        loadSetlokasiSettings(); // Muat pengaturan lokasi saat halaman dimuat
         resetInactivityTimer();
       } else {
         document.getElementById('loginSection').style.display = 'block';
@@ -1021,6 +1077,94 @@
 
     let statusCheckInterval;
     statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000);
+
+    function updateSetlokasiStatusDisplay() {
+      setlokasiStatusElement.textContent = `Setlokasi ${isLocationEnabledAdmin ? 'ON' : 'OFF'}`;
+      setlokasiStatusElement.style.color = isLocationEnabledAdmin ? 'green' : 'red';
+    }
+
+    window.openSetlokasiModal = () => {
+      setlokasiModalElement.style.display = 'flex';
+    };
+
+    window.closeSetlokasiModal = () => {
+      setlokasiModalElement.style.display = 'none';
+    };
+
+    window.openGantiRadiusModal = () => {
+      gantiRadiusModalElement.style.display = 'flex';
+      radiusMeterInputElement.value = allowedRadiusMeterAdmin;
+      closeSetlokasiModal();
+    };
+
+    window.closeGantiRadiusModal = () => {
+      gantiRadiusModalElement.style.display = 'none';
+    };
+
+    window.aktifkanLokasi = () => {
+      update(settingsRef, { isLocationEnabled: true })
+        .then(() => {
+          isLocationEnabledAdmin = true;
+          updateSetlokasiStatusDisplay();
+          showNotification('Fitur lokasi berhasil diaktifkan.');
+          closeSetlokasiModal();
+        })
+        .catch(error => {
+          console.error("Gagal mengaktifkan lokasi:", error);
+          showNotification('Gagal mengaktifkan fitur lokasi.');
+        });
+    };
+
+    window.nonaktifkanLokasi = () => {
+      update(settingsRef, { isLocationEnabled: false })
+        .then(() => {
+          isLocationEnabledAdmin = false;
+          updateSetlokasiStatusDisplay();
+          showNotification('Fitur lokasi berhasil dinonaktifkan.');
+          closeSetlokasiModal();
+        })
+        .catch(error => {
+          console.error("Gagal menonaktifkan lokasi:", error);
+          showNotification('Gagal menonaktifkan fitur lokasi.');
+        });
+    };
+
+    window.gantiRadiusDanAktifkan = () => {
+      const radiusMeter = parseInt(radiusMeterInputElement.value);
+      if (isNaN(radiusMeter) || radiusMeter <= 0) {
+        alert('Masukkan radius yang valid dalam meter.');
+        return;
+      }
+      const radiusKm = radiusMeter / 1000;
+
+      update(settingsRef, { allowedRadiusKm: radiusKm, isLocationEnabled: true })
+        .then(() => {
+          allowedRadiusMeterAdmin = radiusMeter;
+          isLocationEnabledAdmin = true;
+          updateSetlokasiStatusDisplay();
+          showNotification(`Radius lokasi diubah menjadi ${radiusMeter} meter dan fitur lokasi diaktifkan.`);
+          closeGantiRadiusModal();
+        })
+        .catch(error => {
+          console.error("Gagal mengganti radius:", error);
+          showNotification('Gagal mengganti radius lokasi.');
+        });
+    };
+
+    function loadSetlokasiSettings() {
+      onValue(settingsRef, (snapshot) => {
+        const settings = snapshot.val();
+        if (settings) {
+          isLocationEnabledAdmin = settings.isLocationEnabled || false;
+          allowedRadiusMeterAdmin = (settings.allowedRadiusKm || 0.075) * 1000;
+          updateSetlokasiStatusDisplay();
+        } else {
+          // Jika node 'setlokasi' belum ada, inisialisasi dengan nilai default
+          updateSetlokasiStatusDisplay();
+        }
+      });
+    }
   </script>
 </body>
 </html>
+
