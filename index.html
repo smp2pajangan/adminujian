@@ -15,22 +15,11 @@
       color: white;
       padding: 15px;
       text-align: center;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
     }
     .logo {
       display: block;
+      margin: 0 auto;
       width: 100px;
-      margin-right: 15px;
-    }
-    .header-right {
-      display: flex;
-      align-items: center;
     }
     .container {
       max-width: 800px;
@@ -395,20 +384,9 @@
   </style>
 </head>
 <body>
-  <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-    <div class="header-left">
-      <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/logosmpn2pjg.png" class="logo" alt="Logo SMPN 2 Pajangan">
-      <h2>SMP NEGERI 2 PAJANGAN</h2>
-    </div>
-    <div class="header-right" style="display: flex; align-items: center;">
-      <span id="setlokasiStatus" style="font-weight: bold; margin-right: 5px;"></span>
-      <button id="lokasiButton" style="background: none; border: none; cursor: pointer; margin-right: 10px;" onclick="openSetlokasiModal()">
-        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/lokasi.png" alt="Setlokasi" style="width: 24px; height: 24px;">
-      </button>
-      <button onclick="logout()" style="background: none; border: none; cursor: pointer;">
-        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
-      </button>
-    </div>
+  <div class="header">
+    <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/logosmpn2pjg.png" class="logo" alt="Logo SMPN 2 Pajangan">
+    <h2>SMP NEGERI 2 PAJANGAN</h2>
   </div>
 
   <div class="container" id="loginSection" style="display:none;">
@@ -428,6 +406,15 @@
   </div>
 
   <div class="container" id="adminPanel" style="position: relative;">
+    <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px;">
+      <span id="setlokasiStatus" style="font-weight: bold; margin-right: 5px;"></span>
+      <button id="lokasiButton" style="background: none; border: none; cursor: pointer; margin-right: 10px;" onclick="openSetlokasiModal()">
+        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/lokasi.png" alt="Setlokasi" style="width: 24px; height: 24px;">
+      </button>
+      <button onclick="logout()" style="background: none; border: none; cursor: pointer;">
+        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
+      </button>
+    </div>
     <h3>TAMBAH / EDIT TOKEN</h3>
     <form id="tokenForm">
       <label>Mata Pelajaran</label>
@@ -782,7 +769,7 @@
         });
     });
 
-    window.editToken = (id) => {
+    window.editToken = (id)=> {
       const token = tokenCache.find(item => item.key === id);
       if (!token) return;
 
