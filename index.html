@@ -388,7 +388,7 @@
         left: 5px;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-end;
         width: calc(100% - 10px);
       }
       #lokasiButton img {
@@ -425,14 +425,8 @@
   </div>
 
   <div class="container" id="adminPanel" style="position: relative;">
-    <div id="iconBar" style="position: absolute; top: -10px; left: 3px; display: flex; align-items: center; justify-content: space-between; width: calc(100% - 6px);">
-      <div style="display: flex; align-items: center;">
-        <button id="lokasiButton" style="background: none; border: none; cursor: pointer; margin-right: 10px;" onclick="openSetlokasiModal()">
-          <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/lokasi.png" alt="Atur Lokasi" style="width: 24px; height: 24px;">
-        </button>
-        <span id="setlokasiStatus" style="font-weight: bold;"></span>
-      </div>
-      <button onclick="logout()" style="background: none; border: none; cursor: pointer;">
+    <div id="iconBar" style="position: absolute; top: -10px; left: 3px; display: flex; align-items: center; justify-content: flex-end; width: calc(100% - 6px);">
+      <button onclick="logout()" style="background: none; border: none; cursor: pointer; margin-right: 0;">
         <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
       </button>
     </div>
@@ -812,7 +806,7 @@
 
       const isTokenDup = tokenCache.some(item => item.token === t);
       if (isTokenDup) {
-        em.innerText = "Token sudah ada!;
+        em.innerText = "Token sudah ada!";
         return;
       }
 
@@ -1140,7 +1134,6 @@
     }
 
     window.openSetlokasiModal = () => {
-      // Jika Anda ingin menampilkan koordinat saat ini di modal, Anda bisa melakukannya di sini
       setlokasiModalElement.style.display = 'flex';
     };
 
@@ -1159,12 +1152,16 @@
     };
 
     window.aktifkanLokasi = () => {
-      update(settingsRef, { isLocationEnabled: true, latitude: ujianLatitude, longitude: ujianLongitude })
+      const latitude = -7.8589546;
+      const longitude = 110.2655596;
+      update(settingsRef, { isLocationEnabled: true, latitude: latitude, longitude: longitude })
         .then(() => {
           isLocationEnabledAdmin = true;
+          ujianLatitude = latitude;
+          ujianLongitude = longitude;
           updateSetlokasiStatusDisplay();
           updateLokasiTable();
-          showNotification('Fitur lokasi berhasil diaktifkan.');
+          showNotification('Fitur lokasi berhasil diaktifkan dengan koordinat baru.');
           closeSetlokasiModal();
         })
         .catch(error => {
@@ -1195,21 +1192,20 @@
         return;
       }
       const radiusKm = radiusMeter / 1000;
+      const latitude = -7.8589546;
+      const longitude = 110.2655596;
 
-      // Anda mungkin ingin menyimpan juga koordinat di sini jika belum ada cara lain untuk mengaturnya
-      const updates = { allowedRadiusKm: radiusKm, isLocationEnabled: true };
-      if (ujianLatitude !== null && ujianLongitude !== null) {
-        updates.latitude = ujianLatitude;
-        updates.longitude = ujianLongitude;
-      }
+      const updates = { allowedRadiusKm: radiusKm, isLocationEnabled: true, latitude: latitude, longitude: longitude };
 
       update(settingsRef, updates)
         .then(() => {
           allowedRadiusMeterAdmin = radiusMeter;
           isLocationEnabledAdmin = true;
+          ujianLatitude = latitude;
+          ujianLongitude = longitude;
           updateSetlokasiStatusDisplay();
           updateLokasiTable();
-          showNotification(`Radius lokasi diubah menjadi ${radiusMeter} meter dan fitur lokasi diaktifkan.`);
+          showNotification(`Radius lokasi diubah menjadi ${radiusMeter} meter dan fitur lokasi diaktifkan dengan koordinat baru.`);
           closeGantiRadiusModal();
         })
         .catch(error => {
@@ -1227,10 +1223,10 @@
           ujianLatitude = settings.latitude || null;
           ujianLongitude = settings.longitude || null;
           updateSetlokasiStatusDisplay();
-          updateLokasiTable(); // Panggil di sini
+          updateLokasiTable(); // Pastikan ini dipanggil setelah data diambil
         } else {
           updateSetlokasiStatusDisplay();
-          updateLokasiTable(); // Panggil juga jika tidak ada data
+          updateLokasiTable(); // Panggil juga jika tidak ada data awal
         }
       });
     }
