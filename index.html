@@ -386,22 +386,18 @@
       #iconBar {
         top: 10px;
         left: 5px;
-        /* Anda bisa menambahkan atau memodifikasi margin di sini jika perlu mengatur posisi keseluruhan grup */
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: calc(100% - 10px);
       }
       #lokasiButton img {
         width: 24px;
         height: 24px;
       }
-      #iconBar > button:first-child { /* Target tombol logout (tombol pertama di dalam #iconBar) */
-        margin-right: -20px; /* Tambah jarak ke kanan tombol logout */
-      }
-      #lokasiButton {
-        /* Anda bisa menambahkan margin kiri atau kanan pada tombol lokasi */
-        margin-right: -10px; /* Tambah jarak ke kanan ikon lokasi */
-      }
       #setlokasiStatus {
-        margin-left: 0px; /* Jarak kiri tulisan dari ikon lokasi */
-        font-size: 24px;
+        font-weight: bold;
+        margin-left: 5px;
       }
     }
   </style>
@@ -429,16 +425,47 @@
   </div>
 
   <div class="container" id="adminPanel" style="position: relative;">
-    <div id="iconBar" style="position: absolute; top: -10px; left: 3px; display: flex; align-items: center;">
+    <div id="iconBar" style="position: absolute; top: -10px; left: 3px; display: flex; align-items: center; justify-content: space-between; width: calc(100% - 6px);">
+      <div style="display: flex; align-items: center;">
+        <button id="lokasiButton" style="background: none; border: none; cursor: pointer; margin-right: 10px;" onclick="openSetlokasiModal()">
+          <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/lokasi.png" alt="Atur Lokasi" style="width: 24px; height: 24px;">
+        </button>
+        <span id="setlokasiStatus" style="font-weight: bold;"></span>
+      </div>
       <button onclick="logout()" style="background: none; border: none; cursor: pointer;">
         <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
       </button>
-      <button id="lokasiButton" style="background: none; border: none; cursor: pointer; margin-left: -12px;" onclick="openSetlokasiModal()">
-        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/lokasi.png" alt="Setlokasi" style="width: 32px; height: 24px;">
-      </button>
-      <span id="setlokasiStatus" style="font-weight: bold; margin-left: -5px; font-size: 14px; "></span>
     </div>
-    <h3>TAMBAH / EDIT TOKEN</h3>
+
+    <h3 style="text-align: right; margin-top: 20px;">LOKASI UJIAN</h3>
+    <p style="font-size: 11px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
+      Lokasi ujian hanya dapat diakses dari titik ujian dan radius yg telah diatur
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="text-align: center;">TITIK KOORDINAT</th>
+          <th style="text-align: center;">STATUS</th>
+          <th style="text-align: center;">RADIUS</th>
+          <th style="text-align: center;">AKSI</th>
+        </tr>
+      </thead>
+      <tbody id="lokasiTableBody" style="text-align: center;">
+        <tr>
+          <td id="koordinatLokasi">-</td>
+          <td id="statusLokasi">-</td>
+          <td id="radiusLokasi">-</td>
+          <td>
+            <button id="editLokasiButton" class="action-button-icon" onclick="openSetlokasiModal()">
+              <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/lokasi.png" alt="Edit Lokasi" style="width: 16px; height: 16px;">
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top: 20px;">TAMBAH / EDIT TOKEN</h3>
     <form id="tokenForm">
       <label>Mata Pelajaran</label>
       <input type="text" id="subject" placeholder="Gunakan kapital" required />
@@ -456,17 +483,15 @@
       <p id="errorMsg" class="error"></p>
     </form>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; margin-top: 20px;">
       <h3>DAFTAR TOKEN</h3>
       <button onclick="openPrintModal()" style="background: none; border: none; cursor: pointer; margin-left: 10px; margin-right: -10px;">
         <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/print.png" alt="Cetak" style="width: 24px; height: 24px;">
       </button>
     </div>
-
     <p style="font-size: 11px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
       Token yang ditambahkan akan dihapus otomatis setelah 30 hari!
     </p>
-
     <table>
       <thead>
         <tr>
@@ -477,7 +502,7 @@
           <th>LINK</th>
           <th>TOKEN DIBUKA</th>
           <th>TOKEN DITUTUP</th>
-          <th>  STATUS  </th>
+          <th>STATUS</th>
           <th>AKSI</th>
         </tr>
       </thead>
@@ -604,7 +629,7 @@
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus.png";
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
     let inactivityTimer;
-    const INACTIVITY_TIMEOUT = 30 * 60 * 1000;
+    const INACTIVITY_TIMEOUT = 60 * 60 * 1000;
     let currentForceActiveTokenId = null;
 
     // Referensi ke node setlokasi di Firebase
@@ -614,11 +639,27 @@
     let isLocationEnabledAdmin = false;
     let allowedRadiusMeterAdmin = 75; // Default dalam meter
 
-    // Elemen HTML yang baru ditambahkan
+    // Elemen HTML yang baru ditambahkan untuk lokasi
+    const koordinatLokasiElement = document.getElementById('koordinatLokasi');
+    const statusLokasiElement = document.getElementById('statusLokasi');
+    const radiusLokasiElement = document.getElementById('radiusLokasi');
+
+    // Elemen HTML yang sudah ada
     const setlokasiStatusElement = document.getElementById('setlokasiStatus');
     const setlokasiModalElement = document.getElementById('setlokasiModal');
     const gantiRadiusModalElement = document.getElementById('gantiRadiusModal');
     const radiusMeterInputElement = document.getElementById('radiusMeter');
+
+    // Variabel untuk menyimpan koordinat (ambil dari konfigurasi siswa jika ada, atau default)
+    let ujianLatitude = null;
+    let ujianLongitude = null;
+
+    function updateLokasiTable() {
+      koordinatLokasiElement.textContent = ujianLatitude !== null && ujianLongitude !== null ? `${ujianLatitude.toFixed(6)}, ${ujianLongitude.toFixed(6)}` : '-';
+      statusLokasiElement.textContent = isLocationEnabledAdmin ? 'ON' : 'OFF';
+      statusLokasiElement.style.color = isLocationEnabledAdmin ? 'green' : 'red';
+      radiusLokasiElement.textContent = `${allowedRadiusMeterAdmin} m`;
+    }
 
     function showNotification(message) {
       const n = document.getElementById('notification');
@@ -643,7 +684,6 @@
         document.getElementById("loginError").innerText = "Username atau password salah.";
       }
     };
-
 
     window.logout = () => {
       localStorage.removeItem('isAdminLoggedIn');
@@ -728,7 +768,7 @@
             <td>
               <div class="dropdown">
                 <button class="dropdown-button">
-                  <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/dropdown.png" alt="Aksi" style="width: 16px; height: 16px; vertical-align: middle;">
+                  <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/dropdown.png" alt="Aksi" style="width: 16px; height: 16px; height: 16px; vertical-align: middle;">
                 </button>
                 <div class="dropdown-content">
                   <a href="#" onclick="editToken('${data.key}')" style="display: flex; align-items: center; padding: 6px 8px;">
@@ -772,7 +812,7 @@
 
       const isTokenDup = tokenCache.some(item => item.token === t);
       if (isTokenDup) {
-        em.innerText = "Token sudah ada!";
+        em.innerText = "Token sudah ada!;
         return;
       }
 
@@ -1078,7 +1118,7 @@
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();
-        loadSetlokasiSettings(); // Muat pengaturan lokasi saat halaman dimuat
+        loadSetlokasiSettings();
         resetInactivityTimer();
       } else {
         document.getElementById('loginSection').style.display = 'block';
@@ -1100,6 +1140,7 @@
     }
 
     window.openSetlokasiModal = () => {
+      // Jika Anda ingin menampilkan koordinat saat ini di modal, Anda bisa melakukannya di sini
       setlokasiModalElement.style.display = 'flex';
     };
 
@@ -1118,10 +1159,11 @@
     };
 
     window.aktifkanLokasi = () => {
-      update(settingsRef, { isLocationEnabled: true })
+      update(settingsRef, { isLocationEnabled: true, latitude: ujianLatitude, longitude: ujianLongitude })
         .then(() => {
           isLocationEnabledAdmin = true;
           updateSetlokasiStatusDisplay();
+          updateLokasiTable();
           showNotification('Fitur lokasi berhasil diaktifkan.');
           closeSetlokasiModal();
         })
@@ -1136,6 +1178,7 @@
         .then(() => {
           isLocationEnabledAdmin = false;
           updateSetlokasiStatusDisplay();
+          updateLokasiTable();
           showNotification('Fitur lokasi berhasil dinonaktifkan.');
           closeSetlokasiModal();
         })
@@ -1153,11 +1196,19 @@
       }
       const radiusKm = radiusMeter / 1000;
 
-      update(settingsRef, { allowedRadiusKm: radiusKm, isLocationEnabled: true })
+      // Anda mungkin ingin menyimpan juga koordinat di sini jika belum ada cara lain untuk mengaturnya
+      const updates = { allowedRadiusKm: radiusKm, isLocationEnabled: true };
+      if (ujianLatitude !== null && ujianLongitude !== null) {
+        updates.latitude = ujianLatitude;
+        updates.longitude = ujianLongitude;
+      }
+
+      update(settingsRef, updates)
         .then(() => {
           allowedRadiusMeterAdmin = radiusMeter;
           isLocationEnabledAdmin = true;
           updateSetlokasiStatusDisplay();
+          updateLokasiTable();
           showNotification(`Radius lokasi diubah menjadi ${radiusMeter} meter dan fitur lokasi diaktifkan.`);
           closeGantiRadiusModal();
         })
@@ -1173,13 +1224,45 @@
         if (settings) {
           isLocationEnabledAdmin = settings.isLocationEnabled || false;
           allowedRadiusMeterAdmin = (settings.allowedRadiusKm || 0.075) * 1000;
+          ujianLatitude = settings.latitude || null;
+          ujianLongitude = settings.longitude || null;
           updateSetlokasiStatusDisplay();
+          updateLokasiTable(); // Panggil di sini
         } else {
-          // Jika node 'setlokasi' belum ada, inisialisasi dengan nilai default
           updateSetlokasiStatusDisplay();
+          updateLokasiTable(); // Panggil juga jika tidak ada data
         }
       });
+    }
+
+    // Panggil loadSetlokasiSettings saat halaman dimuat
+    window.onload = function() {
+      if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadTokens();
+        loadSetlokasiSettings();
+        resetInactivityTimer();
+      } else {
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('adminPanel').style.display = 'none';
+      }
+    };
+
+    let statusCheckInterval;
+    statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000);
+
+    function updateSetlokasiStatusDisplay() {
+      if (isLocationEnabledAdmin) {
+        setlokasiStatusElement.textContent = `ATURAN LOKASI ON (Radius ${allowedRadiusMeterAdmin}m)`;
+        setlokasiStatusElement.style.color = 'green';
+      } else {
+        setlokasiStatusElement.textContent = `ATURAN LOKASI OFF (Akses bebas)`;
+        setlokasiStatusElement.style.color = 'red';
+      }
     }
   </script>
 </body>
 </html>
+
+
