@@ -8,13 +8,18 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      background-color: #0066cc;
+      background-color: #f0f0f0; /* Mengubah latar belakang keseluruhan menjadi abu-abu */
     }
     .header {
-      background-color: transparent;
+      background-color: #0066cc; /* Warna biru untuk kontainer header */
       color: white;
       padding: 15px;
       text-align: center;
+      max-width: 800px; /* Lebar sesuai dengan kontainer putih */
+      margin: 20px auto 0 auto; /* Rata tengah horizontal, margin atas, tanpa margin bawah */
+      border-top-left-radius: 10px; /* Sudut membulat sesuai kontainer putih */
+      border-top-right-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Bayangan untuk konsistensi */
     }
     .logo {
       display: block;
@@ -23,7 +28,7 @@
     }
     .container {
       max-width: 800px;
-      margin: 20px auto;
+      margin: 0 auto 20px auto; /* Menghapus margin atas, menambahkan margin bawah */
       background: white;
       padding: 20px;
       border-radius: 10px;
@@ -65,23 +70,50 @@
       border: 1px solid #ccc;
       padding: 8px;
       word-wrap: break-word;
-      text-align: left;
-    }
-    td:last-child {
-      text-align: center;
+      text-align: left; /* Perataan teks default untuk semua sel tabel */
     }
     th {
       background-color: #f4f4f4;
-      text-align: center;
+      text-align: center; /* Semua header tabel rata tengah secara default */
     }
-    th:nth-child(1),
-    td:nth-child(1),
-    th:nth-child(3),
-    td:nth-child(3),
-    th:nth-child(4),
-    td:nth-child(4) {
-      text-align: center;
+
+    /* Perataan spesifik untuk Tabel Pengaturan Lokasi */
+    #locationSettingsTableBody td:nth-child(1) {
+      text-align: center; /* Koordinat Lokasi - rata tengah */
     }
+    #locationSettingsTableBody td:nth-child(2) {
+      text-align: center; /* Radius - rata tengah */
+    }
+    #locationSettingsTableBody td:nth-child(3) {
+      text-align: center; /* Status - rata tengah */
+    }
+    #locationSettingsTableBody td:nth-child(4) {
+      text-align: center; /* Aksi - rata tengah */
+    }
+    /* Mengatur ulang tombol di dalam sel tabel agar rata tengah */
+    #locationSettingsTableBody td:nth-child(4) button {
+      display: inline-block; /* Mengubah display agar text-align pada parent berfungsi */
+      margin: 0; /* Hapus margin otomatis yang mungkin menyebabkan perataan tidak tepat */
+    }
+
+
+    /* Perataan spesifik untuk Tabel Daftar Token */
+    #tokenTableBody td:nth-child(1) {
+      text-align: center; /* NO - rata tengah */
+    }
+    #tokenTableBody td:nth-child(3) {
+      text-align: center; /* KELAS - rata tengah */
+    }
+    #tokenTableBody td:nth-child(4) {
+      text-align: center; /* TOKEN - rata tengah */
+    }
+    #tokenTableBody td:nth-child(8) {
+      text-align: center; /* STATUS - rata tengah */
+    }
+    #tokenTableBody td:nth-child(9) {
+      text-align: center; /* AKSI - rata tengah */
+    }
+
     .footer {
       text-align: center;
       margin-top: 20px;
@@ -385,7 +417,8 @@
         @media (min-width: 600px) {
       #iconBar {
         top: 10px;
-        left: 5px;
+        right: 3px; /* Mengubah dari kiri ke kanan */
+        left: auto; /* Memastikan kiri tidak diatur */
         /* Anda bisa menambahkan atau memodifikasi margin di sini jika perlu mengatur posisi keseluruhan grup */
       }
       #lokasiButton img {
@@ -393,11 +426,11 @@
         height: 24px;
       }
       #iconBar > button:first-child { /* Target tombol logout (tombol pertama di dalam #iconBar) */
-        margin-right: -20px; /* Tambah jarak ke kanan tombol logout */
+        margin-right: 0; /* Reset margin */
       }
       #lokasiButton {
         /* Anda bisa menambahkan margin kiri atau kanan pada tombol lokasi */
-        margin-right: -10px; /* Tambah jarak ke kanan ikon lokasi */
+        margin-right: 0; /* Reset margin */
       }
       #setlokasiStatus {
         margin-left: 0px; /* Jarak kiri tulisan dari ikon lokasi */
@@ -429,14 +462,26 @@
   </div>
 
   <div class="container" id="adminPanel" style="position: relative;">
-    <div id="iconBar" style="position: absolute; top: -10px; left: 3px; display: flex; align-items: center;">
+    <div id="iconBar" style="position: absolute; top: -10px; right: 3px; display: flex; align-items: center;">
       <button onclick="logout()" style="background: none; border: none; cursor: pointer;">
         <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
       </button>
-      <button id="lokasiButton" style="background: none; border: none; cursor: pointer; margin-left: -12px;" onclick="openSetlokasiModal()">
-        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/lokasi.png" alt="Setlokasi" style="width: 32px; height: 24px;">
-      </button>
-      <span id="setlokasiStatus" style="font-weight: bold; margin-left: -5px; font-size: 14px; "></span>
+      </div>
+
+    <div style="margin-bottom: 20px;">
+      <h3>ATUR AKSES LOKASI</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>KOORDINAT LOKASI</th>
+            <th>RADIUS</th>
+            <th>STATUS</th>
+            <th>AKSI</th>
+          </tr>
+        </thead>
+        <tbody id="locationSettingsTableBody">
+          </tbody>
+      </table>
     </div>
     <h3>TAMBAH / EDIT TOKEN</h3>
     <form id="tokenForm">
@@ -582,6 +627,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
+    // Konfigurasi Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAOBCX8x60pYqxtXmXMz2xc5dwC3HJH5EE",
       authDomain: "ujian-online-berbasis-android.firebaseapp.com",
@@ -592,34 +638,39 @@
       appId: "1:923446282537:web:60d374dde8aca61f6a0f38"
     };
 
+    // Inisialisasi Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    // Kredensial Admin
     const ADMIN_USER = "admin";
     const ADMIN_PASS = "12345678";
     let currentTokenId = null;
     let tokenCache = [];
-    const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
+    const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000; // 30 hari dalam milidetik
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus.png";
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
     let inactivityTimer;
-    const INACTIVITY_TIMEOUT = 60 * 60 * 1000;
+    const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // Batas waktu tidak aktif 1 jam
     let currentForceActiveTokenId = null;
 
-    // Referensi ke node setlokasi di Firebase
+    // Referensi ke node 'setlokasi' di Firebase
     const settingsRef = ref(db, 'setlokasi');
 
     // Variabel untuk menyimpan status lokasi dan radius
     let isLocationEnabledAdmin = false;
     let allowedRadiusMeterAdmin = 75; // Default dalam meter
+    // Koordinat default untuk akses lokasi (misalnya, titik pusat di Yogyakarta)
+    const defaultLocationCoordinate = "-7.8589546,110.2655596"; // Koordinat yang diperbarui
 
-    // Elemen HTML yang baru ditambahkan
-    const setlokasiStatusElement = document.getElementById('setlokasiStatus');
+    // Elemen HTML
+    const locationSettingsTableBody = document.getElementById('locationSettingsTableBody');
     const setlokasiModalElement = document.getElementById('setlokasiModal');
     const gantiRadiusModalElement = document.getElementById('gantiRadiusModal');
     const radiusMeterInputElement = document.getElementById('radiusMeter');
 
+    // Fungsi untuk menampilkan notifikasi
     function showNotification(message) {
       const n = document.getElementById('notification');
       n.innerText = message;
@@ -629,6 +680,7 @@
       }, 3000);
     }
 
+    // Fungsi untuk menangani login pengguna
     window.login = () => {
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value.trim();
@@ -638,33 +690,34 @@
         document.getElementById('adminPanel').style.display = 'block';
         loadTokens();
         loadSetlokasiSettings(); // Muat pengaturan lokasi saat login
-        resetInactivityTimer(); // Tambahkan ini untuk memulai timer setelah login berhasil
+        resetInactivityTimer(); // Mulai timer tidak aktif setelah login berhasil
       } else {
         document.getElementById("loginError").innerText = "Username atau password salah.";
       }
     };
 
-
+    // Fungsi untuk menangani logout pengguna
     window.logout = () => {
       localStorage.removeItem('isAdminLoggedIn');
       document.getElementById('adminPanel').style.display = 'none';
       document.getElementById('loginSection').style.display = 'block';
-      document.getElementById('password').value = ''; // Mengosongkan password saat logout
+      document.getElementById('password').value = ''; // Kosongkan password saat logout
       showNotification('Anda telah logout.');
     };
 
+    // Fungsi untuk memuat token dari Firebase
     function loadTokens() {
       onValue(ref(db, 'tokens'), (snapshot) => {
         const tbody = document.getElementById('tokenTableBody');
         tbody.innerHTML = '';
         tokenCache = [];
-        let counter = 0;
 
         snapshot.forEach(child => {
           const data = child.val();
           data.key = child.key;
           tokenCache.push(data);
 
+          // Hapus token yang lebih lama dari 30 hari
           if (data.createdAt && (Date.now() - data.createdAt) > THIRTY_DAYS_IN_MS) {
             remove(ref(db, 'tokens/' + data.key))
               .then(() => console.log(`Token ${data.key} dihapus.`))
@@ -673,19 +726,23 @@
           }
         });
 
+        // Urutkan token berdasarkan startTime terlebih dahulu, kemudian berdasarkan kelas
         tokenCache.sort((a, b) => {
+          const timeA = new Date(a.startTime).getTime();
+          const timeB = new Date(b.startTime).getTime();
+          if (timeA !== timeB) {
+            return timeA - timeB;
+          }
+
           const kelasA = parseInt(a.kelas);
           const kelasB = parseInt(b.kelas);
 
           if (!isNaN(kelasA) && !isNaN(kelasB)) {
-            if (kelasA !== kelasB) return kelasA - kelasB;
-          } else if (typeof a.kelas === 'string' && typeof b.kelas === 'string' && a.kelas !== b.kelas) {
+            return kelasA - kelasB;
+          } else if (typeof a.kelas === 'string' && typeof b.kelas === 'string') {
             return a.kelas.localeCompare(b.kelas);
           }
-
-          const timeA = new Date(a.startTime).getTime();
-          const timeB = new Date(b.startTime).getTime();
-          return timeA - timeB;
+          return 0;
         });
 
         let sortedCounter = 0;
@@ -711,7 +768,6 @@
               forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/kunci.png" alt="Aktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceActive('${data.key}')">`;
             }
           }
-
 
           row.innerHTML = `
             <td>${sortedCounter}</td>
@@ -749,6 +805,7 @@
       });
     }
 
+    // Event listener untuk pengiriman formulir token
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const s = document.getElementById('subject').value.trim().toUpperCase();
@@ -793,6 +850,7 @@
         });
     });
 
+    // Fungsi untuk membuka modal edit token
     window.editToken = (id) => {
       const token = tokenCache.find(item => item.key === id);
       if (!token) return;
@@ -808,6 +866,7 @@
       document.getElementById('editModal').style.display = 'flex';
     };
 
+    // Event listener untuk pengiriman formulir modal (edit token)
     document.getElementById('modalForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const s = document.getElementById('editSubject').value.trim().toUpperCase();
@@ -854,6 +913,7 @@
       }
     });
 
+    // Fungsi untuk menutup modal edit token
     window.closeEditModal = () => {
       document.getElementById('editModal').style.display = 'none';
       document.getElementById('editErrorMsg').innerText = "";
@@ -861,11 +921,13 @@
     };
 
     let deleteId = null;
+    // Fungsi untuk meminta konfirmasi penghapusan token
     window.promptDelete = (id) => {
       deleteId = id;
       document.getElementById('deleteModal').style.display = 'flex';
     };
 
+    // Fungsi untuk mengkonfirmasi penghapusan token
     window.confirmDelete = () => {
       if (deleteId) {
         remove(ref(db, 'tokens/' + deleteId))
@@ -877,25 +939,30 @@
       }
     };
 
+    // Fungsi untuk menutup modal hapus token
     window.closeDeleteModal = () => {
       document.getElementById('deleteModal').style.display = 'none';
       deleteId = null;
     };
 
+    // Event listener untuk mengubah input judul cetak menjadi huruf kapital
     document.getElementById('printTitleInput').addEventListener('input', function() {
       this.value = this.value.toUpperCase();
     });
 
+    // Fungsi untuk membuka modal cetak
     window.openPrintModal = () => {
       document.getElementById('printModal').style.display = 'flex';
     };
 
+    // Fungsi untuk menutup modal cetak
     window.closePrintModal = () => {
       document.getElementById('printModal').style.display = 'none';
       document.getElementById('printTitleInput').value = '';
       document.getElementById('printTitleError').innerText = "";
     };
 
+    // Fungsi untuk mencetak daftar token
     window.printTokenList = () => {
       const printTitleElement = document.getElementById('printTitleInput');
       const printTitle = printTitleElement.value.trim();
@@ -914,6 +981,7 @@
       closePrintModal();
     };
 
+    // Fungsi untuk meminta konfirmasi pengaktifan paksa token
     window.promptForceActive = (tokenId) => {
       currentForceActiveTokenId = tokenId;
       document.getElementById('forceActivePassword').value = ''; // Kosongkan password sebelumnya
@@ -921,11 +989,13 @@
       document.getElementById('forceActiveModal').style.display = 'flex';
     };
 
+    // Fungsi untuk meminta konfirmasi penonaktifan paksa token
     window.promptForceInactive = (tokenId) => {
       currentForceActiveTokenId = tokenId;
       document.getElementById('forceInactiveModal').style.display = 'flex';
     };
 
+    // Fungsi untuk mengkonfirmasi pengaktifan paksa token
     window.confirmForceActive = () => {
       const password = document.getElementById('forceActivePassword').value;
       const passwordError = document.getElementById('forceActivePasswordError');
@@ -958,6 +1028,7 @@
       }
     };
 
+    // Fungsi untuk menutup modal pengaktifan paksa
     window.closeForceActiveModal = () => {
       document.getElementById('forceActiveModal').style.display = 'none';
       document.getElementById('forceActivePassword').value = '';
@@ -965,6 +1036,7 @@
       currentForceActiveTokenId = null;
     };
 
+    // Fungsi untuk mengkonfirmasi penonaktifan paksa token
     window.confirmForceInactive = () => {
       if (currentForceActiveTokenId) {
         update(ref(db, 'tokens/' + currentForceActiveTokenId), { isForceActive: false })
@@ -992,11 +1064,13 @@
       }
     };
 
+    // Fungsi untuk menutup modal penonaktifan paksa
     window.closeForceInactiveModal = () => {
       document.getElementById('forceInactiveModal').style.display = 'none';
       currentForceActiveTokenId = null;
     };
 
+    // Fungsi untuk memeriksa dan memperbarui status token
     async function periksaAndUpdateStatusToken() {
       const now = new Date();
       for (const tokenData of tokenCache) {
@@ -1031,6 +1105,7 @@
       // Tidak perlu loadTokens() di sini, onValue akan dipanggil secara otomatis
     }
 
+    // Fungsi untuk memperbarui tampilan waktu saat ini
     function updateTime() {
       const now = new Date();
       const dateOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
@@ -1047,24 +1122,28 @@
     setInterval(updateTime, 1000);
     updateTime();
 
+    // Fungsi untuk mereset timer tidak aktif
     function resetInactivityTimer() {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(logoutDueToInactivity, INACTIVITY_TIMEOUT);
     }
 
+    // Fungsi untuk menangani logout karena tidak aktif
     function logoutDueToInactivity() {
       localStorage.removeItem('isAdminLoggedIn');
       document.getElementById('adminPanel').style.display = 'none';
       document.getElementById('loginSection').style.display = 'block';
-      document.getElementById('password').value = ''; // Mengosongkan password saat logout otomatis
+      document.getElementById('password').value = ''; // Kosongkan password saat logout otomatis
       showNotification('Anda telah logout karena tidak ada aktivitas, masukan password kembali!.');
     }
 
+    // Event listener untuk aktivitas pengguna untuk mereset timer tidak aktif
     window.addEventListener('mousemove', resetInactivityTimer);
     window.addEventListener('keypress', resetInactivityTimer);
     window.addEventListener('scroll', resetInactivityTimer);
     window.addEventListener('click', resetInactivityTimer);
 
+    // Fungsi untuk memulai timer tidak aktif saat halaman dimuat
     function startInactivityTimerOnLoad() {
       if (localStorage.getItem('isAdminLoggedIn') === 'true') {
         resetInactivityTimer();
@@ -1073,6 +1152,7 @@
 
     window.addEventListener('load', startInactivityTimerOnLoad);
 
+    // Logika pemuatan halaman awal
     window.onload = function() {
       if (localStorage.getItem('isAdminLoggedIn') === 'true') {
         document.getElementById('loginSection').style.display = 'none';
@@ -1089,34 +1169,49 @@
     let statusCheckInterval;
     statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000);
 
+    // Fungsi untuk memperbarui tampilan tabel pengaturan lokasi
     function updateSetlokasiStatusDisplay() {
-      if (isLocationEnabledAdmin) {
-        setlokasiStatusElement.textContent = `ATURAN LOKASI ON (Radius ${allowedRadiusMeterAdmin}m)`;
-        setlokasiStatusElement.style.color = 'green';
-      } else {
-        setlokasiStatusElement.textContent = `ATURAN LOKASI OFF (Akses bebas)`;
-        setlokasiStatusElement.style.color = 'red';
-      }
+      locationSettingsTableBody.innerHTML = ''; // Hapus baris yang ada
+      const row = document.createElement('tr');
+      const statusText = isLocationEnabledAdmin ? 'ON' : 'OFF';
+      const statusColor = isLocationEnabledAdmin ? 'green' : 'red';
+
+      row.innerHTML = `
+        <td><a href="https://www.google.com/maps/search/?api=1&query=${defaultLocationCoordinate}" target="_blank">${defaultLocationCoordinate}</a></td>
+        <td>${allowedRadiusMeterAdmin}m</td>
+        <td style="color: ${statusColor}; font-weight: bold;">${statusText}</td>
+        <td>
+          <button onclick="openSetlokasiModal()" style="background: none; border: none; cursor: pointer; padding: 0; margin: 0;">
+            <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/lokasi.png" alt="Setlokasi" style="width: 24px; height: 24px;">
+          </button>
+        </td>
+      `;
+      locationSettingsTableBody.appendChild(row);
     }
 
+    // Fungsi untuk membuka modal pengaturan lokasi
     window.openSetlokasiModal = () => {
       setlokasiModalElement.style.display = 'flex';
     };
 
+    // Fungsi untuk menutup modal pengaturan lokasi
     window.closeSetlokasiModal = () => {
       setlokasiModalElement.style.display = 'none';
     };
 
+    // Fungsi untuk membuka modal ganti radius
     window.openGantiRadiusModal = () => {
       gantiRadiusModalElement.style.display = 'flex';
       radiusMeterInputElement.value = allowedRadiusMeterAdmin;
       closeSetlokasiModal();
     };
 
+    // Fungsi untuk menutup modal ganti radius
     window.closeGantiRadiusModal = () => {
       gantiRadiusModalElement.style.display = 'none';
     };
 
+    // Fungsi untuk mengaktifkan fitur lokasi
     window.aktifkanLokasi = () => {
       update(settingsRef, { isLocationEnabled: true })
         .then(() => {
@@ -1131,6 +1226,7 @@
         });
     };
 
+    // Fungsi untuk menonaktifkan fitur lokasi
     window.nonaktifkanLokasi = () => {
       update(settingsRef, { isLocationEnabled: false })
         .then(() => {
@@ -1145,10 +1241,11 @@
         });
     };
 
+    // Fungsi untuk mengubah radius dan mengaktifkan lokasi
     window.gantiRadiusDanAktifkan = () => {
       const radiusMeter = parseInt(radiusMeterInputElement.value);
       if (isNaN(radiusMeter) || radiusMeter <= 0) {
-        alert('Masukkan radius yang valid dalam meter.');
+        showNotification('Masukkan radius yang valid dalam meter.');
         return;
       }
       const radiusKm = radiusMeter / 1000;
@@ -1167,6 +1264,7 @@
         });
     };
 
+    // Fungsi untuk memuat pengaturan lokasi dari Firebase
     function loadSetlokasiSettings() {
       onValue(settingsRef, (snapshot) => {
         const settings = snapshot.val();
