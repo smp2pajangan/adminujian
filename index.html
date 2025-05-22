@@ -9,32 +9,95 @@
       font-family: Arial, sans-serif;
       margin: 0;
       background-color: #f0f0f0; /* Mengubah latar belakang keseluruhan menjadi abu-abu */
+      padding-top: 0; /* Padding awal, akan diatur oleh JS */
     }
-    .header {
-      background-color: #0066cc; /* Warna biru untuk kontainer header */
-      color: white;
-      padding: 15px;
+
+    /* Header biru (selalu terlihat, fixed di atas) */
+    .header-blue-bg {
+      background-color: #0066cc; /* Warna biru */
+      padding: 15px 20px; /* Padding vertikal dan HORIZONTAL */
       text-align: center;
-      max-width: 800px; /* Lebar sesuai dengan kontainer putih */
-      margin: 20px auto 0 auto; /* Rata tengah horizontal, margin atas, tanpa margin bawah */
-      border-top-left-radius: 10px; /* Sudut membulat sesuai kontainer putih */
+      position: fixed;
+      top: 0;
+      left: 50%; /* Pusatkan elemen fixed */
+      transform: translateX(-50%); /* Penyesuaian untuk pemusatan */
+      width: 100%; /* Ambil lebar penuh, tapi dibatasi max-width */
+      max-width: 800px; /* Lebar maksimum mengikuti container putih */
+      z-index: 25; /* Memastikan di atas nav dan konten */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-top-left-radius: 10px; /* Sudut membulat */
       border-top-right-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Bayangan untuk konsistensi */
+      box-sizing: border-box; /* Penting: padding dihitung dalam lebar */
+    }
+    .header-blue-bg .header-inner { /* Konten di dalam header biru */
+      color: white;
+      /* Tidak perlu max-width/margin auto di sini karena parent sudah diatur */
     }
     .logo {
       display: block;
       margin: 0 auto;
       width: 100px;
     }
+
+    /* Navigasi Dashboard (fixed, muncul di bawah header biru setelah login) */
+    .dashboard-nav-wrapper {
+      position: fixed;
+      top: 0; /* Akan diatur oleh JS setelah header */
+      left: 50%; /* Pusatkan elemen fixed */
+      transform: translateX(-50%); /* Penyesuaian untuk pemusatan */
+      width: 100%; /* Ambil lebar penuh, tapi dibatasi max-width */
+      max-width: 800px; /* Lebar maksimum mengikuti container putih */
+      z-index: 20; /* Lebih rendah dari header, lebih tinggi dari konten */
+      background-color: #e0e0e0; /* Background lebih terang untuk nav */
+      padding: 10px 20px; /* Padding vertikal dan HORIZONTAL */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: none; /* Default: Sembunyikan */
+      border-bottom-left-radius: 10px; /* Sudut membulat */
+      border-bottom-right-radius: 10px;
+      box-sizing: border-box; /* Penting: padding dihitung dalam lebar */
+    }
+    .dashboard-nav-wrapper .dashboard-nav-inner { /* Konten di dalam nav */
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      /* Tidak perlu padding di sini karena sudah diatur di parent */
+    }
+    .dashboard-nav-wrapper button {
+      background-color: #007bff; /* Warna default biru */
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 15px;
+      margin: 0; /* Override margin button default */
+      transition: background-color 0.3s ease;
+    }
+    .dashboard-nav-wrapper button.active {
+      background-color: #6c757d; /* Warna abu-abu untuk tombol aktif */
+    }
+    .dashboard-nav-wrapper button:hover:not(.active) {
+      background-color: #0056b3;
+    }
+
+    /* Kontainer utama untuk login dan konten dashboard */
     .container {
       max-width: 800px;
-      margin: 0 auto 20px auto; /* Menghapus margin atas, menambahkan margin bawah */
+      margin: auto; /* Pusatkan secara horizontal */
+      /* margin-top: 0; <-- DIHAPUS */
+      margin-bottom: 20px; /* Jaga jarak dari footer */
       background: white;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       position: relative;
+      box-sizing: border-box; /* Penting: padding dihitung dalam lebar */
     }
+    /* Untuk bagian dashboard, hilangkan margin-top karena padding body sudah diatur */
+    .dashboard-section.container {
+        /* margin-top: 0; <-- DIHAPUS */
+    }
+
     input, select {
       padding: 10px;
       margin: 8px 0;
@@ -111,8 +174,56 @@
       text-align: center; /* STATUS - rata tengah */
     }
     #tokenTableBody td:nth-child(9) {
+      text-align: center; /* AKSES - rata tengah */
+    }
+    #tokenTableBody td:nth-child(10) {
       text-align: center; /* AKSI - rata tengah */
     }
+
+    /* Perataan spesifik untuk Tabel Daftar Siswa */
+    #studentTableBody td:nth-child(1) {
+      text-align: center; /* NO - rata tengah */
+    }
+    #studentTableBody td:nth-child(2) {
+      text-align: center; /* ID SISWA - rata tengah */
+    }
+    #studentTableBody td:nth-child(4) {
+      text-align: center; /* KELAS - rata tengah */
+    }
+    #studentTableBody td:nth-child(5) {
+      text-align: center; /* STATUS - rata tengah */
+    }
+    #studentTableBody td:last-child {
+      text-align: center; /* AKSI - rata tengah */
+    }
+    /* Styling untuk tombol edit/hapus siswa agar sejajar */
+    .student-action-buttons {
+        display: flex;
+        justify-content: center; /* Pusatkan tombol dalam sel */
+        gap: 5px; /* Beri sedikit jarak antar tombol */
+    }
+    .student-action-buttons button {
+        margin: 0; /* Hapus margin default tombol */
+        padding: 0;
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex; /* Gunakan flex untuk memusatkan ikon */
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+    .student-action-buttons button:hover {
+        background-color: #e0e0e0;
+    }
+    .student-action-buttons button img {
+        width: 16px;
+        height: 16px;
+    }
+
 
     .footer {
       text-align: center;
@@ -158,14 +269,7 @@
     .login-link:active {
       color: red;
     }
-    .action-buttons {
-      display: flex;
-      gap: 4px;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .action-button-icon {
+    .action-button-icon { /* Reused for token actions */
       background: none;
       border: none;
       padding: 0;
@@ -190,8 +294,30 @@
       background-color: #c0c0c0;
     }
     @media (max-width: 600px) {
+      body {
+        /* Padding top diatur oleh JS, ini hanya fallback atau untuk visualisasi */
+        padding-top: 130px;
+      }
+      .header-blue-bg {
+        padding: 10px 10px; /* Kurangi padding horizontal untuk mobile */
+      }
+      .header-blue-bg h2 {
+        font-size: 1.2em; /* Kurangi ukuran font judul */
+      }
+      .dashboard-nav-wrapper {
+        padding: 8px 10px; /* Kurangi padding horizontal untuk mobile */
+      }
+      .dashboard-nav-wrapper .dashboard-nav-inner {
+        flex-wrap: wrap;
+        gap: 5px;
+        padding: 0; /* Padding sudah diatur di parent */
+      }
+      .dashboard-nav-wrapper button {
+        padding: 6px 10px;
+        font-size: 13px;
+      }
       .container {
-        margin: 10px;
+        margin: 10px auto;
         padding: 15px;
       }
       h2, h3 {
@@ -209,13 +335,23 @@
       th, td {
         padding: 6px;
       }
-      thead th:nth-child(5),
-      tbody td:nth-child(5),
-      thead th:nth-child(6),
-      tbody td:nth-child(6),
-      thead th:nth-child(7),
-      tbody td:nth-child(7) {
+      /* Sembunyikan kolom tertentu di layar kecil untuk tabel token */
+      #tokenTableBody td:nth-child(5),
+      #tokenTableBody td:nth-child(6),
+      #tokenTableBody td:nth-child(7),
+      #tokenTableBody th:nth-child(5),
+      #tokenTableBody th:nth-child(6),
+      #tokenTableBody th:nth-child(7) {
         display: none;
+      }
+      /* Sembunyikan kolom tertentu di layar kecil untuk tabel siswa */
+      #studentTableBody td:nth-child(5),
+      #studentTableBody th:nth-child(5) {
+        /* display: none; */ /* Jangan sembunyikan kolom status ini */
+      }
+      #studentTableBody td:nth-child(6),
+      #studentTableBody th:nth-child(6) {
+        display: none; /* Sembunyikan kolom aksi di tabel siswa untuk mobile jika terlalu sempit */
       }
       .action-buttons {
         flex-direction: row;
@@ -283,21 +419,6 @@
       background-color: #dc3545;
       color: white;
     }
-    @media (max-width: 600px) {
-      .print-button-container-mobile {
-        display: none;
-        justify-content: flex-end;
-        margin-bottom: 5px;
-      }
-      .admin-panel-header {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .admin-panel-header h3 {
-        margin-bottom: 5px;
-      }
-    }
     .switch {
       position: relative;
       display: inline-block;
@@ -359,50 +480,66 @@
     }
 
     .dropdown-button {
-      background-color: transparent;
+      background-color: #f0f0f0; /* Default light background */
       color: #333;
-      padding: 0;
-      margin: 0;
-      font-size: 14px;
-      border: none;
-      border-radius: 0;
+      padding: 8px 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
       cursor: pointer;
-      display: inline-flex;
+      font-size: 14px;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+      display: flex; /* Use flex to center text and arrow */
       align-items: center;
       justify-content: center;
-      width: 24px;
-      height: 24px;
+      gap: 5px; /* Space between text and arrow */
     }
 
     .dropdown-button:hover {
-      background-color: #e0e0e0;
+        background-color: #e0e0e0;
+        border-color: #999;
     }
 
-    .dropdown-button img {
-      width: 16px;
-      height: 16px;
-      vertical-align: middle;
+    .dropdown-button.active {
+        background-color: #007bff; /* Active blue */
+        color: white;
+        border-color: #007bff;
+    }
+
+    .dropdown-button.active:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    .dropdown-button .arrow {
+        font-size: 0.8em;
+        transition: transform 0.3s ease;
+    }
+
+    .dropdown-button.active .arrow {
+        transform: rotate(180deg);
     }
 
     .dropdown-content {
       display: none;
       position: absolute;
       background-color: #f9f9f9;
-      width: 30px;
+      min-width: 160px; /* Lebar minimum untuk konten dropdown */
       box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
       z-index: 1;
       border: 1px solid #ccc;
       border-radius: 4px;
       padding: 5px 0;
+      top: 100%; /* Posisi di bawah tombol toggle */
+      left: 0;
+      white-space: nowrap; /* Mencegah teks pecah baris */
     }
 
     .dropdown-content a {
       color: black;
-      padding: 5px 10px;
+      padding: 8px 15px;
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: block; /* Agar setiap item menjadi blok yang dapat diklik */
+      text-align: left; /* Teks rata kiri */
     }
 
 
@@ -410,42 +547,93 @@
       background-color: #ddd;
     }
 
-    .dropdown:hover .dropdown-content {
+    /* .dropdown:hover .dropdown-content {
       display: block;
+    } */ /* Dihapus karena akan dikontrol oleh JS */
+
+    /* Styling for the loading spinner */
+    .loading-overlay {
+        display: none; /* Hidden by default */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* Ensure it's on top */
     }
 
-        @media (min-width: 600px) {
-      #iconBar {
-        top: 10px;
-        right: 3px; /* Mengubah dari kiri ke kanan */
-        left: auto; /* Memastikan kiri tidak diatur */
-        /* Anda bisa menambahkan atau memodifikasi margin di sini jika perlu mengatur posisi keseluruhan grup */
-      }
-      #lokasiButton img {
-        width: 24px;
-        height: 24px;
-      }
-      #iconBar > button:first-child { /* Target tombol logout (tombol pertama di dalam #iconBar) */
-        margin-right: 0; /* Reset margin */
-      }
-      #lokasiButton {
-        /* Anda bisa menambahkan margin kiri atau kanan pada tombol lokasi */
-        margin-right: 0; /* Reset margin */
-      }
-      #setlokasiStatus {
-        margin-left: 0px; /* Jarak kiri tulisan dari ikon lokasi */
-        font-size: 24px;
-      }
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border-left-color: #007bff;
+        animation: spin 1s ease infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .student-filter-buttons {
+        display: flex;
+        justify-content: flex-start; /* Aligned to the left */
+        gap: 10px;
+        margin-top: 10px;
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+
+    .student-filter-button {
+        background-color: #f0f0f0; /* Default light background */
+        color: #333;
+        padding: 8px 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .student-filter-button:hover {
+        background-color: #e0e0e0;
+        border-color: #999;
+    }
+
+    .student-filter-button.active {
+        background-color: #007bff; /* Active blue */
+        color: white;
+        border-color: #007bff;
+    }
+
+    .student-filter-button.active:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/logosmpn2pjg.png" class="logo" alt="Logo SMPN 2 Pajangan">
-    <h2>SMP NEGERI 2 PAJANGAN</h2>
+  <div id="headerBlueBg" class="header-blue-bg">
+    <div class="header-inner">
+      <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/logosmpn2pjg.png" class="logo" alt="Logo SMPN 2 Pajangan">
+      <h2>SMP NEGERI 2 PAJANGAN</h2>
+    </div>
   </div>
 
-  <div class="container" id="loginSection" style="display:none;">
+  <nav id="dashboardNav" class="dashboard-nav-wrapper">
+    <div class="dashboard-nav-inner">
+      <button id="tokenMenuBtn" onclick="showSection('tokenSection')">Token</button>
+      <button id="lokasiMenuBtn" onclick="showSection('locationSection')">Lokasi</button>
+      <button id="pesertaMenuBtn" onclick="showSection('studentSection')">Peserta</button>
+      <button onclick="promptLogout()">Keluar</button>
+    </div>
+  </nav>
+
+  <div class="container" id="loginSection">
     <h3 style="text-align: center;">LOGIN ADMINISTRASI</h3>
     <p id="loginError" class="error"></p>
     <input type="text" id="username" placeholder="Username" />
@@ -461,74 +649,156 @@
     </div>
   </div>
 
-  <div class="container" id="adminPanel" style="position: relative;">
-    <div id="iconBar" style="position: absolute; top: -10px; right: 3px; display: flex; align-items: center;">
-      <button onclick="logout()" style="background: none; border: none; cursor: pointer;">
-        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/keluar.png" alt="Keluar" style="width: 24px; height: 24px;">
-      </button>
+  <div id="dashboardContent" style="display:none;">
+    <div id="tokenSection" class="dashboard-section container">
+      <h3>TAMBAH / EDIT TOKEN</h3>
+      <form id="tokenForm">
+        <label>Mata Pelajaran</label>
+        <input type="text" id="subject" placeholder="Gunakan kapital" required />
+        <label>Kelas</label>
+        <input type="text" id="kelas" placeholder="Berupa angka saja" required />
+        <label>Token Ujian (Base Token)</label>
+        <input type="text" id="token" placeholder="Berupa huruf/angka (gunakan kapital)" required />
+        <label>Link Ujian</label>
+        <input type="url" id="url" placeholder="Gunakan http://" required />
+        <label>Waktu Token Dibuka</label>
+        <input type="datetime-local" id="startTime" required />
+        <label>Waktu Token Ditutup</labeL>
+        <input type="datetime-local" id="endTime" required />
+        <button type="submit">Tambah</button>
+        <p id="errorMsg" class="error"></p>
+      </form>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3>DAFTAR TOKEN</h3>
+        <button onclick="openPrintModal()" style="background: none; border: none; cursor: pointer; margin-left: 10px; margin-right: -10px;">
+          <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/print.png" alt="Cetak" style="width: 24px; height: 24px;">
+        </button>
       </div>
 
-    <div style="margin-bottom: 20px;">
-      <h3>ATUR AKSES LOKASI</h3>
+      <p style="font-size: 11px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
+        Token yang ditambahkan akan dihapus otomatis setelah 30 hari!
+      </p>
+
       <table>
         <thead>
           <tr>
-            <th>KOORDINAT LOKASI</th>
-            <th>RADIUS</th>
-            <th>STATUS</th>
+            <th>NO</th>
+            <th>MAPEL</th>
+            <th>KELAS</th>
+            <th>TOKEN</th>
+            <th>LINK</th>
+            <th>TOKEN DIBUKA</th>
+            <th>TOKEN DITUTUP</th>
+            <th>  STATUS  </th>
+            <th>AKSES</th>
             <th>AKSI</th>
           </tr>
         </thead>
-        <tbody id="locationSettingsTableBody">
-          </tbody>
+        <tbody id="tokenTableBody"></tbody>
       </table>
     </div>
-    <h3>TAMBAH / EDIT TOKEN</h3>
-    <form id="tokenForm">
-      <label>Mata Pelajaran</label>
-      <input type="text" id="subject" placeholder="Gunakan kapital" required />
-      <label>Kelas</label>
-      <input type="text" id="kelas" placeholder="Berupa angka saja" required />
-      <label>Token Ujian</label>
-      <input type="text" id="token" placeholder="Berupa huruf/angka (gunakan kapital)" required />
-      <label>Link Ujian</label>
-      <input type="url" id="url" placeholder="Gunakan http://" required />
-      <label>Waktu Token Dibuka</label>
-      <input type="datetime-local" id="startTime" required />
-      <label>Waktu Token Ditutup</label>
-      <input type="datetime-local" id="endTime" required />
-      <button type="submit">Tambah</button>
-      <p id="errorMsg" class="error"></p>
-    </form>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-      <h3>DAFTAR TOKEN</h3>
-      <button onclick="openPrintModal()" style="background: none; border: none; cursor: pointer; margin-left: 10px; margin-right: -10px;">
-        <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/print.png" alt="Cetak" style="width: 24px; height: 24px;">
-      </button>
+    <div id="locationSection" class="dashboard-section container">
+      <div style="margin-bottom: 20px;">
+        <h3>ATUR AKSES LOKASI</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>KOORDINAT LOKASI</th>
+              <th>RADIUS</th>
+              <th>STATUS</th>
+              <th>AKSI</th>
+            </tr>
+          </thead>
+          <tbody id="locationSettingsTableBody">
+            </tbody>
+        </table>
+      </div>
     </div>
 
-    <p style="font-size: 11px; color: #555; margin-top: -10px; margin-bottom: 10px; text-align: center;">
-      Token yang ditambahkan akan dihapus otomatis setelah 30 hari!
-    </p>
+    <div id="studentSection" class="dashboard-section container">
+      <div style="margin-bottom: 20px;">
+        <h3>MANAJEMEN SISWA</h3>
+        <form id="studentForm">
+          <label>ID Siswa</label>
+          <input type="text" id="studentId" placeholder="Contoh: 001" required />
+          <label>Nama Siswa</label>
+          <input type="text" id="studentName" placeholder="Nama Lengkap Siswa" required />
+          <label>Kelas</label>
+          <input type="text" id="studentClass" placeholder="Contoh: 7A, 8B, 9C" required />
+          <button type="submit" id="addStudentButton">Tambah Siswa</button>
+          <button type="button" id="updateStudentButton" style="display:none;">Perbarui Siswa</button>
+          <p id="studentErrorMsg" class="error"></p>
+        </form>
 
-    <table>
-      <thead>
-        <tr>
-          <th>NO</th>
-          <th>MAPEL</th>
-          <th>KELAS</th>
-          <th>TOKEN</th>
-          <th>LINK</th>
-          <th>TOKEN DIBUKA</th>
-          <th>TOKEN DITUTUP</th>
-          <th>  STATUS  </th>
-          <th>AKSI</th>
-        </tr>
-      </thead>
-      <tbody id="tokenTableBody"></tbody>
-    </table>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 10px;">
+          <h3>DAFTAR SISWA</h3>
+          <div style="display: flex; gap: 10px;">
+            <button onclick="openImportStudentModal()" style="background: none; border: none; cursor: pointer; padding: 0; margin: 0;">
+                <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/impor.png" alt="Impor" style="width: 24px; height: 24px;">
+            </button>
+            <button onclick="openEmptyStudentsModal()" style="background: none; border: none; cursor: pointer; padding: 0; margin: 0;">
+                <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus%20total.png" alt="Kosongkan Daftar" style="width: 24px; height: 24px;">
+            </button>
+          </div>
+        </div>
 
+        <div class="student-filter-buttons">
+            <div class="dropdown" id="dropdownKelas7">
+                <button class="student-filter-button dropdown-toggle" onclick="toggleDropdown(event, 'dropdownKelas7')">Kelas 7 <span class="arrow">▼</span></button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="filterStudentsByClass('7A', 'dropdownKelas7'); event.stopPropagation();">7A</a>
+                    <a href="#" onclick="filterStudentsByClass('7B', 'dropdownKelas7'); event.stopPropagation();">7B</a>
+                    <a href="#" onclick="filterStudentsByClass('7C', 'dropdownKelas7'); event.stopPropagation();">7C</a>
+                    <a href="#" onclick="filterStudentsByClass('7D', 'dropdownKelas7'); event.stopPropagation();">7D</a>
+                    <a href="#" onclick="filterStudentsByClass('7E', 'dropdownKelas7'); event.stopPropagation();">7E</a>
+                    <a href="#" onclick="filterStudentsByClass('7F', 'dropdownKelas7'); event.stopPropagation();">7F</a>
+                    <a href="#" onclick="filterStudentsByClass('7_all', 'dropdownKelas7'); event.stopPropagation();">Semua Rombel 7</a>
+                </div>
+            </div>
+            <div class="dropdown" id="dropdownKelas8">
+                <button class="student-filter-button dropdown-toggle" onclick="toggleDropdown(event, 'dropdownKelas8')">Kelas 8 <span class="arrow">▼</span></button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="filterStudentsByClass('8A', 'dropdownKelas8'); event.stopPropagation();">8A</a>
+                    <a href="#" onclick="filterStudentsByClass('8B', 'dropdownKelas8'); event.stopPropagation();">8B</a>
+                    <a href="#" onclick="filterStudentsByClass('8C', 'dropdownKelas8'); event.stopPropagation();">8C</a>
+                    <a href="#" onclick="filterStudentsByClass('8D', 'dropdownKelas8'); event.stopPropagation();">8D</a>
+                    <a href="#" onclick="filterStudentsByClass('8E', 'dropdownKelas8'); event.stopPropagation();">8E</a>
+                    <a href="#" onclick="filterStudentsByClass('8F', 'dropdownKelas8'); event.stopPropagation();">8F</a>
+                    <a href="#" onclick="filterStudentsByClass('8_all', 'dropdownKelas8'); event.stopPropagation();">Semua Rombel 8</a>
+                </div>
+            </div>
+            <div class="dropdown" id="dropdownKelas9">
+                <button class="student-filter-button dropdown-toggle" onclick="toggleDropdown(event, 'dropdownKelas9')">Kelas 9 <span class="arrow">▼</span></button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="filterStudentsByClass('9A', 'dropdownKelas9'); event.stopPropagation();">9A</a>
+                    <a href="#" onclick="filterStudentsByClass('9B', 'dropdownKelas9'); event.stopPropagation();">9B</a>
+                    <a href="#" onclick="filterStudentsByClass('9C', 'dropdownKelas9'); event.stopPropagation();">9C</a>
+                    <a href="#" onclick="filterStudentsByClass('9D', 'dropdownKelas9'); event.stopPropagation();">9D</a>
+                    <a href="#" onclick="filterStudentsByClass('9E', 'dropdownKelas9'); event.stopPropagation();">9E</a>
+                    <a href="#" onclick="filterStudentsByClass('9F', 'dropdownKelas9'); event.stopPropagation();">9F</a>
+                    <a href="#" onclick="filterStudentsByClass('9_all', 'dropdownKelas9'); event.stopPropagation();">Semua Rombel 9</a>
+                </div>
+            </div>
+            <button id="showAllStudentsBtn" class="student-filter-button active" onclick="showAllStudents()" style="margin-left: auto;">Tampilkan Semua</button>
+        </div>
+
+
+        <table>
+          <thead>
+            <tr>
+              <th>NO</th>
+              <th>ID SISWA</th>
+              <th>NAMA</th>
+              <th>KELAS</th>
+              <th>STATUS</th> <th>AKSI</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody"></tbody>
+        </table>
+      </div>
+    </div>
     <div class="footer">
       <div>@Admin SMPN 2 Pajangan</div>
       <div id="adminDateTime" class="date-time"></div>
@@ -623,9 +893,109 @@
     </div>
   </div>
 
+  <div id="accessDetailModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <h4 id="accessDetailTokenTitle">Detail Akses Token: [Token]</h4>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>NO</th>
+              <th>ID SISWA</th>
+              <th>NAMA SISWA</th>
+              <th>KELAS</th>
+              <th>STATUS AKSES</th>
+              <th>WAKTU AKSES PERTAMA</th>
+            </tr>
+          </thead>
+          <tbody id="accessDetailTableBody">
+            </tbody>
+        </table>
+      </div>
+      <button onclick="closeAccessDetailModal()" style="margin-top: 20px;">Tutup</button>
+    </div>
+  </div>
+
+  <div id="editStudentModal" class="modal">
+    <div class="modal-content">
+      <h4>Edit Data Siswa</h4>
+      <p id="editStudentErrorMsg" class="error"></p>
+      <label for="modalStudentId">ID Siswa</label>
+      <input type="text" id="modalStudentId" required />
+      <label for="modalStudentName">Nama Siswa</label>
+      <input type="text" id="modalStudentName" required />
+      <label for="modalStudentClass">Kelas</label>
+      <input type="text" id="modalStudentClass" required />
+      <button onclick="confirmEditStudent()">Simpan</button>
+      <button onclick="closeEditStudentModal()">Batal</button>
+    </div>
+  </div>
+
+  <div id="deleteStudentConfirmModal" class="modal">
+    <div class="modal-content">
+      <p>Yakin ingin menghapus siswa ini?</p>
+      <button onclick="confirmDeleteStudent()">Hapus</button>
+      <button onclick="closeDeleteStudentConfirmModal()">Batal</button>
+    </div>
+  </div>
+
+  <div id="importStudentModal" class="modal">
+    <div class="modal-content">
+      <h4>Import Data Peserta dari csv</h4>
+      <p style="font-size: 0.9em; color: #555; text-align: left;">
+        Perhatikan hal-hal berikut!<br>
+        1. Siapkan data peserta dengan 3 kolom: ID Peserta (angka), Nama Lengkap, dan Kelas (misal: 7A, 8B, dsb)<br>
+        2. Simpan file dengan format *.csv (comma delimited)<br>
+        3. Pastikan tidak ada kolom tambahan
+      </p>
+      <a href="https://drive.google.com/uc?export=download&id=1hSJbLnLTq3F2wLAKKN7l9BNOQc04ypnX" target="_blank" style="display: block; text-align: center; margin: 15px 0; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px;">Unduh Template CSV</a>
+      <input type="file" id="csvFileInput" accept=".csv" style="margin-top: 15px; margin-bottom: 10px;" />
+      <p id="importFileError" class="error"></p>
+      <button onclick="processCsvFile()">Mulai Impor</button>
+      <button onclick="closeImportStudentModal()">Batal</button>
+    </div>
+  </div>
+
+  <div id="importResultModal" class="modal">
+    <div class="modal-content">
+      <h4>Hasil Impor Data Siswa</h4>
+      <p id="importResultSummary"></p>
+      <ul id="importResultDetails" style="text-align: left; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 5px;"></ul>
+      <button onclick="closeImportResultModal()">Tutup</button>
+    </div>
+  </div>
+
+  <div id="emptyStudentsModal" class="modal">
+    <div class="modal-content">
+      <h4>Kosongkan Daftar Peserta</h4>
+      <p>Anda yakin ingin menghapus <b>SEMUA</b> data peserta? Tindakan ini tidak dapat dibatalkan.</p>
+      <div>
+        <label for="emptyStudentsPassword">Password Admin:</label>
+        <input type="password" id="emptyStudentsPassword">
+        <p id="emptyStudentsPasswordError" class="error"></p>
+      </div>
+      <button onclick="confirmEmptyStudents()">Konfirmasi Hapus Semua</button>
+      <button onclick="closeEmptyStudentsModal()">Batal</button>
+    </div>
+  </div>
+
+  <div id="logoutConfirmModal" class="modal">
+    <div class="modal-content">
+      <h4>Konfirmasi Logout</h4>
+      <p>Anda yakin ingin keluar dari panel admin?</p>
+      <button onclick="confirmLogout()">Ya, Keluar</button>
+      <button onclick="closeLogoutModal()">Batal</button>
+    </div>
+  </div>
+
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="spinner"></div>
+  </div>
+
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, update, remove, runTransaction, get } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
     // Konfigurasi Firebase
     const firebaseConfig = {
@@ -646,17 +1016,26 @@
     const ADMIN_USER = "admin";
     const ADMIN_PASS = "12345678";
     let currentTokenId = null;
+    let currentStudentKey = null; // Untuk edit/hapus siswa
+    let deleteStudentKey = null; // Untuk konfirmasi hapus siswa
     let tokenCache = [];
+    let studentCache = []; // Cache untuk data siswa
+    let tokenAccessStatus = {}; // Cache untuk status akses token per siswa
     const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000; // 30 hari dalam milidetik
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus.png";
+    const DETAIL_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/detail.png"; // Icon untuk detail akses
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
     let inactivityTimer;
     const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // Batas waktu tidak aktif 1 jam
     let currentForceActiveTokenId = null;
+    let isImporting = false; // Flag untuk mencegah impor ganda
+    let currentStudentFilter = null; // Filter untuk daftar siswa (misal: '7A', '7_all', atau null untuk semua)
 
     // Referensi ke node 'setlokasi' di Firebase
     const settingsRef = ref(db, 'setlokasi');
+    const studentsRef = ref(db, 'students'); // Referensi ke node siswa
+    const examAccessStatusRef = ref(db, 'exam_access_status'); // Referensi ke node status akses ujian
 
     // Variabel untuk menyimpan status lokasi dan radius
     let isLocationEnabledAdmin = false;
@@ -669,6 +1048,86 @@
     const setlokasiModalElement = document.getElementById('setlokasiModal');
     const gantiRadiusModalElement = document.getElementById('gantiRadiusModal');
     const radiusMeterInputElement = document.getElementById('radiusMeter');
+
+    // Elemen HTML untuk Manajemen Siswa
+    const studentForm = document.getElementById('studentForm');
+    const studentIdInput = document.getElementById('studentId');
+    const studentNameInput = document.getElementById('studentName');
+    const studentClassInput = document.getElementById('studentClass');
+    const addStudentButton = document.getElementById('addStudentButton');
+    const updateStudentButton = document.getElementById('updateStudentButton');
+    const studentErrorMsg = document.getElementById('studentErrorMsg');
+    const studentTableBody = document.getElementById('studentTableBody');
+    const accessDetailModal = document.getElementById('accessDetailModal');
+    const accessDetailTableBody = document.getElementById('accessDetailTableBody');
+    const accessDetailTokenTitle = document.getElementById('accessDetailTokenTitle');
+
+    // Elemen HTML untuk Modal Edit Siswa
+    const editStudentModal = document.getElementById('editStudentModal');
+    const modalStudentIdInput = document.getElementById('modalStudentId');
+    const modalStudentNameInput = document.getElementById('modalStudentName');
+    const modalStudentClassInput = document.getElementById('modalStudentClass');
+    const editStudentErrorMsg = document.getElementById('editStudentErrorMsg');
+
+    // Elemen HTML untuk Modal Konfirmasi Hapus Siswa
+    const deleteStudentConfirmModal = document.getElementById('deleteStudentConfirmModal');
+    const emptyStudentsModal = document.getElementById('emptyStudentsModal');
+    const emptyStudentsPasswordInput = document.getElementById('emptyStudentsPassword');
+    const emptyStudentsPasswordError = document.getElementById('emptyStudentsPasswordError');
+
+    // Elemen HTML untuk Modal Impor Siswa
+    const importStudentModal = document.getElementById('importStudentModal');
+    const csvFileInput = document.getElementById('csvFileInput');
+    const importFileError = document.getElementById('importFileError');
+    const importResultModal = document.getElementById('importResultModal');
+    const importResultSummary = document.getElementById('importResultSummary');
+    const importResultDetails = document.getElementById('importResultDetails');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // Elemen HTML untuk Modal Logout
+    const logoutConfirmModal = document.getElementById('logoutConfirmModal');
+
+
+    // Elemen tombol navigasi dan header
+    const headerBlueBg = document.getElementById('headerBlueBg');
+    const dashboardNav = document.getElementById('dashboardNav');
+    const loginSection = document.getElementById('loginSection');
+    const dashboardContent = document.getElementById('dashboardContent');
+    const tokenMenuBtn = document.getElementById('tokenMenuBtn');
+    const lokasiMenuBtn = document.getElementById('lokasiMenuBtn');
+    const pesertaMenuBtn = document.getElementById('pesertaMenuBtn');
+    const showAllStudentsBtn = document.getElementById('showAllStudentsBtn');
+
+    // Helper function to pad student ID with leading zeros
+    function padStudentId(id) {
+        return String(id).padStart(3, '0');
+    }
+
+    // Fungsi untuk menampilkan/menyembunyikan bagian dashboard
+    window.showSection = (sectionId) => {
+        // Sembunyikan semua bagian konten dashboard
+        document.querySelectorAll('.dashboard-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        // Tampilkan bagian yang dipilih
+        document.getElementById(sectionId).style.display = 'block';
+
+        // Atur gaya tombol navigasi
+        document.querySelectorAll('.dashboard-nav-wrapper button').forEach(button => {
+            button.classList.remove('active');
+        });
+        if (sectionId === 'tokenSection') {
+            tokenMenuBtn.classList.add('active');
+            renderTokenTable(); // Render ulang tabel token
+        } else if (sectionId === 'locationSection') {
+            lokasiMenuBtn.classList.add('active');
+            updateSetlokasiStatusDisplay(); // Perbarui tampilan lokasi
+        } else if (sectionId === 'studentSection') {
+            pesertaMenuBtn.classList.add('active');
+            // Reset filter saat masuk ke bagian siswa
+            showAllStudents();
+        }
+    };
 
     // Fungsi untuk menampilkan notifikasi
     function showNotification(message) {
@@ -686,37 +1145,115 @@
       const p = document.getElementById("password").value.trim();
       if(u === ADMIN_USER && p === ADMIN_PASS) {
         localStorage.setItem('isAdminLoggedIn', 'true');
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
+        loginSection.style.display = 'none'; // Sembunyikan login section
+        dashboardContent.style.display = 'block'; // Tampilkan dashboard content
+        dashboardNav.style.display = 'block'; // Tampilkan navigasi dashboard
+        
+        // Hitung dan atur padding-top body
+        const headerHeight = headerBlueBg.offsetHeight;
+        const navHeight = dashboardNav.offsetHeight;
+        document.body.style.paddingTop = `${headerHeight + navHeight}px`; // padding-top = tinggi header + tinggi nav
+        dashboardNav.style.top = `${headerHeight}px`; // Posisikan nav di bawah header
+        
         loadTokens();
+        loadStudents(); // Muat data siswa saat login
         loadSetlokasiSettings(); // Muat pengaturan lokasi saat login
+        showSection('tokenSection'); // Tampilkan bagian token secara default
         resetInactivityTimer(); // Mulai timer tidak aktif setelah login berhasil
       } else {
         document.getElementById("loginError").innerText = "Username atau password salah.";
       }
     };
 
-    // Fungsi untuk menangani logout pengguna
-    window.logout = () => {
+    // Fungsi untuk menampilkan modal konfirmasi logout
+    window.promptLogout = () => {
+        logoutConfirmModal.style.display = 'flex';
+    };
+
+    // Fungsi untuk mengkonfirmasi logout
+    window.confirmLogout = () => {
       localStorage.removeItem('isAdminLoggedIn');
-      document.getElementById('adminPanel').style.display = 'none';
-      document.getElementById('loginSection').style.display = 'block';
+      dashboardContent.style.display = 'none'; // Sembunyikan dashboard content
+      dashboardNav.style.display = 'none'; // Sembunyikan navigasi dashboard
+      document.body.style.paddingTop = `${headerBlueBg.offsetHeight + 20}px`; // Padding untuk header biru + jarak 20px ke login content
+      loginSection.style.display = 'block'; // Tampilkan login section
       document.getElementById('password').value = ''; // Kosongkan password saat logout
       showNotification('Anda telah logout.');
+      closeLogoutModal();
     };
+
+    // Fungsi untuk menutup modal konfirmasi logout
+    window.closeLogoutModal = () => {
+        logoutConfirmModal.style.display = 'none';
+    };
+
+    // Fungsi untuk merender/memperbarui tabel token
+    function renderTokenTable() {
+        const tbody = document.getElementById('tokenTableBody');
+        tbody.innerHTML = ''; // Hapus baris yang ada
+
+        let sortedCounter = 0;
+        tokenCache.forEach(data => {
+            sortedCounter++;
+            const row = document.createElement('tr');
+            row.dataset.tokenKey = data.key;
+            const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+            const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+            let tokenDisplay = data.token;
+            if (data.isForceActive) {
+                tokenDisplay = `<strong style="color: #0066cc;">${data.token}</strong>`;
+            } else if (data.isActive) {
+                tokenDisplay = `<strong style="color: green;">${data.token}</strong>`;
+            }
+            let forceActiveIconsHTML = '';
+            if (data.isForceActive) {
+                forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceInactive('${data.key}')">`;
+            } else {
+                if (data.isActive) {
+                    forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceInactive('${data.key}')">`;
+                } else {
+                    forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/kunci.png" alt="Aktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceActive('${data.key}')">`;
+                }
+            }
+
+            // Dapatkan jumlah siswa yang mengakses token ini
+            const accessedStudents = tokenAccessStatus[data.key] ? Object.keys(tokenAccessStatus[data.key]).length : 0;
+
+            row.innerHTML = `
+                <td>${sortedCounter}</td>
+                <td>${data.subject}</td>
+                <td>${data.kelas}</td>
+                <td>${tokenDisplay}</td>
+                <td><a href="#" onclick="trackAndOpenLinkDemo('${data.key}', '${data.url}')">Link</a></td>
+                <td>${startTimeFormatted}</td>
+                <td>${endTimeFormatted}</td>
+                <td style="text-align: center;">
+                  <span style="color: ${data.isActive ? 'green' : 'grey'}; font-weight: bold;">${data.isActive ? 'ON' : 'OFF'}</span>
+                  ${forceActiveIconsHTML}
+                </td>
+                <td style="text-align: center;">${accessedStudents}</td>
+                <td style="text-align: center;">
+                  <div class="student-action-buttons">
+                    <button onclick="editToken('${data.key}')">
+                      <img src="${EDIT_ICON_URL}" alt="Edit">
+                    </button>
+                    <button onclick="promptDelete('${data.key}')">
+                      <img src="${DELETE_ICON_URL}" alt="Hapus">
+                    </button>
+                  </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
 
     // Fungsi untuk memuat token dari Firebase
     function loadTokens() {
       onValue(ref(db, 'tokens'), (snapshot) => {
-        const tbody = document.getElementById('tokenTableBody');
-        tbody.innerHTML = '';
         tokenCache = [];
-
         snapshot.forEach(child => {
           const data = child.val();
           data.key = child.key;
-          tokenCache.push(data);
-
           // Hapus token yang lebih lama dari 30 hari
           if (data.createdAt && (Date.now() - data.createdAt) > THIRTY_DAYS_IN_MS) {
             remove(ref(db, 'tokens/' + data.key))
@@ -724,6 +1261,7 @@
               .catch(error => console.error(`Gagal hapus ${data.key}: `, error));
             return;
           }
+          tokenCache.push(data);
         });
 
         // Urutkan token berdasarkan startTime terlebih dahulu, kemudian berdasarkan kelas
@@ -745,72 +1283,87 @@
           return 0;
         });
 
-        let sortedCounter = 0;
-        tokenCache.forEach(data => {
-          sortedCounter++;
-          const row = document.createElement('tr');
-          row.dataset.tokenKey = data.key;
-          const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-          const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-          let tokenDisplay = data.token;
-          if (data.isForceActive) {
-            tokenDisplay = `<strong style="color: #0066cc;">${data.token}</strong>`;
-          } else if (data.isActive) {
-            tokenDisplay = `<strong style="color: green;">${data.token}</strong>`;
-          }
-          let forceActiveIconsHTML = '';
-          if (data.isForceActive) {
-            forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceInactive('${data.key}')">`;
-          } else {
-            if (data.isActive) {
-              forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceInactive('${data.key}')">`;
-            } else {
-              forceActiveIconsHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/kunci.png" alt="Aktifkan Paksa" style="width: 16px; height: 16px; cursor: pointer; vertical-align: middle; margin-left: 2px;" onclick="promptForceActive('${data.key}')">`;
-            }
-          }
-
-          row.innerHTML = `
-            <td>${sortedCounter}</td>
-            <td>${data.subject}</td>
-            <td>${data.kelas}</td>
-            <td>${tokenDisplay}</td>
-            <td><a href="${data.url}" target="_blank">Link</a></td>
-            <td>${startTimeFormatted}</td>
-            <td>${endTimeFormatted}</td>
-            <td style="text-align: center;">
-              <span style="color: ${data.isActive ? 'green' : 'grey'}; font-weight: bold;">${data.isActive ? 'ON' : 'OFF'}</span>
-              ${forceActiveIconsHTML}
-            </td>
-            <td>
-              <div class="dropdown">
-                <button class="dropdown-button">
-                  <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/dropdown.png" alt="Aksi" style="width: 16px; height: 16px; vertical-align: middle;">
-                </button>
-                <div class="dropdown-content">
-                  <a href="#" onclick="editToken('${data.key}')" style="display: flex; align-items: center; padding: 6px 8px;">
-                    <img src="${EDIT_ICON_URL}" alt="Edit" style="width: 16px; height: 16px; margin-right: -1px; vertical-align: middle;">
-                  </a>
-                  <a href="#" onclick="promptDelete('${data.key}')" style="display: flex; align-items: center; padding: 6px 8px;">
-                    <img src="${DELETE_ICON_URL}" alt="Hapus" style="width: 16px; height: 16px; margin-right: 0px; vertical-align: middle;">
-                  </a>
-                </div>
-              </div>
-            </td>
-          `;
-          document.getElementById('tokenTableBody').appendChild(row);
-        });
+        renderTokenTable(); // Render ulang tabel setelah token dimuat/diurutkan
         clearInterval(statusCheckInterval);
         statusCheckInterval = setInterval(periksaAndUpdateStatusToken, 10000); // Periksa setiap 10 detik
         periksaAndUpdateStatusToken();
       });
     }
 
+    // Listener untuk status akses token per siswa
+    onValue(examAccessStatusRef, (snapshot) => {
+        tokenAccessStatus = snapshot.val() || {};
+        renderTokenTable(); // Render ulang tabel token untuk memperbarui jumlah akses
+        renderStudentTable(); // Perbarui juga tabel siswa untuk status akses
+    });
+
+    // Fungsi untuk mencatat akses link dan membukanya (DEMO untuk admin panel)
+    // Dalam aplikasi siswa, fungsi ini akan dipanggil setelah token digabungkan dengan ID siswa
+    window.trackAndOpenLinkDemo = (tokenId, actualUrl) => {
+        const studentIdDemo = prompt("Masukkan ID Siswa untuk simulasi akses (misal: 001, 002):");
+        if (!studentIdDemo) {
+            showNotification("Akses dibatalkan. ID Siswa diperlukan untuk simulasi.");
+            return;
+        }
+
+        const student = studentCache.find(s => s.id === padStudentId(studentIdDemo)); // Pad input ID
+        if (!student) {
+            showNotification(`ID Siswa '${padStudentId(studentIdDemo)}' tidak ditemukan. Harap tambahkan siswa terlebih dahulu.`);
+            return;
+        }
+
+        const token = tokenCache.find(t => t.key === tokenId);
+        if (!token) {
+            showNotification("Token tidak ditemukan."); // Seharusnya tidak terjadi jika tokenId valid
+            return;
+        }
+
+        // Ekstrak bagian angka dari kelas siswa (misal: '7' dari '7A')
+        const studentClassNumericMatch = student.class.match(/\d+/);
+        const studentClassNumeric = studentClassNumericMatch ? studentClassNumericMatch[0] : null;
+
+        // Bandingkan bagian angka kelas siswa dengan kelas umum token
+        // Validasi ini tetap ada karena ini adalah simulasi akses token,
+        // yang mana token memang dikaitkan dengan kelas tertentu.
+        if (!studentClassNumeric || studentClassNumeric !== token.kelas) {
+            showNotification(`Akses ditolak: Siswa dari kelas ${student.class} tidak dapat mengakses token untuk kelas ${token.kelas}.`);
+            return;
+        }
+
+        const tokenAccessRef = ref(db, `exam_access_status/${tokenId}/${student.id}`); // Use padded student.id
+
+        runTransaction(tokenAccessRef, (currentAccess) => {
+            if (currentAccess === null) {
+                // Akses pertama oleh siswa ini untuk token ini
+                return {
+                    firstAccessTime: Date.now(),
+                    lastAccessTime: Date.now()
+                };
+            } else {
+                // Akses berikutnya oleh siswa ini untuk token ini
+                currentAccess.lastAccessTime = Date.now();
+                return currentAccess;
+            }
+        })
+        .then(() => {
+            console.log(`Akses token ${tokenId} oleh siswa ${student.id} berhasil dicatat.`);
+            showNotification(`Siswa ${student.id} dari kelas ${student.class} berhasil mengakses token ${token.token} (kelas ${token.kelas}).`);
+            window.open(actualUrl, '_blank');
+        })
+        .catch(error => {
+            console.error("Gagal mencatat akses token:", error);
+            showNotification('Gagal mencatat akses token, namun ujian akan tetap dibuka.');
+            window.open(actualUrl, '_blank');
+        });
+    };
+
+
     // Event listener untuk pengiriman formulir token
     document.getElementById('tokenForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const s = document.getElementById('subject').value.trim().toUpperCase();
       const k = document.getElementById('kelas').value.trim();
-      const t = document.getElementById('token').value.trim().toUpperCase();
+      const t = document.getElementById('token').value.trim().toUpperCase(); // Ini adalah base token
       const u = document.getElementById('url').value.trim();
       const st = document.getElementById('startTime').value;
       const et = document.getElementById('endTime').value;
@@ -827,9 +1380,10 @@
         return;
       }
 
+      // Periksa duplikasi base token saja
       const isTokenDup = tokenCache.some(item => item.token === t);
       if (isTokenDup) {
-        em.innerText = "Token sudah ada!";
+        em.innerText = "Token (Base Token) sudah ada!";
         return;
       }
 
@@ -931,10 +1485,14 @@
     window.confirmDelete = () => {
       if (deleteId) {
         remove(ref(db, 'tokens/' + deleteId))
+          .then(() => {
+            // Hapus juga status akses terkait token ini
+            remove(ref(db, `exam_access_status/${deleteId}`));
+            showNotification('Token berhasil dihapus!');
+          })
           .catch(err => alert("Gagal menghapus token: " + err.message))
           .finally(() => {
             closeDeleteModal();
-            showNotification('Token berhasil dihapus!');
           });
       }
     };
@@ -989,7 +1547,7 @@
       document.getElementById('forceActiveModal').style.display = 'flex';
     };
 
-    // Fungsi untuk meminta konfirmasi penonaktifan paksa token
+    // Fungsi untuk meminta konfirmasi penonaktifkan paksa token
     window.promptForceInactive = (tokenId) => {
       currentForceActiveTokenId = tokenId;
       document.getElementById('forceInactiveModal').style.display = 'flex';
@@ -1009,10 +1567,7 @@
         update(ref(db, 'tokens/' + currentForceActiveTokenId), { isForceActive: true, isActive: true })
           .then(() => {
             showNotification('Token dipaksa aktif!');
-            const iconsDiv = document.getElementById(`forceActiveIcons-${currentForceActiveTokenId}`);
-            if (iconsDiv) {
-              iconsDiv.innerHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceInactive('${currentForceActiveTokenId}')">`;
-            }
+            // Render ulang tabel akan ditangani oleh onValue listener untuk 'tokens'
           })
           .catch(error => {
             console.error("Gagal mengaktifkan status paksa: ", error);
@@ -1036,22 +1591,13 @@
       currentForceActiveTokenId = null;
     };
 
-    // Fungsi untuk mengkonfirmasi penonaktifan paksa token
+    // Fungsi untuk mengkonfirmasi penonaktifkan paksa token
     window.confirmForceInactive = () => {
       if (currentForceActiveTokenId) {
         update(ref(db, 'tokens/' + currentForceActiveTokenId), { isForceActive: false })
           .then(() => {
             showNotification('Token paksa aktif dinonaktifkan!');
-            // Perbarui tampilan ikon
-            const iconsDiv = document.getElementById(`forceActiveIcons-${currentForceActiveTokenId}`);
-            const tokenData = tokenCache.find(item => item.key === currentForceActiveTokenId);
-            if (iconsDiv && tokenData) {
-              if (tokenData.isActive) {
-                iconsDiv.innerHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/gembok.png" alt="Nonaktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceInactive('${currentForceActiveTokenId}')">`;
-              } else {
-                iconsDiv.innerHTML = `<img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/kunci.png" alt="Aktifkan Paksa" style="width: 20px; height: 20px; cursor: pointer;" onclick="promptForceActive('${currentForceActiveTokenId}')">`;
-              }
-            }
+            // Render ulang tabel akan ditangani oleh onValue listener untuk 'tokens'
           })
           .catch(error => {
             console.error("Gagal menonaktifkan status paksa: ", error);
@@ -1064,7 +1610,7 @@
       }
     };
 
-    // Fungsi untuk menutup modal penonaktifan paksa
+    // Fungsi untuk menutup modal penonaktifkan paksa
     window.closeForceInactiveModal = () => {
       document.getElementById('forceInactiveModal').style.display = 'none';
       currentForceActiveTokenId = null;
@@ -1087,22 +1633,12 @@
           try {
             await update(ref(db, 'tokens/' + tokenData.key), { isActive: newIsActive });
             console.log(`Token ${tokenData.key} status diperbarui menjadi ${newIsActive ? 'aktif' : 'nonaktif'}.`);
-            // Tidak perlu loadTokens() di sini, onValue akan menangani pembaruan
-            // Kita bisa memperbarui tampilan baris di sini jika perlu sinkronisasi cepat
-            const row = document.querySelector(`#tokenTableBody tr[data-token-key="${tokenData.key}"]`);
-            if (row) {
-              const statusSpan = row.querySelector('td:nth-child(8) span');
-              if (statusSpan) {
-                statusSpan.innerText = newIsActive ? 'ON' : 'OFF';
-                statusSpan.style.color = newIsActive ? 'green' : 'grey';
-              }
-            }
+            // Render ulang tabel akan ditangani oleh onValue listener untuk 'tokens'
           } catch (error) {
             console.error(`Gagal memperbarui status token ${tokenData.key}: `, error);
           }
         }
       }
-      // Tidak perlu loadTokens() di sini, onValue akan dipanggil secara otomatis
     }
 
     // Fungsi untuk memperbarui tampilan waktu saat ini
@@ -1131,9 +1667,11 @@
     // Fungsi untuk menangani logout karena tidak aktif
     function logoutDueToInactivity() {
       localStorage.removeItem('isAdminLoggedIn');
-      document.getElementById('adminPanel').style.display = 'none';
-      document.getElementById('loginSection').style.display = 'block';
-      document.getElementById('password').value = ''; // Kosongkan password saat logout otomatis
+      dashboardContent.style.display = 'none';
+      dashboardNav.style.display = 'none';
+      document.body.style.paddingTop = `${headerBlueBg.offsetHeight + 20}px`; // Padding untuk header biru + jarak 20px ke login content
+      loginSection.style.display = 'block';
+      document.getElementById('password').value = '';
       showNotification('Anda telah logout karena tidak ada aktivitas, masukan password kembali!.');
     }
 
@@ -1143,26 +1681,31 @@
     window.addEventListener('scroll', resetInactivityTimer);
     window.addEventListener('click', resetInactivityTimer);
 
-    // Fungsi untuk memulai timer tidak aktif saat halaman dimuat
-    function startInactivityTimerOnLoad() {
-      if (localStorage.getItem('isAdminLoggedIn') === 'true') {
-        resetInactivityTimer();
-      }
-    }
-
-    window.addEventListener('load', startInactivityTimerOnLoad);
-
     // Logika pemuatan halaman awal
     window.onload = function() {
+      // Atur padding-top body agar konten login tidak tertutup header biru
+      document.body.style.paddingTop = `${headerBlueBg.offsetHeight + 20}px`;
+
       if (localStorage.getItem('isAdminLoggedIn') === 'true') {
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
+        loginSection.style.display = 'none';
+        dashboardContent.style.display = 'block';
+        dashboardNav.style.display = 'block';
+        
+        // Hitung dan atur padding-top body dan posisi nav
+        const headerHeight = headerBlueBg.offsetHeight;
+        const navHeight = dashboardNav.offsetHeight;
+        document.body.style.paddingTop = `${headerHeight + navHeight}px`; // padding-top = tinggi header + tinggi nav
+        dashboardNav.style.top = `${headerHeight}px`;
+        
         loadTokens();
-        loadSetlokasiSettings(); // Muat pengaturan lokasi saat halaman dimuat
+        loadStudents();
+        loadSetlokasiSettings();
+        showSection('tokenSection'); // Tampilkan bagian token secara default
         resetInactivityTimer();
       } else {
-        document.getElementById('loginSection').style.display = 'block';
-        document.getElementById('adminPanel').style.display = 'none';
+        loginSection.style.display = 'block';
+        dashboardContent.style.display = 'none';
+        dashboardNav.style.display = 'none';
       }
     };
 
@@ -1177,7 +1720,7 @@
       const statusColor = isLocationEnabledAdmin ? 'green' : 'red';
 
       row.innerHTML = `
-        <td><a href="https://www.google.com/maps/search/?api=1&query=${defaultLocationCoordinate}" target="_blank">${defaultLocationCoordinate}</a></td>
+        <td><a href="http://maps.google.com/?q=${defaultLocationCoordinate}" target="_blank">${defaultLocationCoordinate}</a></td>
         <td>${allowedRadiusMeterAdmin}m</td>
         <td style="color: ${statusColor}; font-weight: bold;">${statusText}</td>
         <td>
@@ -1278,6 +1821,594 @@
         }
       });
     }
+
+    // Fungsi untuk membuka modal detail akses token
+    window.openAccessDetailModal = async (tokenId, tokenValue) => {
+        accessDetailTokenTitle.innerText = `Detail Akses Token: ${tokenValue}`;
+        accessDetailTableBody.innerHTML = '<tr><td colspan="6">Memuat data...</td></tr>';
+        accessDetailModal.style.display = 'flex';
+
+        try {
+            const accessSnapshot = await get(ref(db, `exam_access_status/${tokenId}`));
+            const accessData = accessSnapshot.val();
+
+            accessDetailTableBody.innerHTML = ''; // Clear loading message
+
+            if (accessData) {
+                let counter = 0;
+                // Sort access data by student ID for consistent display
+                const sortedStudentIds = Object.keys(accessData).sort((a, b) => a.localeCompare(b));
+
+                for (const studentId of sortedStudentIds) {
+                    counter++;
+                    const studentAccess = accessData[studentId];
+                    const studentInfo = studentCache.find(s => s.id === studentId); // Find student info from cache
+
+                    const studentName = studentInfo ? studentInfo.name : 'Tidak Ditemukan';
+                    const studentClass = studentInfo ? studentInfo.class : 'Tidak Ditemukan';
+                    const firstAccessTime = studentAccess.firstAccessTime ? new Date(studentAccess.firstAccessTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+
+                    // Determine status based on current active tokens
+                    let statusAccess = 'Tidak Aktif';
+                    const activeTokens = tokenCache.filter(token => token.isActive);
+                    for (const activeToken of activeTokens) {
+                        if (activeToken.key === tokenId && studentAccess) { // Check if this specific token is active and has access data
+                            statusAccess = 'Sedang Aktif';
+                            break;
+                        }
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${counter}</td>
+                        <td>${studentId}</td>
+                        <td>${studentName}</td>
+                        <td>${studentClass}</td>
+                        <td>${statusAccess}</td>
+                        <td>${firstAccessTime}</td>
+                    `;
+                    accessDetailTableBody.appendChild(row);
+                }
+            } else {
+                accessDetailTableBody.innerHTML = '<tr><td colspan="6">Tidak ada data akses untuk token ini.</td></tr>';
+            }
+        } catch (error) {
+            console.error("Error loading access details:", error);
+            accessDetailTableBody.innerHTML = '<tr><td colspan="6" style="color: red;">Gagal memuat detail akses.</td></tr>';
+        }
+    };
+
+    // Fungsi untuk menutup modal detail akses token
+    window.closeAccessDetailModal = () => {
+        accessDetailModal.style.display = 'none';
+        accessDetailTableBody.innerHTML = '';
+    };
+
+    /* --- Fungsi-fungsi Manajemen Siswa --- */
+
+    // Fungsi untuk merender/memperbarui tabel siswa
+    async function renderStudentTable() {
+        studentTableBody.innerHTML = '';
+        let counter = 0;
+
+        const activeTokens = tokenCache.filter(token => token.isActive);
+        const hasActiveTokens = activeTokens.length > 0;
+
+        let studentsToDisplay = studentCache;
+
+        // Apply filter if active
+        if (currentStudentFilter) {
+            if (currentStudentFilter.endsWith('_all')) {
+                const classPrefix = currentStudentFilter.split('_')[0]; // e.g., '7'
+                studentsToDisplay = studentCache.filter(student => student.class.startsWith(classPrefix));
+            } else {
+                // Exact class match (e.g., '7A')
+                studentsToDisplay = studentCache.filter(student => student.class === currentStudentFilter);
+            }
+        }
+
+        // Urutkan studentsToDisplay sebelum merender
+        studentsToDisplay.sort((a, b) => {
+            // Helper function to extract numeric and alphabetic parts
+            const extractClassParts = (className) => {
+                const match = className.match(/^(\d+)([A-Z]+)$/);
+                if (match) {
+                    return { num: parseInt(match[1]), char: match[2] };
+                }
+                return { num: 0, char: className }; // Fallback for unexpected formats
+            };
+
+            const classA = extractClassParts(a.class);
+            const classB = extractClassParts(b.class);
+
+            // Primary sort by numeric part of class
+            if (classA.num !== classB.num) {
+                return classA.num - classB.num;
+            }
+
+            // Secondary sort by alphabetic part of class if numeric parts are equal
+            if (classA.char !== classB.char) {
+                return classA.char.localeCompare(b.char);
+            }
+
+            // Tertiary sort by full name if classes are identical
+            return a.name.localeCompare(b.name);
+        });
+
+
+        for (const student of studentsToDisplay) {
+            counter++;
+            const row = document.createElement('tr');
+
+            let studentStatus = 'Belum Aktif';
+            let statusColor = 'red';
+
+            // Extract the numeric part of the student's class (e.g., '7' from '7A')
+            const studentClassNumericMatch = student.class.match(/\d+/);
+            const studentClassNumeric = studentClassNumericMatch ? studentClassNumericMatch[0] : null;
+
+            let foundRelevantActiveToken = false;
+
+            if (studentClassNumeric) {
+                // Check if there's any active token relevant to this student's class
+                for (const activeToken of activeTokens) {
+                    if (activeToken.kelas === studentClassNumeric) {
+                        foundRelevantActiveToken = true;
+                        // Check if this specific student has accessed this specific active token
+                        if (tokenAccessStatus[activeToken.key] && tokenAccessStatus[activeToken.key][student.id]) {
+                            studentStatus = 'Sedang Aktif';
+                            statusColor = 'green';
+                            break; // Found an active token relevant to their class that they accessed
+                        }
+                    }
+                }
+            }
+
+            if (!foundRelevantActiveToken) {
+                studentStatus = '-'; // No active token for their class, or class could not be parsed
+                statusColor = 'grey';
+            } else if (studentStatus === 'Belum Aktif' && foundRelevantActiveToken) {
+                // This means a relevant active token exists, but the student hasn't accessed it
+                studentStatus = 'Belum Aktif'; // Keep as "Belum Aktif"
+            }
+
+            row.innerHTML = `
+                <td>${counter}</td>
+                <td>${student.id}</td>
+                <td>${student.name}</td>
+                <td>${student.class}</td>
+                <td style="color: ${statusColor}; font-weight: bold;">${studentStatus}</td>
+                <td>
+                    <div class="student-action-buttons">
+                        <button onclick="openEditStudentModal('${student.key}')">
+                            <img src="${EDIT_ICON_URL}" alt="Edit">
+                        </button>
+                        <button onclick="openDeleteStudentConfirmModal('${student.key}')">
+                            <img src="${DELETE_ICON_URL}" alt="Hapus">
+                        </button>
+                    </div>
+                </td>
+            `;
+            studentTableBody.appendChild(row);
+        }
+    }
+
+    // Fungsi untuk memuat data siswa dari Firebase
+    function loadStudents() {
+        onValue(studentsRef, (snapshot) => {
+            studentCache = [];
+            snapshot.forEach(child => {
+                const data = child.val();
+                data.key = child.key; // Simpan Firebase key
+                studentCache.push(data);
+            });
+            // Sorting and rendering will now happen inside renderStudentTable to ensure it's always sorted before display
+            renderStudentTable();
+        });
+    }
+
+    // Event listener untuk form tambah/edit siswa
+    studentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const studentId = padStudentId(studentIdInput.value.trim()); // Pad ID
+        const studentName = studentNameInput.value.trim().toUpperCase(); // Otomatis kapital
+        const studentClass = studentClassInput.value.trim().toUpperCase(); // Otomatis kapital
+        studentErrorMsg.innerText = "";
+
+        // Validasi ID Siswa (harus angka)
+        if (!/^\d+$/.test(studentId)) { // Validasi setelah padding, tapi padStudentId sudah memastikan format string
+            studentErrorMsg.innerText = "ID Siswa harus berupa angka!";
+            return;
+        }
+
+        // Periksa duplikasi ID siswa
+        const isIdDup = studentCache.some(s => s.id === studentId && s.key !== currentStudentKey);
+        if (isIdDup) {
+            studentErrorMsg.innerText = "ID Siswa sudah ada!";
+            return;
+        }
+
+        if (currentStudentKey) {
+            // Mode Edit (ini seharusnya tidak dipanggil dari sini lagi setelah ada modal edit)
+            // Namun, jika tombol updateStudentButton tetap ada, ini akan menangani submit form
+            update(ref(db, 'students/' + currentStudentKey), { id: studentId, name: studentName, class: studentClass })
+                .then(() => {
+                    showNotification('Data siswa berhasil diperbarui.');
+                    studentForm.reset();
+                    addStudentButton.style.display = 'block';
+                    updateStudentButton.style.display = 'none';
+                    currentStudentKey = null;
+                })
+                .catch(error => {
+                    studentErrorMsg.innerText = "Gagal memperbarui siswa: " + error.message;
+                });
+        } else {
+            // Mode Tambah
+            push(studentsRef, { id: studentId, name: studentName, class: studentClass }) 
+                .then(() => {
+                    showNotification('Siswa berhasil ditambahkan.');
+                    studentForm.reset();
+                })
+                .catch(error => {
+                    studentErrorMsg.innerText = "Gagal menambahkan siswa: " + error.message;
+                });
+        }
+    });
+
+    // Fungsi untuk membuka modal edit siswa
+    window.openEditStudentModal = (key) => {
+        const student = studentCache.find(s => s.key === key);
+        if (!student) return;
+
+        currentStudentKey = key; // Simpan key siswa yang sedang diedit
+        modalStudentIdInput.value = student.id;
+        modalStudentNameInput.value = student.name;
+        modalStudentClassInput.value = student.class;
+        editStudentErrorMsg.innerText = ""; // Bersihkan pesan error sebelumnya
+        editStudentModal.style.display = 'flex';
+    };
+
+    // Fungsi untuk mengkonfirmasi edit siswa dari modal
+    window.confirmEditStudent = () => {
+        const studentId = padStudentId(modalStudentIdInput.value.trim()); // Pad ID
+        const studentName = modalStudentNameInput.value.trim().toUpperCase();
+        const studentClass = modalStudentClassInput.value.trim().toUpperCase();
+        editStudentErrorMsg.innerText = "";
+
+        if (!studentId || !studentName || !studentClass) {
+            editStudentErrorMsg.innerText = "Semua field harus diisi!";
+            return;
+        }
+
+        if (!/^\d+$/.test(studentId)) {
+            editStudentErrorMsg.innerText = "ID Siswa harus berupa angka!";
+            return;
+        }
+
+        const isIdDup = studentCache.some(s => s.id === studentId && s.key !== currentStudentKey);
+        if (isIdDup) {
+            editStudentErrorMsg.innerText = "ID Siswa sudah ada!";
+            return;
+        }
+
+        if (currentStudentKey) {
+            update(ref(db, 'students/' + currentStudentKey), { id: studentId, name: studentName, class: studentClass })
+                .then(() => {
+                    showNotification('Data siswa berhasil diperbarui.');
+                    closeEditStudentModal();
+                })
+                .catch(error => {
+                    editStudentErrorMsg.innerText = "Gagal memperbarui siswa: " + error.message;
+                });
+        }
+    };
+
+    // Fungsi untuk menutup modal edit siswa
+    window.closeEditStudentModal = () => {
+        editStudentModal.style.display = 'none';
+        editStudentErrorMsg.innerText = "";
+        currentStudentKey = null; // Reset key siswa yang sedang diedit
+    };
+
+    // Fungsi untuk membuka modal konfirmasi hapus siswa
+    window.openDeleteStudentConfirmModal = (key) => {
+        deleteStudentKey = key; // Simpan key siswa yang akan dihapus
+        deleteStudentConfirmModal.style.display = 'flex';
+    };
+
+    // Fungsi untuk mengkonfirmasi hapus siswa
+    window.confirmDeleteStudent = () => {
+        if (deleteStudentKey) {
+            remove(ref(db, 'students/' + deleteStudentKey))
+                .then(() => {
+                    showNotification('Siswa berhasil dihapus.');
+                    closeDeleteStudentConfirmModal();
+                })
+                .catch(error => {
+                    showNotification("Gagal menghapus siswa: " + error.message);
+                    closeDeleteStudentConfirmModal();
+                });
+        }
+    };
+
+    // Fungsi untuk menutup modal konfirmasi hapus siswa
+    window.closeDeleteStudentConfirmModal = () => {
+        deleteStudentConfirmModal.style.display = 'none';
+        deleteStudentKey = null; // Reset key siswa yang akan dihapus
+    };
+
+    // --- Fungsi Impor Siswa dari CSV ---
+
+    // Fungsi untuk membuka modal impor siswa
+    window.openImportStudentModal = () => {
+        importStudentModal.style.display = 'flex';
+        csvFileInput.value = ''; // Bersihkan input file
+        importFileError.innerText = ''; // Bersihkan pesan error
+    };
+
+    // Fungsi untuk menutup modal impor siswa
+    window.closeImportStudentModal = () => {
+        importStudentModal.style.display = 'none';
+    };
+
+    // Fungsi untuk menutup modal hasil impor
+    window.closeImportResultModal = () => {
+        importResultModal.style.display = 'none';
+        importResultSummary.innerText = '';
+        importResultDetails.innerHTML = '';
+    };
+
+    // Fungsi untuk memproses file CSV
+    window.processCsvFile = async () => {
+        if (isImporting) {
+            showNotification('Proses impor sedang berjalan, harap tunggu.');
+            return;
+        }
+
+        const file = csvFileInput.files[0];
+        if (!file) {
+            importFileError.innerText = 'Pilih file CSV terlebih dahulu.';
+            return;
+        }
+
+        if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+            importFileError.innerText = 'File harus berformat CSV.';
+            return;
+        }
+
+        importFileError.innerText = '';
+        isImporting = true; // Set flag to true
+        loadingOverlay.style.display = 'flex'; // Tampilkan loading spinner
+
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+            const text = e.target.result;
+            const lines = text.split('\n').filter(line => line.trim() !== '');
+
+            let importedCount = 0;
+            let skippedCount = 0;
+            let errorDetails = [];
+            
+            // Object to hold all updates for a single batch operation
+            const studentsToBatchUpdate = {};
+
+            // Mulai pembacaan dari baris kedua (indeks 1) untuk mengabaikan header
+            const dataLines = lines.slice(1); 
+
+            for (let i = 0; i < dataLines.length; i++) {
+                const line = dataLines[i];
+                // Try splitting by comma first
+                let parts = line.split(',');
+                let delimiter = ',';
+
+                // If comma split doesn't yield 3 parts, try semicolon
+                if (parts.length !== 3) {
+                    parts = line.split(';');
+                    delimiter = ';';
+                }
+
+                const originalLineNumber = i + 2; // Nomor baris asli di file CSV (karena kita slice(1))
+
+                if (parts.length !== 3) {
+                    errorDetails.push(`Baris ${originalLineNumber}: Format tidak valid (diharapkan ID,Nama,Kelas). Baris: "${line}"`);
+                    skippedCount++;
+                    continue;
+                }
+
+                const id = padStudentId(parts[0].trim()); // Pad ID
+                const name = parts[1].trim().toUpperCase();
+                const studentClass = parts[2].trim().toUpperCase();
+
+                // Validasi ID Siswa (harus angka)
+                if (!/^\d+$/.test(id)) { // Validasi setelah padding, tapi padStudentId sudah memastikan format string
+                    errorDetails.push(`Baris ${originalLineNumber}: ID Siswa '${id}' tidak valid (harus angka).`);
+                    skippedCount++;
+                    continue;
+                }
+
+                // Validasi Nama Siswa (tidak boleh kosong)
+                if (name === "") {
+                    errorDetails.push(`Baris ${originalLineNumber}: Nama Siswa tidak boleh kosong.`);
+                    skippedCount++;
+                    continue;
+                }
+
+                // Periksa duplikasi ID siswa di cache lokal (sebelum push ke Firebase)
+                const isIdDup = studentCache.some(s => s.id === id);
+                if (isIdDup) {
+                    errorDetails.push(`Baris ${originalLineNumber}: Siswa dengan ID '${id}' sudah ada, dilewati.`);
+                    skippedCount++;
+                    continue;
+                }
+
+                // Generate a new key and add to the batch update object
+                const newRef = push(studentsRef); // Get a new reference with a unique key
+                studentsToBatchUpdate[newRef.key] = { id: id, name: name, class: studentClass };
+                importedCount++; // Increment immediately for display purposes
+            }
+
+            try {
+                if (Object.keys(studentsToBatchUpdate).length > 0) {
+                    await update(studentsRef, studentsToBatchUpdate);
+                    showNotification(`${importedCount} siswa berhasil diimpor!`);
+                } else {
+                    showNotification('Tidak ada data siswa yang valid untuk diimpor.');
+                }
+            } catch (error) {
+                console.error("Gagal melakukan batch import:", error);
+                showNotification(`Gagal mengimpor data: ${error.message}`);
+                // If the whole batch fails, all previously counted importedCount should be considered skipped/failed
+                skippedCount += importedCount;
+                importedCount = 0;
+                errorDetails.push(`Kesalahan umum saat menyimpan ke Firebase: ${error.message}`);
+            } finally {
+                isImporting = false; // Reset flag after import completes
+                loadingOverlay.style.display = 'none';
+                closeImportStudentModal();
+                displayImportResults(importedCount, skippedCount, errorDetails);
+            }
+        };
+
+        reader.onerror = () => {
+            isImporting = false; // Reset flag on error too
+            loadingOverlay.style.display = 'none';
+            importFileError.innerText = 'Gagal membaca file.';
+        };
+
+        reader.readAsText(file);
+    };
+
+    // Fungsi untuk menampilkan hasil impor
+    function displayImportResults(importedCount, skippedCount, errorDetails) {
+        importResultSummary.innerHTML = `Berhasil diimpor: <span style="font-weight: bold; color: green;">${importedCount}</span>, Dilewati/Gagal: <span style="font-weight: bold; color: orange;">${skippedCount}</span>.`;
+        importResultDetails.innerHTML = '';
+
+        if (errorDetails.length > 0) {
+            errorDetails.forEach(detail => {
+                const li = document.createElement('li');
+                li.style.color = 'red';
+                li.innerText = detail;
+                importResultDetails.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.style.color = 'green';
+            li.innerText = 'Semua data berhasil diimpor atau tidak ada masalah yang ditemukan.';
+            importResultDetails.appendChild(li);
+        }
+        importResultModal.style.display = 'flex';
+    }
+
+    // --- Fungsi Kosongkan Daftar Peserta ---
+    window.openEmptyStudentsModal = () => {
+        emptyStudentsPasswordInput.value = ''; // Bersihkan password
+        emptyStudentsPasswordError.innerText = ''; // Bersihkan error
+        emptyStudentsModal.style.display = 'flex';
+    };
+
+    window.closeEmptyStudentsModal = () => {
+        emptyStudentsModal.style.display = 'none';
+    };
+
+    window.confirmEmptyStudents = async () => {
+        const password = emptyStudentsPasswordInput.value;
+        if (password !== ADMIN_PASS) {
+            emptyStudentsPasswordError.innerText = "Password salah!";
+            return;
+        }
+
+        loadingOverlay.style.display = 'flex'; // Tampilkan loading spinner
+        try {
+            await remove(studentsRef); // Hapus semua data siswa
+            await remove(examAccessStatusRef); // Hapus juga semua status akses ujian
+            showNotification('Semua data peserta berhasil dikosongkan!');
+        } catch (error) {
+            console.error("Gagal mengosongkan daftar peserta:", error);
+            showNotification('Gagal mengosongkan daftar peserta: ' + error.message);
+        } finally {
+            loadingOverlay.style.display = 'none'; // Sembunyikan loading spinner
+            closeEmptyStudentsModal();
+        }
+    };
+
+    // --- Fungsi Filter Siswa ---
+    window.filterStudentsByClass = (filterValue, dropdownId = null) => {
+        currentStudentFilter = filterValue;
+        renderStudentTable();
+
+        // Remove active class from all filter buttons and dropdown toggles
+        document.querySelectorAll('.student-filter-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.dropdown-toggle').forEach(btn => btn.classList.remove('active'));
+        
+        // Close all dropdowns
+        document.querySelectorAll('.dropdown-content').forEach(content => content.style.display = 'none');
+
+        // Set active state for the selected dropdown toggle
+        if (dropdownId) {
+            const toggleButton = document.querySelector(`#${dropdownId} .dropdown-toggle`);
+            if (toggleButton) {
+                toggleButton.classList.add('active');
+            }
+        } else {
+            // If it's the "Tampilkan Semua" button
+            showAllStudentsBtn.classList.add('active');
+        }
+    };
+
+    window.showAllStudents = () => {
+        currentStudentFilter = null;
+        renderStudentTable();
+        // Remove active class from all filter buttons and dropdown toggles
+        document.querySelectorAll('.student-filter-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.dropdown-toggle').forEach(btn => btn.classList.remove('active'));
+        // Close all dropdowns
+        document.querySelectorAll('.dropdown-content').forEach(content => content.style.display = 'none');
+        showAllStudentsBtn.classList.add('active');
+    };
+
+    // Function to toggle dropdown visibility
+    window.toggleDropdown = (event, dropdownId) => {
+        event.stopPropagation(); // Prevent the click from immediately propagating to the window listener
+        const dropdownContent = document.querySelector(`#${dropdownId} .dropdown-content`);
+        const dropdownToggle = event.currentTarget; // The button that was clicked
+
+        // Close other open dropdowns
+        document.querySelectorAll('.dropdown-content').forEach(content => {
+            if (content.parentElement.id !== dropdownId) {
+                content.style.display = 'none';
+                // Find the correct toggle button for this content and remove active class
+                const otherToggleButton = content.parentElement.querySelector('.dropdown-toggle') || content.previousElementSibling;
+                if (otherToggleButton) {
+                    otherToggleButton.classList.remove('active');
+                }
+            }
+        });
+
+        // Toggle current dropdown
+        if (dropdownContent.style.display === 'block') {
+            dropdownContent.style.display = 'none';
+            dropdownToggle.classList.remove('active');
+        } else {
+            dropdownContent.style.display = 'block';
+            dropdownToggle.classList.add('active');
+        }
+    };
+
+    // Close dropdowns if clicked outside
+    window.addEventListener('click', function(event) {
+        // Ensure the click is not inside any dropdown
+        if (!event.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown-content').forEach(content => {
+                content.style.display = 'none';
+                const toggleButton = content.parentElement.querySelector('.dropdown-toggle') || content.previousElementSibling;
+                if (toggleButton) {
+                    toggleButton.classList.remove('active');
+                }
+            });
+        }
+    });
+
   </script>
 </body>
 </html>
