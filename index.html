@@ -9,7 +9,6 @@
       font-family: Arial, sans-serif;
       margin: 0;
       background-color: #f0f0f0;
-      /* padding-top dihapus karena header tidak lagi fixed */
     }
 
     /* Header biru (mengikuti scroll) */
@@ -17,10 +16,9 @@
       background-color: #0066cc;
       padding: 15px 20px;
       text-align: center;
-      /* Dihapus: position: fixed, top, left, transform, z-index */
       width: 100%;
       max-width: 800px;
-      margin: 0 auto; /* Pusatkan header */
+      margin: 0 auto;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
@@ -37,10 +35,9 @@
 
     /* Navigasi Dashboard (mengikuti scroll) */
     .dashboard-nav-wrapper {
-      /* Dihapus: position: fixed, top, left, transform, z-index */
       width: 100%;
       max-width: 800px;
-      margin: 0 auto; /* Pusatkan nav */
+      margin: 0 auto;
       background-color: #e0e0e0;
       padding: 10px 20px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -53,6 +50,7 @@
       display: flex;
       justify-content: center;
       gap: 10px;
+      flex-wrap: wrap; /* Memungkinkan tombol melipat ke baris baru */
     }
     .dashboard-nav-wrapper button {
       background-color: #007bff;
@@ -75,7 +73,7 @@
     /* Kontainer utama untuk login dan konten dashboard */
     .container {
       max-width: 800px;
-      margin: 20px auto; /* Tambahkan margin-top untuk memisahkan dari header/nav */
+      margin: 20px auto;
       margin-bottom: 20px;
       background: white;
       padding: 20px;
@@ -84,9 +82,8 @@
       position: relative;
       box-sizing: border-box;
     }
-    /* Untuk bagian dashboard, pastikan margin konsisten */
     .dashboard-section.container {
-        margin-top: 20px; /* Margin konsisten dari nav */
+        margin-top: 20px;
     }
 
     input, select {
@@ -115,10 +112,16 @@
       font-size: 14px;
       text-align: center;
     }
+    /* Wrapper untuk tabel agar bisa di-scroll horizontal */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Untuk smooth scrolling di iOS */
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
+      min-width: 600px; /* Lebar minimum untuk tabel agar tidak terlalu sempit */
     }
     th, td {
       border: 1px solid #ccc;
@@ -197,7 +200,7 @@
     .modal {
       display: none;
       position: fixed;
-      z-index: 100; /* Ditingkatkan z-index untuk memastikan selalu di atas */
+      z-index: 100;
       left: 0; top: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.5);
@@ -208,8 +211,9 @@
       background: #fff;
       padding: 20px;
       border-radius: 8px;
-      width: 90%;
+      width: 90%; /* Lebih fleksibel untuk mobile */
       max-width: 400px;
+      box-sizing: border-box; /* Pastikan padding dihitung dalam lebar */
     }
     .modal button {
       margin: 5px;
@@ -254,11 +258,12 @@
     }
     @media (max-width: 600px) {
       body {
-        padding-top: 0; /* Tidak ada header fixed, jadi tidak perlu padding */
+        padding-top: 0;
       }
       .header-blue-bg, .dashboard-nav-wrapper, .container {
-        margin-left: 10px; /* Tambahkan margin samping untuk layar kecil */
+        margin-left: 10px;
         margin-right: 10px;
+        border-radius: 0; /* Hilangkan border radius di layar kecil untuk tampilan full-width */
       }
       .header-blue-bg {
         padding: 10px 10px;
@@ -279,7 +284,7 @@
         font-size: 13px;
       }
       .container {
-        margin: 10px auto; /* Sesuaikan margin untuk mobile */
+        margin: 10px auto;
         padding: 15px;
       }
       h2, h3 {
@@ -293,29 +298,80 @@
       }
       table {
         font-size: 11px;
+        min-width: 500px; /* Sesuaikan min-width tabel untuk mobile */
       }
       th, td {
         padding: 6px;
       }
       /* Sembunyikan kolom tertentu di layar kecil untuk tabel token */
-      #tokenTableBody td:nth-child(5),
-      #tokenTableBody td:nth-child(6),
-      #tokenTableBody th:nth-child(5),
-      #tokenTableBody th:nth-child(6) {
+      #tokenTable thead th:nth-child(5), /* LINK */
+      #tokenTable tbody td:nth-child(5),
+      #tokenTable thead th:nth-child(6), /* TOKEN DIBUKA */
+      #tokenTable tbody td:nth-child(6),
+      #tokenTable thead th:nth-child(7), /* TOKEN DITUTUP */
+      #tokenTable tbody td:nth-child(7) {
         display: none;
       }
       /* Sembunyikan kolom tertentu di layar kecil untuk tabel siswa */
-      #studentTableBody td:nth-child(5),
-      #studentTableBody th:nth-child(5) {
-        /* display: none; */
+      #studentTable thead th:nth-child(5), /* STATUS */
+      #studentTable tbody td:nth-child(5) {
+        /* display: none; */ /* Biarkan status terlihat, penting */
       }
-      #studentTableBody td:nth-child(6),
-      #studentTableBody th:nth-child(6) {
-        display: none;
+      #studentTable thead th:nth-child(6), /* AKSI */
+      #studentTable tbody td:nth-child(6) {
+        /* display: none; */ /* Biarkan aksi terlihat */
       }
       .action-buttons {
         flex-direction: row;
         justify-content: center;
+      }
+      .modal-content {
+        padding: 15px;
+        width: 95%; /* Lebih lebar untuk mengisi layar */
+      }
+      .modal button {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      .student-filters-container {
+        flex-direction: column; /* Stack filters vertically */
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .student-filters-container > div {
+        flex-direction: column; /* Stack label and select vertically */
+        align-items: flex-start;
+        width: 100%;
+      }
+      .student-filters-container select {
+        width: 100%;
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .header-blue-bg .logo {
+        width: 60px;
+      }
+      .title {
+        font-size: 18px;
+      }
+      .card-body {
+        padding: 15px;
+      }
+      input {
+        font-size: 14px;
+        padding: 8px;
+      }
+      button {
+        font-size: 14px;
+        padding: 8px 15px;
+      }
+      .footer {
+        font-size: 10px;
+      }
+      table {
+        min-width: 400px; /* Lebih kecil lagi untuk layar sangat kecil */
       }
     }
     #notification {
@@ -339,7 +395,7 @@
     #printModal {
       display: none;
       position: fixed;
-      z-index: 101; /* Z-index lebih tinggi untuk modal cetak */
+      z-index: 101;
       left: 0; top: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.5);
@@ -433,7 +489,6 @@
       cursor: pointer;
       font-weight: bold;
     }
-    /* Styling for the loading spinner */
     .loading-overlay {
         display: none;
         position: fixed;
@@ -462,7 +517,6 @@
         100% { transform: rotate(360deg); }
     }
 
-    /* New filter container for both class and exam status */
     .student-filters-container {
         display: flex;
         justify-content: flex-start;
@@ -554,40 +608,44 @@
         Token yang ditambahkan akan dihapus otomatis setelah 30 hari!
       </p>
 
-      <table>
-        <thead>
-          <tr>
-            <th>NO</th>
-            <th>MAPEL</th>
-            <th>KELAS</th>
-            <th>TOKEN</th>
-            <th>LINK</th>
-            <th>TOKEN DIBUKA</th>
-            <th>TOKEN DITUTUP</th>
-            <th>  STATUS  </th>
-            <th>AKSES</th>
-            <th>AKSI</th>
-          </tr>
-        </thead>
-        <tbody id="tokenTableBody"></tbody>
-      </table>
+      <div class="table-responsive">
+        <table id="tokenTable">
+          <thead>
+            <tr>
+              <th>NO</th>
+              <th>MAPEL</th>
+              <th>KELAS</th>
+              <th>TOKEN</th>
+              <th>LINK</th>
+              <th>TOKEN DIBUKA</th>
+              <th>TOKEN DITUTUP</th>
+              <th>  STATUS  </th>
+              <th>AKSES</th>
+              <th>AKSI</th>
+            </tr>
+          </thead>
+          <tbody id="tokenTableBody"></tbody>
+        </table>
+      </div>
     </div>
 
     <div id="locationSection" class="dashboard-section container">
       <div style="margin-bottom: 20px;">
         <h3>ATUR AKSES LOKASI</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>KOORDINAT LOKASI</th>
-              <th>RADIUS</th>
-              <th>STATUS</th>
-              <th>AKSI</th>
-            </tr>
-          </thead>
-          <tbody id="locationSettingsTableBody">
-            </tbody>
-        </table>
+        <div class="table-responsive">
+          <table id="locationSettingsTable">
+            <thead>
+              <tr>
+                <th>KOORDINAT LOKASI</th>
+                <th>RADIUS</th>
+                <th>STATUS</th>
+                <th>AKSI</th>
+              </tr>
+            </thead>
+            <tbody id="locationSettingsTableBody">
+              </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -633,18 +691,20 @@
             </div>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>NO</th>
-              <th>ID SISWA</th>
-              <th>NAMA</th>
-              <th>KELAS</th>
-              <th>STATUS</th> <th>AKSI</th>
-            </tr>
-          </thead>
-          <tbody id="studentTableBody"></tbody>
-        </table>
+        <div class="table-responsive">
+          <table id="studentTable">
+            <thead>
+              <tr>
+                <th>NO</th>
+                <th>ID SISWA</th>
+                <th>NAMA</th>
+                <th>KELAS</th>
+                <th>STATUS</th> <th>AKSI</th>
+              </tr>
+            </thead>
+            <tbody id="studentTableBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
     <div class="footer">
@@ -744,8 +804,8 @@
   <div id="accessDetailModal" class="modal">
     <div class="modal-content" style="max-width: 600px;">
       <h4 id="accessDetailTokenTitle">Detail Akses Token: [Token]</h4>
-      <div style="overflow-x: auto;">
-        <table>
+      <div class="table-responsive">
+        <table id="accessDetailTable">
           <thead>
             <tr>
               <th>NO</th>
@@ -1691,13 +1751,12 @@
 
                 for (const studentId of sortedStudentIds) {
                     counter++;
-                    const studentAccess = accessData[studentId];
                     const studentInfo = studentCache.find(s => s.id === studentId); // Cari info siswa dari cache
 
                     const studentName = studentInfo ? studentInfo.name : 'Tidak Ditemukan';
                     const studentClass = studentInfo ? studentInfo.class : 'Tidak Ditemukan';
-                    const firstAccessTime = studentAccess.firstAccessTime ? new Date(studentAccess.firstAccessTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-                    const accessCount = studentAccess.accessCount || 0;
+                    const firstAccessTime = accessData[studentId].firstAccessTime ? new Date(accessData[studentId].firstAccessTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                    const accessCount = accessData[studentId].accessCount || 0;
 
 
                     const row = document.createElement('tr');
@@ -1933,7 +1992,7 @@
                 });
         } else {
             // Mode Tambah
-            push(studentsRef, { id: studentId, name: name, class: studentClass }) 
+            push(studentsRef, { id: studentId, name: studentName, class: studentClass })
                 .then(() => {
                     showNotification('Siswa berhasil ditambahkan.');
                     studentForm.reset();
