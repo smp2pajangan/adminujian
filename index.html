@@ -8,30 +8,26 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      background-color: #f0f0f0; /* Mengubah latar belakang keseluruhan menjadi abu-abu */
-      padding-top: 0; /* Padding awal, akan diatur oleh JS */
+      background-color: #f0f0f0;
+      padding-top: 0; /* No longer needed for fixed header, content will flow naturally */
     }
 
-    /* Header biru (selalu terlihat, fixed di atas) */
+    /* Header biru (mengikuti scroll) */
     .header-blue-bg {
-      background-color: #0066cc; /* Warna biru */
-      padding: 15px 20px; /* Padding vertikal dan HORIZONTAL */
+      background-color: #0066cc;
+      padding: 15px 20px;
       text-align: center;
-      position: fixed;
-      top: 0;
-      left: 50%; /* Pusatkan elemen fixed */
-      transform: translateX(-50%); /* Penyesuaian untuk pemusatan */
-      width: 100%; /* Ambil lebar penuh, tapi dibatasi max-width */
-      max-width: 800px; /* Lebar maksimum mengikuti container putih */
-      z-index: 25; /* Memastikan di atas nav dan konten */
+      /* Removed position: fixed and related properties */
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto; /* Center the header */
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      border-top-left-radius: 10px; /* Sudut membulat */
+      border-top-left-radius: 10px;
       border-top-right-radius: 10px;
-      box-sizing: border-box; /* Penting: padding dihitung dalam lebar */
+      box-sizing: border-box;
     }
-    .header-blue-bg .header-inner { /* Konten di dalam header biru */
+    .header-blue-bg .header-inner {
       color: white;
-      /* Tidak perlu max-width/margin auto di sini karena parent sudah diatur */
     }
     .logo {
       display: block;
@@ -39,42 +35,38 @@
       width: 100px;
     }
 
-    /* Navigasi Dashboard (fixed, muncul di bawah header biru setelah login) */
+    /* Navigasi Dashboard (mengikuti scroll) */
     .dashboard-nav-wrapper {
-      position: fixed;
-      top: 0; /* Akan diatur oleh JS setelah header */
-      left: 50%; /* Pusatkan elemen fixed */
-      transform: translateX(-50%); /* Penyesuaian untuk pemusatan */
-      width: 100%; /* Ambil lebar penuh, tapi dibatasi max-width */
-      max-width: 800px; /* Lebar maksimum mengikuti container putih */
-      z-index: 20; /* Lebih rendah dari header, lebih tinggi dari konten */
-      background-color: #e0e0e0; /* Background lebih terang untuk nav */
-      padding: 10px 20px; /* Padding vertikal dan HORIZONTAL */
+      /* Removed position: fixed and related properties */
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto; /* Center the nav */
+      background-color: #e0e0e0;
+      padding: 10px 20px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      display: none; /* Default: Sembunyikan */
-      border-bottom-left-radius: 10px; /* Sudut membulat */
+      display: none;
+      border-bottom-left-radius: 10px;
       border-bottom-right-radius: 10px;
-      box-sizing: border-box; /* Penting: padding dihitung dalam lebar */
+      box-sizing: border-box;
     }
-    .dashboard-nav-wrapper .dashboard-nav-inner { /* Konten di dalam nav */
+    .dashboard-nav-wrapper .dashboard-nav-inner {
       display: flex;
       justify-content: center;
       gap: 10px;
-      /* Tidak perlu padding di sini karena sudah diatur di parent */
     }
     .dashboard-nav-wrapper button {
-      background-color: #007bff; /* Warna default biru */
+      background-color: #007bff;
       color: white;
       padding: 8px 15px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       font-size: 15px;
-      margin: 0; /* Override margin button default */
+      margin: 0;
       transition: background-color 0.3s ease;
     }
     .dashboard-nav-wrapper button.active {
-      background-color: #6c757d; /* Warna abu-abu untuk tombol aktif */
+      background-color: #6c757d;
     }
     .dashboard-nav-wrapper button:hover:not(.active) {
       background-color: #0056b3;
@@ -83,19 +75,18 @@
     /* Kontainer utama untuk login dan konten dashboard */
     .container {
       max-width: 800px;
-      margin: auto; /* Pusatkan secara horizontal */
-      /* margin-top: 0; <-- DIHAPUS */
-      margin-bottom: 20px; /* Jaga jarak dari footer */
+      margin: 20px auto; /* Add margin-top to separate from header/nav */
+      margin-bottom: 20px;
       background: white;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       position: relative;
-      box-sizing: border-box; /* Penting: padding dihitung dalam lebar */
+      box-sizing: border-box;
     }
-    /* Untuk bagian dashboard, hilangkan margin-top karena padding body sudah diatur */
+    /* For dashboard sections, ensure consistent margin */
     .dashboard-section.container {
-        /* margin-top: 0; <-- DIHAPUS */
+        margin-top: 20px; /* Consistent margin from nav */
     }
 
     input, select {
@@ -133,82 +124,51 @@
       border: 1px solid #ccc;
       padding: 8px;
       word-wrap: break-word;
-      text-align: left; /* Perataan teks default untuk semua sel tabel */
+      text-align: left;
     }
     th {
       background-color: #f4f4f4;
-      text-align: center; /* Semua header tabel rata tengah secara default */
+      text-align: center;
     }
 
     /* Perataan spesifik untuk Tabel Pengaturan Lokasi */
-    #locationSettingsTableBody td:nth-child(1) {
-      text-align: center; /* Koordinat Lokasi - rata tengah */
-    }
-    #locationSettingsTableBody td:nth-child(2) {
-      text-align: center; /* Radius - rata tengah */
-    }
-    #locationSettingsTableBody td:nth-child(3) {
-      text-align: center; /* Status - rata tengah */
-    }
-    #locationSettingsTableBody td:nth-child(4) {
-      text-align: center; /* Aksi - rata tengah */
-    }
-    /* Mengatur ulang tombol di dalam sel tabel agar rata tengah */
+    #locationSettingsTableBody td:nth-child(1) { text-align: center; }
+    #locationSettingsTableBody td:nth-child(2) { text-align: center; }
+    #locationSettingsTableBody td:nth-child(3) { text-align: center; }
+    #locationSettingsTableBody td:nth-child(4) { text-align: center; }
     #locationSettingsTableBody td:nth-child(4) button {
-      display: inline-block; /* Mengubah display agar text-align pada parent berfungsi */
-      margin: 0; /* Hapus margin otomatis yang mungkin menyebabkan perataan tidak tepat */
+      display: inline-block;
+      margin: 0;
     }
-
 
     /* Perataan spesifik untuk Tabel Daftar Token */
-    #tokenTableBody td:nth-child(1) {
-      text-align: center; /* NO - rata tengah */
-    }
-    #tokenTableBody td:nth-child(3) {
-      text-align: center; /* KELAS - rata tengah */
-    }
-    #tokenTableBody td:nth-child(4) {
-      text-align: center; /* TOKEN - rata tengah */
-    }
-    #tokenTableBody td:nth-child(8) {
-      text-align: center; /* STATUS - rata tengah */
-    }
-    #tokenTableBody td:nth-child(9) {
-      text-align: center; /* AKSES - rata tengah */
-    }
-    #tokenTableBody td:nth-child(10) {
-      text-align: center; /* AKSI - rata tengah */
-    }
+    #tokenTableBody td:nth-child(1) { text-align: center; }
+    #tokenTableBody td:nth-child(3) { text-align: center; }
+    #tokenTableBody td:nth-child(4) { text-align: center; }
+    #tokenTableBody td:nth-child(8) { text-align: center; }
+    #tokenTableBody td:nth-child(9) { text-align: center; }
+    #tokenTableBody td:nth-child(10) { text-align: center; }
 
     /* Perataan spesifik untuk Tabel Daftar Siswa */
-    #studentTableBody td:nth-child(1) {
-      text-align: center; /* NO - rata tengah */
-    }
-    #studentTableBody td:nth-child(2) {
-      text-align: center; /* ID SISWA - rata tengah */
-    }
-    #studentTableBody td:nth-child(4) {
-      text-align: center; /* KELAS - rata tengah */
-    }
-    #studentTableBody td:nth-child(5) {
-      text-align: center; /* STATUS - rata tengah */
-    }
-    #studentTableBody td:last-child {
-      text-align: center; /* AKSI - rata tengah */
-    }
+    #studentTableBody td:nth-child(1) { text-align: center; }
+    #studentTableBody td:nth-child(2) { text-align: center; }
+    #studentTableBody td:nth-child(4) { text-align: center; }
+    #studentTableBody td:nth-child(5) { text-align: center; }
+    #studentTableBody td:last-child { text-align: center; }
+
     /* Styling untuk tombol edit/hapus siswa agar sejajar */
     .student-action-buttons {
         display: flex;
-        justify-content: center; /* Pusatkan tombol dalam sel */
-        gap: 5px; /* Beri sedikit jarak antar tombol */
+        justify-content: center;
+        gap: 5px;
     }
     .student-action-buttons button {
-        margin: 0; /* Hapus margin default tombol */
+        margin: 0;
         padding: 0;
         background: none;
         border: none;
         cursor: pointer;
-        display: flex; /* Gunakan flex untuk memusatkan ikon */
+        display: flex;
         align-items: center;
         justify-content: center;
         width: 24px;
@@ -220,10 +180,9 @@
         background-color: #e0e0e0;
     }
     .student-action-buttons button img {
-        width: 16px;
-        height: 16px;
+        width: 16px; /* Explicitly set icon size */
+        height: 16px; /* Explicitly set icon size */
     }
-
 
     .footer {
       text-align: center;
@@ -238,7 +197,7 @@
     .modal {
       display: none;
       position: fixed;
-      z-index: 10;
+      z-index: 100; /* Increased z-index to ensure it's always on top */
       left: 0; top: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.5);
@@ -269,7 +228,7 @@
     .login-link:active {
       color: red;
     }
-    .action-button-icon { /* Reused for token actions */
+    .action-button-icon {
       background: none;
       border: none;
       padding: 0;
@@ -283,8 +242,8 @@
       border-radius: 4px;
     }
     .action-button-icon img {
-      width: 16px;
-      height: 16px;
+      width: 16px; /* Explicitly set icon size */
+      height: 16px; /* Explicitly set icon size */
       display: block;
     }
     .action-button-icon:hover {
@@ -295,29 +254,32 @@
     }
     @media (max-width: 600px) {
       body {
-        /* Padding top diatur oleh JS, ini hanya fallback atau untuk visualisasi */
-        padding-top: 130px;
+        padding-top: 0; /* No fixed header, so no padding needed */
+      }
+      .header-blue-bg, .dashboard-nav-wrapper, .container {
+        margin-left: 10px; /* Add some side margin for small screens */
+        margin-right: 10px;
       }
       .header-blue-bg {
-        padding: 10px 10px; /* Kurangi padding horizontal untuk mobile */
+        padding: 10px 10px;
       }
       .header-blue-bg h2 {
-        font-size: 1.2em; /* Kurangi ukuran font judul */
+        font-size: 1.2em;
       }
       .dashboard-nav-wrapper {
-        padding: 8px 10px; /* Kurangi padding horizontal untuk mobile */
+        padding: 8px 10px;
       }
       .dashboard-nav-wrapper .dashboard-nav-inner {
         flex-wrap: wrap;
         gap: 5px;
-        padding: 0; /* Padding sudah diatur di parent */
+        padding: 0;
       }
       .dashboard-nav-wrapper button {
         padding: 6px 10px;
         font-size: 13px;
       }
       .container {
-        margin: 10px auto;
+        margin: 10px auto; /* Adjust margin for mobile */
         padding: 15px;
       }
       h2, h3 {
@@ -338,20 +300,18 @@
       /* Sembunyikan kolom tertentu di layar kecil untuk tabel token */
       #tokenTableBody td:nth-child(5),
       #tokenTableBody td:nth-child(6),
-      #tokenTableBody td:nth-child(7),
       #tokenTableBody th:nth-child(5),
-      #tokenTableBody th:nth-child(6),
-      #tokenTableBody th:nth-child(7) {
+      #tokenTableBody th:nth-child(6) {
         display: none;
       }
       /* Sembunyikan kolom tertentu di layar kecil untuk tabel siswa */
       #studentTableBody td:nth-child(5),
       #studentTableBody th:nth-child(5) {
-        /* display: none; */ /* Jangan sembunyikan kolom status ini */
+        /* display: none; */
       }
       #studentTableBody td:nth-child(6),
       #studentTableBody th:nth-child(6) {
-        display: none; /* Sembunyikan kolom aksi di tabel siswa untuk mobile jika terlalu sempit */
+        display: none;
       }
       .action-buttons {
         flex-direction: row;
@@ -379,7 +339,7 @@
     #printModal {
       display: none;
       position: fixed;
-      z-index: 11;
+      z-index: 101; /* Higher z-index for print modal */
       left: 0; top: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.5);
@@ -473,87 +433,9 @@
       cursor: pointer;
       font-weight: bold;
     }
-    /* CSS untuk Dropdown */
-    .dropdown {
-      position: relative;
-      display: inline-block;
-    }
-
-    .dropdown-button {
-      background-color: #f0f0f0; /* Default light background */
-      color: #333;
-      padding: 8px 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-      display: flex; /* Use flex to center text and arrow */
-      align-items: center;
-      justify-content: center;
-      gap: 5px; /* Space between text and arrow */
-    }
-
-    .dropdown-button:hover {
-        background-color: #e0e0e0;
-        border-color: #999;
-    }
-
-    .dropdown-button.active {
-        background-color: #007bff; /* Active blue */
-        color: white;
-        border-color: #007bff;
-    }
-
-    .dropdown-button.active:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
-    }
-
-    .dropdown-button .arrow {
-        font-size: 0.8em;
-        transition: transform 0.3s ease;
-    }
-
-    .dropdown-button.active .arrow {
-        transform: rotate(180deg);
-    }
-
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #f9f9f9;
-      min-width: 160px; /* Lebar minimum untuk konten dropdown */
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 5px 0;
-      top: 100%; /* Posisi di bawah tombol toggle */
-      left: 0;
-      white-space: nowrap; /* Mencegah teks pecah baris */
-    }
-
-    .dropdown-content a {
-      color: black;
-      padding: 8px 15px;
-      text-decoration: none;
-      display: block; /* Agar setiap item menjadi blok yang dapat diklik */
-      text-align: left; /* Teks rata kiri */
-    }
-
-
-    .dropdown-content a:hover {
-      background-color: #ddd;
-    }
-
-    /* .dropdown:hover .dropdown-content {
-      display: block;
-    } */ /* Dihapus karena akan dikontrol oleh JS */
-
     /* Styling for the loading spinner */
     .loading-overlay {
-        display: none; /* Hidden by default */
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
@@ -563,7 +445,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 9999; /* Ensure it's on top */
+        z-index: 9999;
     }
 
     .spinner {
@@ -580,40 +462,32 @@
         100% { transform: rotate(360deg); }
     }
 
-    .student-filter-buttons {
+    /* New filter container for both class and exam status */
+    .student-filters-container {
         display: flex;
-        justify-content: flex-start; /* Aligned to the left */
-        gap: 10px;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 15px;
         margin-top: 10px;
-        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+    .student-filters-container > div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .student-filters-container label {
+        font-weight: bold;
+        white-space: nowrap;
+    }
+    .student-filters-container select {
+        width: auto;
+        max-width: 200px;
+        flex-grow: 1;
+        margin: 0;
     }
 
-    .student-filter-button {
-        background-color: #f0f0f0; /* Default light background */
-        color: #333;
-        padding: 8px 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-    }
-
-    .student-filter-button:hover {
-        background-color: #e0e0e0;
-        border-color: #999;
-    }
-
-    .student-filter-button.active {
-        background-color: #007bff; /* Active blue */
-        color: white;
-        border-color: #007bff;
-    }
-
-    .student-filter-button.active:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
-    }
   </style>
 </head>
 <body>
@@ -671,7 +545,7 @@
 
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <h3>DAFTAR TOKEN</h3>
-        <button onclick="openPrintModal()" style="background: none; border: none; cursor: pointer; margin-left: 10px; margin-right: -10px;">
+        <button onclick="openPrintModal()" style="background: none; border: none; cursor: pointer; padding: 0; margin: 0;">
           <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/print.png" alt="Cetak" style="width: 24px; height: 24px;">
         </button>
       </div>
@@ -744,46 +618,20 @@
           </div>
         </div>
 
-        <div class="student-filter-buttons">
-            <div class="dropdown" id="dropdownKelas7">
-                <button class="student-filter-button dropdown-toggle" onclick="toggleDropdown(event, 'dropdownKelas7')">Kelas 7 <span class="arrow">▼</span></button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="filterStudentsByClass('7A', 'dropdownKelas7'); event.stopPropagation();">7A</a>
-                    <a href="#" onclick="filterStudentsByClass('7B', 'dropdownKelas7'); event.stopPropagation();">7B</a>
-                    <a href="#" onclick="filterStudentsByClass('7C', 'dropdownKelas7'); event.stopPropagation();">7C</a>
-                    <a href="#" onclick="filterStudentsByClass('7D', 'dropdownKelas7'); event.stopPropagation();">7D</a>
-                    <a href="#" onclick="filterStudentsByClass('7E', 'dropdownKelas7'); event.stopPropagation();">7E</a>
-                    <a href="#" onclick="filterStudentsByClass('7F', 'dropdownKelas7'); event.stopPropagation();">7F</a>
-                    <a href="#" onclick="filterStudentsByClass('7_all', 'dropdownKelas7'); event.stopPropagation();">Semua Rombel 7</a>
-                </div>
+        <div class="student-filters-container">
+            <div>
+                <label for="classFilterDropdownSelect">KELAS:</label>
+                <select id="classFilterDropdownSelect" onchange="filterStudentsByClass(this.value)">
+                    <option value="">SEMUA KELAS</option>
+                    </select>
             </div>
-            <div class="dropdown" id="dropdownKelas8">
-                <button class="student-filter-button dropdown-toggle" onclick="toggleDropdown(event, 'dropdownKelas8')">Kelas 8 <span class="arrow">▼</span></button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="filterStudentsByClass('8A', 'dropdownKelas8'); event.stopPropagation();">8A</a>
-                    <a href="#" onclick="filterStudentsByClass('8B', 'dropdownKelas8'); event.stopPropagation();">8B</a>
-                    <a href="#" onclick="filterStudentsByClass('8C', 'dropdownKelas8'); event.stopPropagation();">8C</a>
-                    <a href="#" onclick="filterStudentsByClass('8D', 'dropdownKelas8'); event.stopPropagation();">8D</a>
-                    <a href="#" onclick="filterStudentsByClass('8E', 'dropdownKelas8'); event.stopPropagation();">8E</a>
-                    <a href="#" onclick="filterStudentsByClass('8F', 'dropdownKelas8'); event.stopPropagation();">8F</a>
-                    <a href="#" onclick="filterStudentsByClass('8_all', 'dropdownKelas8'); event.stopPropagation();">Semua Rombel 8</a>
-                </div>
+            <div>
+                <label for="examStatusFilter">STATUS UJIAN:</label>
+                <select id="examStatusFilter" onchange="filterStudentsByExamStatus(this.value)">
+                    <option value="">TOKEN SAAT INI</option>
+                    </select>
             </div>
-            <div class="dropdown" id="dropdownKelas9">
-                <button class="student-filter-button dropdown-toggle" onclick="toggleDropdown(event, 'dropdownKelas9')">Kelas 9 <span class="arrow">▼</span></button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="filterStudentsByClass('9A', 'dropdownKelas9'); event.stopPropagation();">9A</a>
-                    <a href="#" onclick="filterStudentsByClass('9B', 'dropdownKelas9'); event.stopPropagation();">9B</a>
-                    <a href="#" onclick="filterStudentsByClass('9C', 'dropdownKelas9'); event.stopPropagation();">9C</a>
-                    <a href="#" onclick="filterStudentsByClass('9D', 'dropdownKelas9'); event.stopPropagation();">9D</a>
-                    <a href="#" onclick="filterStudentsByClass('9E', 'dropdownKelas9'); event.stopPropagation();">9E</a>
-                    <a href="#" onclick="filterStudentsByClass('9F', 'dropdownKelas9'); event.stopPropagation();">9F</a>
-                    <a href="#" onclick="filterStudentsByClass('9_all', 'dropdownKelas9'); event.stopPropagation();">Semua Rombel 9</a>
-                </div>
-            </div>
-            <button id="showAllStudentsBtn" class="student-filter-button active" onclick="showAllStudents()" style="margin-left: auto;">Tampilkan Semua</button>
         </div>
-
 
         <table>
           <thead>
@@ -927,7 +775,7 @@
       <label for="modalStudentClass">Kelas</label>
       <input type="text" id="modalStudentClass" required />
       <button onclick="confirmEditStudent()">Simpan</button>
-      <button onclick="closeEditStudentModal()">Batal</button>
+      <button type="button" onclick="closeEditStudentModal()">Batal</button>
     </div>
   </div>
 
@@ -1024,13 +872,13 @@
     const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000; // 30 hari dalam milidetik
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus.png";
-    const DETAIL_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/detail.png"; // Icon untuk detail akses
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
     let inactivityTimer;
     const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // Batas waktu tidak aktif 1 jam
     let currentForceActiveTokenId = null;
     let isImporting = false; // Flag untuk mencegah impor ganda
-    let currentStudentFilter = null; // Filter untuk daftar siswa (misal: '7A', '7_all', atau null untuk semua)
+    let currentStudentClassFilter = null; // Filter untuk daftar siswa (misal: '7A', '7_all', atau null untuk semua)
+    let currentExamStatusFilterToken = null; // Filter untuk status ujian (token key)
 
     // Referensi ke node 'setlokasi' di Firebase
     const settingsRef = ref(db, 'setlokasi');
@@ -1061,6 +909,9 @@
     const accessDetailModal = document.getElementById('accessDetailModal');
     const accessDetailTableBody = document.getElementById('accessDetailTableBody');
     const accessDetailTokenTitle = document.getElementById('accessDetailTokenTitle');
+    const examStatusFilterDropdown = document.getElementById('examStatusFilter');
+    const classFilterDropdownSelect = document.getElementById('classFilterDropdownSelect'); // New class filter select
+
 
     // Elemen HTML untuk Modal Edit Siswa
     const editStudentModal = document.getElementById('editStudentModal');
@@ -1096,7 +947,7 @@
     const tokenMenuBtn = document.getElementById('tokenMenuBtn');
     const lokasiMenuBtn = document.getElementById('lokasiMenuBtn');
     const pesertaMenuBtn = document.getElementById('pesertaMenuBtn');
-    const showAllStudentsBtn = document.getElementById('showAllStudentsBtn');
+
 
     // Helper function to pad student ID with leading zeros
     function padStudentId(id) {
@@ -1124,8 +975,10 @@
             updateSetlokasiStatusDisplay(); // Perbarui tampilan lokasi
         } else if (sectionId === 'studentSection') {
             pesertaMenuBtn.classList.add('active');
-            // Reset filter saat masuk ke bagian siswa
-            showAllStudents();
+            // Ensure filters are populated and table rendered
+            populateClassFilter();
+            populateExamStatusFilter();
+            renderStudentTable();
         }
     };
 
@@ -1149,11 +1002,7 @@
         dashboardContent.style.display = 'block'; // Tampilkan dashboard content
         dashboardNav.style.display = 'block'; // Tampilkan navigasi dashboard
         
-        // Hitung dan atur padding-top body
-        const headerHeight = headerBlueBg.offsetHeight;
-        const navHeight = dashboardNav.offsetHeight;
-        document.body.style.paddingTop = `${headerHeight + navHeight}px`; // padding-top = tinggi header + tinggi nav
-        dashboardNav.style.top = `${headerHeight}px`; // Posisikan nav di bawah header
+        // No longer need to adjust padding-top or fixed position for header/nav
         
         loadTokens();
         loadStudents(); // Muat data siswa saat login
@@ -1175,7 +1024,6 @@
       localStorage.removeItem('isAdminLoggedIn');
       dashboardContent.style.display = 'none'; // Sembunyikan dashboard content
       dashboardNav.style.display = 'none'; // Sembunyikan navigasi dashboard
-      document.body.style.paddingTop = `${headerBlueBg.offsetHeight + 20}px`; // Padding untuk header biru + jarak 20px ke login content
       loginSection.style.display = 'block'; // Tampilkan login section
       document.getElementById('password').value = ''; // Kosongkan password saat logout
       showNotification('Anda telah logout.');
@@ -1245,6 +1093,7 @@
             `;
             tbody.appendChild(row);
         });
+        populateExamStatusFilter(); // Ensure the exam status filter is updated when tokens change
     }
 
     // Fungsi untuk memuat token dari Firebase
@@ -1333,15 +1182,26 @@
         const tokenAccessRef = ref(db, `exam_access_status/${tokenId}/${student.id}`); // Use padded student.id
 
         runTransaction(tokenAccessRef, (currentAccess) => {
+            const now = Date.now();
+            const SPAM_THRESHOLD_MS = 5000; // 5 seconds
+
             if (currentAccess === null) {
-                // Akses pertama oleh siswa ini untuk token ini
+                // First access by this student for this token
                 return {
-                    firstAccessTime: Date.now(),
-                    lastAccessTime: Date.now()
+                    firstAccessTime: now,
+                    lastAccessTime: now,
+                    accessCount: 1
                 };
             } else {
-                // Akses berikutnya oleh siswa ini untuk token ini
-                currentAccess.lastAccessTime = Date.now();
+                // Subsequent access by this student for this token
+                if (now - (currentAccess.lastAccessTime || 0) > SPAM_THRESHOLD_MS) { // Ensure lastAccessTime exists
+                    // Not a spam click, increment count
+                    currentAccess.accessCount = (currentAccess.accessCount || 0) + 1;
+                    currentAccess.lastAccessTime = now;
+                } else {
+                    // Spam click, just update lastAccessTime but don't increment count
+                    currentAccess.lastAccessTime = now;
+                }
                 return currentAccess;
             }
         })
@@ -1669,7 +1529,6 @@
       localStorage.removeItem('isAdminLoggedIn');
       dashboardContent.style.display = 'none';
       dashboardNav.style.display = 'none';
-      document.body.style.paddingTop = `${headerBlueBg.offsetHeight + 20}px`; // Padding untuk header biru + jarak 20px ke login content
       loginSection.style.display = 'block';
       document.getElementById('password').value = '';
       showNotification('Anda telah logout karena tidak ada aktivitas, masukan password kembali!.');
@@ -1683,19 +1542,11 @@
 
     // Logika pemuatan halaman awal
     window.onload = function() {
-      // Atur padding-top body agar konten login tidak tertutup header biru
-      document.body.style.paddingTop = `${headerBlueBg.offsetHeight + 20}px`;
-
+      // No longer need to adjust padding-top for fixed header
       if (localStorage.getItem('isAdminLoggedIn') === 'true') {
         loginSection.style.display = 'none';
         dashboardContent.style.display = 'block';
         dashboardNav.style.display = 'block';
-        
-        // Hitung dan atur padding-top body dan posisi nav
-        const headerHeight = headerBlueBg.offsetHeight;
-        const navHeight = dashboardNav.offsetHeight;
-        document.body.style.paddingTop = `${headerHeight + navHeight}px`; // padding-top = tinggi header + tinggi nav
-        dashboardNav.style.top = `${headerHeight}px`;
         
         loadTokens();
         loadStudents();
@@ -1847,16 +1698,8 @@
                     const studentName = studentInfo ? studentInfo.name : 'Tidak Ditemukan';
                     const studentClass = studentInfo ? studentInfo.class : 'Tidak Ditemukan';
                     const firstAccessTime = studentAccess.firstAccessTime ? new Date(studentAccess.firstAccessTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                    const accessCount = studentAccess.accessCount || 0;
 
-                    // Determine status based on current active tokens
-                    let statusAccess = 'Tidak Aktif';
-                    const activeTokens = tokenCache.filter(token => token.isActive);
-                    for (const activeToken of activeTokens) {
-                        if (activeToken.key === tokenId && studentAccess) { // Check if this specific token is active and has access data
-                            statusAccess = 'Sedang Aktif';
-                            break;
-                        }
-                    }
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -1864,7 +1707,7 @@
                         <td>${studentId}</td>
                         <td>${studentName}</td>
                         <td>${studentClass}</td>
-                        <td>${statusAccess}</td>
+                        <td>${accessCount > 0 ? `Sudah Mengakses (${accessCount})` : 'Belum Mengakses'}</td>
                         <td>${firstAccessTime}</td>
                     `;
                     accessDetailTableBody.appendChild(row);
@@ -1886,90 +1729,149 @@
 
     /* --- Fungsi-fungsi Manajemen Siswa --- */
 
+    // Helper function to extract numeric and alphabetic parts for class sorting
+    const extractClassParts = (className) => {
+        const match = className.match(/^(\d+)([A-Z]+)?$/);
+        if (match) {
+            return { num: parseInt(match[1]), char: match[2] || '' }; // Handle cases like '7' without a rombel char
+        }
+        return { num: 0, char: className }; // Fallback for unexpected formats
+    };
+
     // Fungsi untuk merender/memperbarui tabel siswa
     async function renderStudentTable() {
         studentTableBody.innerHTML = '';
         let counter = 0;
 
-        const activeTokens = tokenCache.filter(token => token.isActive);
-        const hasActiveTokens = activeTokens.length > 0;
-
         let studentsToDisplay = studentCache;
 
-        // Apply filter if active
-        if (currentStudentFilter) {
-            if (currentStudentFilter.endsWith('_all')) {
-                const classPrefix = currentStudentFilter.split('_')[0]; // e.g., '7'
-                studentsToDisplay = studentCache.filter(student => student.class.startsWith(classPrefix));
+        // Apply class filter first
+        if (currentStudentClassFilter) {
+            if (currentStudentClassFilter.endsWith('_all')) {
+                const classPrefix = currentStudentClassFilter.split('_')[0];
+                studentsToDisplay = studentsToDisplay.filter(student => student.class.startsWith(classPrefix));
             } else {
-                // Exact class match (e.g., '7A')
-                studentsToDisplay = studentCache.filter(student => student.class === currentStudentFilter);
+                studentsToDisplay = studentsToDisplay.filter(student => student.class === currentStudentClassFilter);
             }
         }
 
-        // Urutkan studentsToDisplay sebelum merender
+        let selectedTokenForStatus = null;
+        if (currentExamStatusFilterToken) {
+            selectedTokenForStatus = tokenCache.find(t => t.key === currentExamStatusFilterToken);
+            if (selectedTokenForStatus) {
+                const tokenClassNumeric = selectedTokenForStatus.kelas; // e.g., '7', '8', '9'
+                // Further filter students to only those whose class starts with the token's class
+                studentsToDisplay = studentsToDisplay.filter(student => student.class.startsWith(tokenClassNumeric));
+            } else {
+                // Token not found, maybe deleted? Clear internal filter but keep visual selection
+                currentExamStatusFilterToken = null; // Clear internal filter
+                showNotification("Token ujian yang dipilih tidak ditemukan atau telah dihapus. Menampilkan status saat ini.");
+                // Re-render will now use the default status logic, but with existing class filter
+            }
+        }
+
+        // Sorting logic
         studentsToDisplay.sort((a, b) => {
-            // Helper function to extract numeric and alphabetic parts
-            const extractClassParts = (className) => {
-                const match = className.match(/^(\d+)([A-Z]+)$/);
-                if (match) {
-                    return { num: parseInt(match[1]), char: match[2] };
+            let isAccessedA = false;
+            let isAccessedB = false;
+
+            if (currentExamStatusFilterToken) {
+                // Specific token selected: check access for that token
+                isAccessedA = (tokenAccessStatus[currentExamStatusFilterToken] && tokenAccessStatus[currentExamStatusFilterToken][a.id] && (tokenAccessStatus[currentExamStatusFilterToken][a.id].accessCount || 0) > 0);
+                isAccessedB = (tokenAccessStatus[currentExamStatusFilterToken] && tokenAccessStatus[currentExamStatusFilterToken][b.id] && (tokenAccessStatus[currentExamStatusFilterToken][b.id].accessCount || 0) > 0);
+            } else {
+                // "TOKEN SAAT INI" (default) selected: check if accessed *any* relevant active token
+                const studentClassNumericA = a.class.match(/\d+/);
+                const studentClassNumericB = b.class.match(/\d+/);
+
+                if (studentClassNumericA) {
+                    const relevantActiveTokensA = tokenCache.filter(token => token.isActive && token.kelas === studentClassNumericA[0]);
+                    for (const activeToken of relevantActiveTokensA) {
+                        if (tokenAccessStatus[activeToken.key] && tokenAccessStatus[activeToken.key][a.id] && (tokenAccessStatus[activeToken.key][a.id].accessCount || 0) > 0) {
+                            isAccessedA = true;
+                            break;
+                        }
+                    }
                 }
-                return { num: 0, char: className }; // Fallback for unexpected formats
-            };
-
-            const classA = extractClassParts(a.class);
-            const classB = extractClassParts(b.class);
-
-            // Primary sort by numeric part of class
-            if (classA.num !== classB.num) {
-                return classA.num - classB.num;
-            }
-
-            // Secondary sort by alphabetic part of class if numeric parts are equal
-            if (classA.char !== classB.char) {
-                return classA.char.localeCompare(b.char);
-            }
-
-            // Tertiary sort by full name if classes are identical
-            return a.name.localeCompare(b.name);
-        });
-
-
-        for (const student of studentsToDisplay) {
-            counter++;
-            const row = document.createElement('tr');
-
-            let studentStatus = 'Belum Aktif';
-            let statusColor = 'red';
-
-            // Extract the numeric part of the student's class (e.g., '7' from '7A')
-            const studentClassNumericMatch = student.class.match(/\d+/);
-            const studentClassNumeric = studentClassNumericMatch ? studentClassNumericMatch[0] : null;
-
-            let foundRelevantActiveToken = false;
-
-            if (studentClassNumeric) {
-                // Check if there's any active token relevant to this student's class
-                for (const activeToken of activeTokens) {
-                    if (activeToken.kelas === studentClassNumeric) {
-                        foundRelevantActiveToken = true;
-                        // Check if this specific student has accessed this specific active token
-                        if (tokenAccessStatus[activeToken.key] && tokenAccessStatus[activeToken.key][student.id]) {
-                            studentStatus = 'Sedang Aktif';
-                            statusColor = 'green';
-                            break; // Found an active token relevant to their class that they accessed
+                if (studentClassNumericB) {
+                    const relevantActiveTokensB = tokenCache.filter(token => token.isActive && token.kelas === studentClassNumericB[0]);
+                    for (const activeToken of relevantActiveTokensB) {
+                        if (tokenAccessStatus[activeToken.key] && tokenAccessStatus[activeToken.key][b.id] && (tokenAccessStatus[activeToken.key][b.id].accessCount || 0) > 0) {
+                            isAccessedB = true;
+                            break;
                         }
                     }
                 }
             }
 
-            if (!foundRelevantActiveToken) {
-                studentStatus = '-'; // No active token for their class, or class could not be parsed
-                statusColor = 'grey';
-            } else if (studentStatus === 'Belum Aktif' && foundRelevantActiveToken) {
-                // This means a relevant active token exists, but the student hasn't accessed it
-                studentStatus = 'Belum Aktif'; // Keep as "Belum Aktif"
+            // Primary sort: Belum Mengakses/Belum Aktif (false for isAccessed) first
+            if (!isAccessedA && isAccessedB) return -1;
+            if (isAccessedA && !isAccessedB) return 1;
+
+            // Secondary sort: By class (numeric then alphabetic)
+            const classA = extractClassParts(a.class);
+            const classB = extractClassParts(b.class);
+
+            if (classA.num !== classB.num) {
+                return classA.num - classB.num;
+            }
+            // Ensure alphabetical sort for class characters (e.g., A, B, C)
+            if (classA.char !== classB.char) {
+                return classA.char.localeCompare(classB.char);
+            }
+
+            // Tertiary sort: By name
+            return a.name.localeCompare(b.name);
+        });
+
+        // Rendering loop
+        for (const student of studentsToDisplay) {
+            counter++;
+            const row = document.createElement('tr');
+            let studentStatus = '';
+            let statusColor = '';
+
+            if (currentExamStatusFilterToken) {
+                // Status for the specific selected token
+                const tokenAccessData = tokenAccessStatus[currentExamStatusFilterToken] && tokenAccessStatus[currentExamStatusFilterToken][student.id];
+                if (tokenAccessData && tokenAccessData.accessCount > 0) {
+                    studentStatus = `Sudah Mengakses (${tokenAccessData.accessCount})`;
+                    statusColor = 'green';
+                } else {
+                    studentStatus = 'Belum Mengakses';
+                    statusColor = 'red';
+                }
+            } else {
+                // Default status based on currently active tokens for their class
+                const activeTokens = tokenCache.filter(token => token.isActive);
+                const studentClassNumericMatch = student.class.match(/\d+/);
+                const studentClassNumeric = studentClassNumericMatch ? studentClassNumericMatch[0] : null;
+
+                let foundRelevantActiveToken = false;
+                let totalAccessCountForStudent = 0;
+
+                if (studentClassNumeric) {
+                    for (const activeToken of activeTokens) {
+                        if (activeToken.kelas === studentClassNumeric) {
+                            foundRelevantActiveToken = true;
+                            if (tokenAccessStatus[activeToken.key] && tokenAccessStatus[activeToken.key][student.id]) {
+                                const accessData = tokenAccessStatus[activeToken.key][student.id];
+                                totalAccessCountForStudent += (accessData.accessCount || 0);
+                            }
+                        }
+                    }
+                }
+
+                if (totalAccessCountForStudent > 0) {
+                    studentStatus = totalAccessCountForStudent > 1 ? `Sedang Aktif (${totalAccessCountForStudent})` : 'Sedang Aktif';
+                    statusColor = 'green';
+                } else if (!foundRelevantActiveToken) {
+                    studentStatus = '-';
+                    statusColor = 'grey';
+                } else {
+                    studentStatus = 'Belum Aktif';
+                    statusColor = 'red';
+                }
             }
 
             row.innerHTML = `
@@ -2002,8 +1904,23 @@
                 data.key = child.key; // Simpan Firebase key
                 studentCache.push(data);
             });
-            // Sorting and rendering will now happen inside renderStudentTable to ensure it's always sorted before display
-            renderStudentTable();
+
+            // Add initial sort to studentCache here to ensure consistent base order
+            studentCache.sort((a, b) => {
+                const classA = extractClassParts(a.class);
+                const classB = extractClassParts(b.class);
+
+                if (classA.num !== classB.num) {
+                    return classA.num - classB.num;
+                }
+                if (classA.char !== classB.char) {
+                    return classA.char.localeCompare(classB.char);
+                }
+                return a.name.localeCompare(b.name);
+            });
+
+            populateClassFilter(); // Populate class filter after students are loaded
+            renderStudentTable(); // Render without passing specific token filter, uses currentExamStatusFilterToken
         });
     }
 
@@ -2332,82 +2249,90 @@
         }
     };
 
-    // --- Fungsi Filter Siswa ---
-    window.filterStudentsByClass = (filterValue, dropdownId = null) => {
-        currentStudentFilter = filterValue;
+    // --- Fungsi Filter Siswa (berdasarkan kelas) ---
+    window.filterStudentsByClass = (filterValue) => {
+        currentStudentClassFilter = filterValue === "" ? null : filterValue; // null for "SEMUA KELAS"
         renderStudentTable();
-
-        // Remove active class from all filter buttons and dropdown toggles
-        document.querySelectorAll('.student-filter-button').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.dropdown-toggle').forEach(btn => btn.classList.remove('active'));
-        
-        // Close all dropdowns
-        document.querySelectorAll('.dropdown-content').forEach(content => content.style.display = 'none');
-
-        // Set active state for the selected dropdown toggle
-        if (dropdownId) {
-            const toggleButton = document.querySelector(`#${dropdownId} .dropdown-toggle`);
-            if (toggleButton) {
-                toggleButton.classList.add('active');
-            }
-        } else {
-            // If it's the "Tampilkan Semua" button
-            showAllStudentsBtn.classList.add('active');
-        }
     };
 
-    window.showAllStudents = () => {
-        currentStudentFilter = null;
-        renderStudentTable();
-        // Remove active class from all filter buttons and dropdown toggles
-        document.querySelectorAll('.student-filter-button').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.dropdown-toggle').forEach(btn => btn.classList.remove('active'));
-        // Close all dropdowns
-        document.querySelectorAll('.dropdown-content').forEach(content => content.style.display = 'none');
-        showAllStudentsBtn.classList.add('active');
-    };
+    // Fungsi untuk mengisi dropdown filter kelas
+    function populateClassFilter() {
+        classFilterDropdownSelect.innerHTML = '<option value="">SEMUA KELAS</option>'; // Default option
 
-    // Function to toggle dropdown visibility
-    window.toggleDropdown = (event, dropdownId) => {
-        event.stopPropagation(); // Prevent the click from immediately propagating to the window listener
-        const dropdownContent = document.querySelector(`#${dropdownId} .dropdown-content`);
-        const dropdownToggle = event.currentTarget; // The button that was clicked
+        // Collect unique class grades (7, 8, 9) and rombels (7A, 7B, etc.)
+        const grades = new Set();
+        const rombels = new Set();
 
-        // Close other open dropdowns
-        document.querySelectorAll('.dropdown-content').forEach(content => {
-            if (content.parentElement.id !== dropdownId) {
-                content.style.display = 'none';
-                // Find the correct toggle button for this content and remove active class
-                const otherToggleButton = content.parentElement.querySelector('.dropdown-toggle') || content.previousElementSibling;
-                if (otherToggleButton) {
-                    otherToggleButton.classList.remove('active');
+        studentCache.forEach(student => {
+            const classMatch = student.class.match(/^(\d+)([A-Z]+)?$/);
+            if (classMatch) {
+                const grade = classMatch[1];
+                const rombel = classMatch[2];
+                grades.add(parseInt(grade));
+                if (rombel) {
+                    rombels.add(student.class);
                 }
             }
         });
 
-        // Toggle current dropdown
-        if (dropdownContent.style.display === 'block') {
-            dropdownContent.style.display = 'none';
-            dropdownToggle.classList.remove('active');
+        // Sort grades numerically
+        const sortedGrades = Array.from(grades).sort((a, b) => a - b);
+        // Sort rombels alphabetically
+        const sortedRombels = Array.from(rombels).sort((a, b) => {
+            const classA = extractClassParts(a);
+            const classB = extractClassParts(b);
+            if (classA.num !== classB.num) {
+                return classA.num - classB.num;
+            }
+            return classA.char.localeCompare(classB.char);
+        });
+
+        sortedGrades.forEach(grade => {
+            // Add "Semua Rombel X" option
+            const allRombelOption = document.createElement('option');
+            allRombelOption.value = `${grade}_all`;
+            allRombelOption.innerText = `KELAS ${grade} (SEMUA ROMBEL)`;
+            classFilterDropdownSelect.appendChild(allRombelOption);
+
+            // Add specific rombel options for this grade
+            sortedRombels.filter(r => r.startsWith(grade))
+                         .forEach(rombel => {
+                const rombelOption = document.createElement('option');
+                rombelOption.value = rombel;
+                rombelOption.innerText = rombel;
+                classFilterDropdownSelect.appendChild(rombelOption);
+            });
+        });
+
+        // Set the selected value if a filter is active
+        if (currentStudentClassFilter) {
+            classFilterDropdownSelect.value = currentStudentClassFilter;
         } else {
-            dropdownContent.style.display = 'block';
-            dropdownToggle.classList.add('active');
+            classFilterDropdownSelect.value = ""; // Ensure "SEMUA KELAS" is selected if no filter
         }
+    }
+
+
+    // --- Fungsi Filter Siswa (berdasarkan status ujian/token) ---
+    window.filterStudentsByExamStatus = (selectedTokenKey) => {
+        currentExamStatusFilterToken = selectedTokenKey === "" ? null : selectedTokenKey;
+        renderStudentTable();
     };
 
-    // Close dropdowns if clicked outside
-    window.addEventListener('click', function(event) {
-        // Ensure the click is not inside any dropdown
-        if (!event.target.closest('.dropdown')) {
-            document.querySelectorAll('.dropdown-content').forEach(content => {
-                content.style.display = 'none';
-                const toggleButton = content.parentElement.querySelector('.dropdown-toggle') || content.previousElementSibling;
-                if (toggleButton) {
-                    toggleButton.classList.remove('active');
-                }
-            });
+    // Fungsi untuk mengisi dropdown filter status ujian
+    function populateExamStatusFilter() {
+        examStatusFilterDropdown.innerHTML = '<option value="">TOKEN SAAT INI</option>'; // Changed text here
+        tokenCache.forEach(token => {
+            const option = document.createElement('option');
+            option.value = token.key;
+            option.innerText = `${token.token} (${token.subject} Kelas ${token.kelas})`;
+            examStatusFilterDropdown.appendChild(option);
+        });
+        // Set the selected value if a filter is active
+        if (currentExamStatusFilterToken) {
+            examStatusFilterDropdown.value = currentExamStatusFilterToken;
         }
-    });
+    }
 
   </script>
 </body>
