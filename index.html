@@ -8,8 +8,8 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      background-color: #f0f0f0;
       padding: 20px; /* Global padding for desktop */
+      background-color: #f0f0f0;
       box-sizing: border-box; /* Include padding in element's total width and height */
     }
 
@@ -663,7 +663,8 @@
           <input type="text" id="studentName" placeholder="Nama Lengkap Siswa" required />
           <label>Kelas</label>
           <input type="text" id="studentClass" placeholder="Contoh: 7A, 8B, 9C" required />
-          <button type="submit" id="addStudentButton">Tambah Siswa</button>
+          <label>Ruang</label>
+          <input type="text" id="studentRoom" placeholder="Contoh: 01, 02, dsb" required /> <button type="submit" id="addStudentButton">Tambah Siswa</button>
           <button type="button" id="updateStudentButton" style="display:none;">Perbarui Siswa</button>
           <p id="studentErrorMsg" class="error"></p>
         </form>
@@ -706,7 +707,9 @@
                 <th>ID SISWA</th>
                 <th>NAMA</th>
                 <th>KELAS</th>
-                <th>STATUS</th> <th>AKSI</th>
+                <th>RUANG</th>
+                <th>STATUS</th>
+                <th>AKSI</th>
               </tr>
             </thead>
             <tbody id="studentTableBody"></tbody>
@@ -791,7 +794,10 @@
       <h4>Cetak Kartu Peserta</h4>
       <div id="printStudentCardError" class="error" style="text-align: center; margin-bottom: 5px;"></div>
       <label for="printCardTitleInput" style="display: block; text-align: left; margin-top: 10px; font-weight: bold;">Judul Kartu:</label>
-      <textarea id="printCardTitleInput" placeholder="Contoh:&#10;UJIAN SEKOLAH&#10;SMP NEGERI 2 PAJANGAN&#10;TAHUN AJARAN 2024/2025" style="width: calc(100% - 20px); padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; height: 80px;"></textarea>
+      <textarea id="printCardTitleInput" placeholder="Contoh:
+UJIAN SEKOLAH
+SMP NEGERI 2 PAJANGAN
+TAHUN AJARAN 2024/2025" style="width: calc(100% - 20px); padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; height: 80px;"></textarea>
 
       <label for="printCardDateInput" style="display: block; text-align: left; margin-top: 10px; font-weight: bold;">Tanggal:</label>
       <input type="text" id="printCardDateInput" placeholder="Contoh: Pajangan, 23 Mei 2025" style="margin-bottom: 15px;" />
@@ -856,7 +862,8 @@
       <input type="text" id="modalStudentName" required />
       <label for="modalStudentClass">Kelas</label>
       <input type="text" id="modalStudentClass" required />
-      <button onclick="confirmEditStudent()">Simpan</button>
+      <label for="modalStudentRoom">Ruang</label>
+      <input type="text" id="modalStudentRoom" placeholder="Contoh: 01, 02, dsb" required /> <button onclick="confirmEditStudent()">Simpan</button>
       <button type="button" onclick="closeEditStudentModal()">Batal</button>
     </div>
   </div>
@@ -874,12 +881,11 @@
       <h4>Import Data Peserta dari csv</h4>
       <p style="font-size: 0.9em; color: #555; text-align: left;">
         Perhatikan hal-hal berikut!<br>
-        1. Siapkan data peserta dengan 3 kolom: ID Peserta (angka), Nama Lengkap, dan Kelas (misal: 7A, 8B, dsb)<br>
+        1. Siapkan data peserta dengan 4 kolom: ID Peserta (angka), Nama Lengkap, Kelas, dan Ruang<br>
         2. Simpan file dengan format *.csv (comma delimited)<br>
         3. Pastikan tidak ada kolom tambahan
       </p>
-      <a href="https://drive.google.com/uc?export=download&id=1hSJbLnLTq3F2wLAKKN7l9BNOQc04ypnX" target="_blank" style="display: block; text-align: center; margin: 15px 0; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px;">Unduh Template CSV</a>
-      <input type="file" id="csvFileInput" accept=".csv" style="margin-top: 15px; margin-bottom: 10px;" />
+      <a href="https://drive.google.com/uc?export=download&id=16rzsLjQ3AVm0wIPqWnzsauzbrwGfO7An" target="_blank" style="display: block; text-align: center; margin: 15px 0; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px;">Unduh Template CSV</a> <input type="file" id="csvFileInput" accept=".csv" style="margin-top: 15px; margin-bottom: 10px;" />
       <p id="importFileError" class="error"></p>
       <button onclick="processCsvFile()">Mulai Impor</button>
       <button onclick="closeImportStudentModal()">Batal</button>
@@ -985,6 +991,7 @@
     const studentIdInput = document.getElementById('studentId');
     const studentNameInput = document.getElementById('studentName');
     const studentClassInput = document.getElementById('studentClass');
+    const studentRoomInput = document.getElementById('studentRoom'); // NEW: Referensi input ruang
     const addStudentButton = document.getElementById('addStudentButton');
     const updateStudentButton = document.getElementById('updateStudentButton');
     const studentErrorMsg = document.getElementById('studentErrorMsg');
@@ -1001,6 +1008,7 @@
     const modalStudentIdInput = document.getElementById('modalStudentId');
     const modalStudentNameInput = document.getElementById('modalStudentName');
     const modalStudentClassInput = document.getElementById('modalStudentClass');
+    const modalStudentRoomInput = document.getElementById('modalStudentRoom'); // NEW: Referensi input ruang di modal edit
     const editStudentErrorMsg = document.getElementById('editStudentErrorMsg');
 
     // Elemen HTML untuk Modal Konfirmasi Hapus Siswa
@@ -1041,6 +1049,17 @@
     // Helper function to pad student ID with leading zeros
     function padStudentId(id) {
         return String(id).padStart(3, '0');
+    }
+
+    // NEW: Helper function to pad room number with leading zeros (2 digits)
+    function padRoomNumber(room) {
+        if (!room) return '-'; // Handle empty or null room
+        // Attempt to convert to number and pad, otherwise return as is
+        const numRoom = parseInt(room, 10);
+        if (!isNaN(numRoom)) {
+            return String(numRoom).padStart(2, '0');
+        }
+        return String(room).toUpperCase(); // Return as is if not a number, ensure uppercase
     }
 
     // Fungsi untuk menampilkan/menyembunyikan bagian dashboard
@@ -1833,6 +1852,13 @@
                     const firstAccessTime = accessData[studentId].firstAccessTime ? new Date(accessData[studentId].firstAccessTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
                     const accessCount = accessData[studentId].accessCount || 0;
 
+                    let displayStatus = 'Belum Mengakses';
+                    if (accessCount > 0) {
+                        displayStatus = 'Sudah Mengakses';
+                        if (accessCount > 1) {
+                            displayStatus += ` (${accessCount})`;
+                        }
+                    }
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -1840,7 +1866,7 @@
                         <td>${studentId}</td>
                         <td>${studentName}</td>
                         <td>${studentClass}</td>
-                        <td>${accessCount > 0 ? `Sudah Mengakses (${accessCount})` : 'Belum Mengakses'}</td>
+                        <td>${displayStatus}</td>
                         <td>${firstAccessTime}</td>
                     `;
                     accessDetailTableBody.appendChild(row);
@@ -1941,25 +1967,29 @@
                 // Status untuk token spesifik yang dipilih
                 const tokenAccessData = tokenAccessStatus[currentExamStatusFilterToken] && tokenAccessStatus[currentExamStatusFilterToken][student.id];
                 if (tokenAccessData && tokenAccessData.accessCount > 0) {
-                    studentStatus = `Sudah Mengakses (${tokenAccessData.accessCount})`;
+                    studentStatus = `Sudah Mengakses`;
+                    if (tokenAccessData.accessCount > 1) {
+                        studentStatus += ` (${tokenAccessData.accessCount})`;
+                    }
                     statusColor = 'green';
                 } else {
                     studentStatus = 'Belum Mengakses';
                     statusColor = 'red';
                 }
             } else {
-                // Status default berdasarkan token aktif yang relevan untuk kelas mereka
+                // Status default berdasarkan apakah siswa telah mengakses token aktif yang relevan
                 const activeTokens = tokenCache.filter(token => token.isActive);
                 const studentClassNumericMatch = student.class.match(/\d+/);
                 const studentClassNumeric = studentClassNumericMatch ? studentClassNumericMatch[0] : null;
 
-                let foundRelevantActiveToken = false;
                 let totalAccessCountForStudent = 0;
+                let foundRelevantActiveToken = false; // Flag to indicate if there's any relevant active token for this student's class
 
                 if (studentClassNumeric) {
                     for (const activeToken of activeTokens) {
+                        // Check if the active token's class matches the numeric part of the student's class
                         if (activeToken.kelas === studentClassNumeric) {
-                            foundRelevantActiveToken = true;
+                            foundRelevantActiveToken = true; // Found at least one relevant active token
                             if (tokenAccessStatus[activeToken.key] && tokenAccessStatus[activeToken.key][student.id]) {
                                 const accessData = tokenAccessStatus[activeToken.key][student.id];
                                 totalAccessCountForStudent += (accessData.accessCount || 0);
@@ -1969,14 +1999,19 @@
                 }
 
                 if (totalAccessCountForStudent > 0) {
-                    studentStatus = totalAccessCountForStudent > 1 ? `Sedang Aktif (${totalAccessCountForStudent})` : 'Sedang Aktif';
+                    studentStatus = `Sudah Mengakses`;
+                    if (totalAccessCountForStudent > 1) {
+                        studentStatus += ` (${totalAccessCountForStudent})`;
+                    }
                     statusColor = 'green';
-                } else if (!foundRelevantActiveToken) {
+                } else if (foundRelevantActiveToken) {
+                    // There are relevant active tokens, but the student hasn't accessed any of them
+                    studentStatus = 'Belum Mengakses';
+                    statusColor = 'red';
+                } else {
+                    // No relevant active tokens found for this student's class
                     studentStatus = '-';
                     statusColor = 'grey';
-                } else {
-                    studentStatus = 'Belum Aktif';
-                    statusColor = 'red';
                 }
             }
 
@@ -1985,7 +2020,7 @@
                 <td>${student.id}</td>
                 <td>${student.name}</td>
                 <td>${student.class}</td>
-                <td style="color: ${statusColor}; font-weight: bold;">${studentStatus}</td>
+                <td>${padRoomNumber(student.room)}</td> <td style="color: ${statusColor}; font-weight: bold;">${studentStatus}</td>
                 <td>
                     <div class="student-action-buttons">
                         <button onclick="openEditStudentModal('${student.key}')">
@@ -2020,7 +2055,7 @@
                     return classA.num - classB.num;
                 }
                 if (classA.char !== classB.char) {
-                    return classA.char.localeCompare(classB.char);
+                    return classA.char.localeCompare(b.char);
                 }
                 return a.name.localeCompare(b.name);
             });
@@ -2036,10 +2071,11 @@
         const studentId = padStudentId(studentIdInput.value.trim()); // Pad ID
         const studentName = studentNameInput.value.trim().toUpperCase(); // Otomatis kapital
         const studentClass = studentClassInput.value.trim().toUpperCase(); // Otomatis kapital
+        const studentRoom = padRoomNumber(studentRoomInput.value.trim()); // UPDATED: Ambil nilai ruang dan pad
         studentErrorMsg.innerText = "";
 
         // Validasi ID Siswa (harus angka)
-        if (!/^\d+$/.test(studentId)) { // Validasi setelah padding, tapi padStudentId sudah memastikan format string
+        if (!/^\d+$/.test(studentId)) {
             studentErrorMsg.innerText = "ID Siswa harus berupa angka!";
             return;
         }
@@ -2054,7 +2090,7 @@
         if (currentStudentKey) {
             // Mode Edit (ini seharusnya tidak dipanggil dari sini lagi setelah ada modal edit)
             // Namun, jika tombol updateStudentButton tetap ada, ini akan menangani submit form
-            update(ref(db, 'students/' + currentStudentKey), { id: studentId, name: studentName, class: studentClass })
+            update(ref(db, 'students/' + currentStudentKey), { id: studentId, name: studentName, class: studentClass, room: studentRoom }) // UPDATED: Tambahkan ruang
                 .then(() => {
                     showNotification('Data siswa berhasil diperbarui.');
                     studentForm.reset();
@@ -2067,7 +2103,7 @@
                 });
         } else {
             // Mode Tambah
-            push(studentsRef, { id: studentId, name: studentName, class: studentClass })
+            push(studentsRef, { id: studentId, name: studentName, class: studentClass, room: studentRoom }) // UPDATED: Tambahkan ruang
                 .then(() => {
                     showNotification('Siswa berhasil ditambahkan.');
                     studentForm.reset();
@@ -2087,6 +2123,7 @@
       modalStudentIdInput.value = student.id;
       modalStudentNameInput.value = student.name;
       modalStudentClassInput.value = student.class;
+      modalStudentRoomInput.value = student.room || ''; // NEW: Isi input ruang di modal edit, handle jika undefined
       editStudentErrorMsg.innerText = ""; // Bersihkan pesan error sebelumnya
       editStudentModal.style.display = 'flex';
     };
@@ -2096,9 +2133,10 @@
         const studentId = padStudentId(modalStudentIdInput.value.trim()); // Pad ID
         const studentName = modalStudentNameInput.value.trim().toUpperCase();
         const studentClass = modalStudentClassInput.value.trim().toUpperCase();
+        const studentRoom = padRoomNumber(modalStudentRoomInput.value.trim()); // UPDATED: Ambil nilai ruang dari modal dan pad
         editStudentErrorMsg.innerText = "";
 
-        if (!studentId || !studentName || !studentClass) {
+        if (!studentId || !studentName || !studentClass || !studentRoom) { // UPDATED: Validasi ruang
             editStudentErrorMsg.innerText = "Semua field harus diisi!";
             return;
         }
@@ -2115,7 +2153,7 @@
         }
 
         if (currentStudentKey) {
-            update(ref(db, 'students/' + currentStudentKey), { id: studentId, name: studentName, class: studentClass })
+            update(ref(db, 'students/' + currentStudentKey), { id: studentId, name: studentName, class: studentClass, room: studentRoom }) // UPDATED: Tambahkan ruang
                 .then(() => {
                     showNotification('Data siswa berhasil diperbarui.');
                     closeEditStudentModal();
@@ -2225,26 +2263,27 @@
                 let parts = line.split(',');
                 let delimiter = ',';
 
-                // Jika pemisahan koma tidak menghasilkan 3 bagian, coba titik koma
-                if (parts.length !== 3) {
+                // Jika pemisahan koma tidak menghasilkan 4 bagian, coba titik koma
+                if (parts.length !== 4) { // UPDATED: Expect 4 parts now
                     parts = line.split(';');
                     delimiter = ';';
                 }
 
                 const originalLineNumber = i + 2; // Nomor baris asli di file CSV (karena kita slice(1))
 
-                if (parts.length !== 3) {
-                    errorDetails.push(`Baris ${originalLineNumber}: Format tidak valid (diharapkan ID,Nama,Kelas). Baris: "${line}"`);
+                if (parts.length !== 4) { // UPDATED: Check for 4 parts
+                    errorDetails.push(`Baris ${originalLineNumber}: Format tidak valid (diharapkan ID,Nama,Kelas,Ruang). Baris: "${line}"`); // UPDATED message
                     skippedCount++;
                     continue;
                 }
 
-                const id = padStudentId(parts[0].trim()); // Pad ID
+                const id = padStudentId(parts[0].trim());
                 const name = parts[1].trim().toUpperCase();
                 const studentClass = parts[2].trim().toUpperCase();
+                const studentRoom = padRoomNumber(parts[3].trim()); // UPDATED: Ambil data ruang dan pad
 
                 // Validasi ID Siswa (harus angka)
-                if (!/^\d+$/.test(id)) { // Validasi setelah padding, tapi padStudentId sudah memastikan format string
+                if (!/^\d+$/.test(id)) {
                     errorDetails.push(`Baris ${originalLineNumber}: ID Siswa '${id}' tidak valid (harus angka).`);
                     skippedCount++;
                     continue;
@@ -2267,7 +2306,7 @@
 
                 // Hasilkan kunci baru dan tambahkan ke objek pembaruan batch
                 const newRef = push(studentsRef); // Dapatkan referensi baru dengan kunci unik
-                studentsToBatchUpdate[newRef.key] = { id: id, name: name, class: studentClass };
+                studentsToBatchUpdate[newRef.key] = { id: id, name: name, class: studentClass, room: studentRoom }; // UPDATED: Tambahkan ruang
                 importedCount++; // Tingkatkan segera untuk tujuan tampilan
             }
 
@@ -2390,7 +2429,7 @@
             if (classA.num !== classB.num) {
                 return classA.num - classB.num;
             }
-            return classA.char.localeCompare(classB.char);
+            return classA.char.localeCompare(b.char);
         });
 
         sortedGrades.forEach(grade => {
