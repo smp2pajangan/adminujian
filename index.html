@@ -546,6 +546,44 @@
         margin: 0;
     }
 
+    /* Gaya khusus untuk modal informasi cetak kartu */
+    #printInfoModal .modal-content {
+        max-width: 500px; /* Override max-width of generic modal-content */
+        border: 1px solid #888; /* Add border */
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); /* Add specific shadow */
+        text-align: center; /* Center text within modal */
+        font-size: 16px; /* Adjust font size */
+    }
+
+    #printInfoModal .modal-content p {
+        margin: 0 0 10px 0; /* Default margin for paragraphs */
+    }
+    #printInfoModal .modal-content p:last-of-type {
+        margin-bottom: 0; /* No bottom margin for the last paragraph */
+    }
+    #printInfoModal .modal-content a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    #printInfoModal .modal-content a:hover {
+        text-decoration: underline;
+    }
+    #printInfoModal .close-button {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    #printInfoModal .close-button:hover,
+    #printInfoModal .close-button:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -678,7 +716,7 @@
             <button onclick="openEmptyStudentsModal()" style="background: none; border: none; cursor: pointer; padding: 0; margin: 0;">
                 <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus%20total.png" alt="Kosongkan Daftar" style="width: 24px; height: 24px;">
             </button>
-            <button onclick="openPrintStudentCardModal()" style="background: none; border: none; cursor: pointer; padding: 0; margin: 0;">
+            <button onclick="showPrintInfoModal()" style="background: none; border: none; cursor: pointer; padding: 0; margin: 0;">
               <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/print.png" alt="Cetak Kartu" style="width: 24px; height: 24px;">
             </button>
           </div>
@@ -789,21 +827,21 @@
     </div>
   </div>
 
-  <div id="printStudentCardModal" class="modal">
+  <div id="printInfoModal" class="modal">
     <div class="modal-content">
-      <h4>Cetak Kartu Peserta</h4>
-      <div id="printStudentCardError" class="error" style="text-align: center; margin-bottom: 5px;"></div>
-      <label for="printCardTitleInput" style="display: block; text-align: left; margin-top: 10px; font-weight: bold;">Judul Kartu:</label>
-      <textarea id="printCardTitleInput" placeholder="Contoh:
-UJIAN SEKOLAH
-SMP NEGERI 2 PAJANGAN
-TAHUN AJARAN 2024/2025" style="width: calc(100% - 20px); padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; height: 80px;"></textarea>
-
-      <label for="printCardDateInput" style="display: block; text-align: left; margin-top: 10px; font-weight: bold;">Tanggal:</label>
-      <input type="text" id="printCardDateInput" placeholder="Contoh: Pajangan, 23 Mei 2025" style="margin-bottom: 15px;" />
-
-      <button class="print-button" onclick="confirmPrintStudentCard()">Lanjutkan Mencetak</button>
-      <button class="cancel-button" onclick="closePrintStudentCardModal()">Batal</button>
+        <span class="close-button" onclick="closePrintInfoModal()">&times;</span>
+        <p style="margin-bottom: 20px;">
+            Maaf, sementara cetak kartu belum bisa. Silahkan download 2 file excel dan word dibawah ini:
+        </p>
+        <p style="margin-bottom: 10px;">
+            <a href="https://drive.google.com/uc?export=download&id=1rLFyKUzQloJi7LAnO-x7Q-lK0BzdxQv3" target="_blank">File Word (disini)</a>
+        </p>
+        <p style="margin-bottom: 20px;">
+            <a href="https://drive.google.com/uc?export=download&id=14uoOXQScECxd9hXD4AIMJjFBlmbSAgxS" target="_blank">File Excel (disini)</a>
+        </p>
+        <p style="font-size: 14px; color: #555;">
+            **Catatan:** ISI ID_SISWA SESUAI DENGAN TEMPLATE CSV!
+        </p>
     </div>
   </div>
 
@@ -961,7 +999,7 @@ TAHUN AJARAN 2024/2025" style="width: calc(100% - 20px); padding: 10px; margin: 
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus.png";
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
-    const PRINT_STUDENT_CARD_URL = "https://smp2pajangan.github.io/cetakkartu"; // URL for student card printing
+    // const PRINT_STUDENT_CARD_URL = "https://smp2pajangan.github.io/cetakkartu"; // URL for student card printing (dihapus/diganti)
     let inactivityTimer;
     const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // Batas waktu tidak aktif 1 jam
     let currentForceActiveTokenId = null;
@@ -1029,11 +1067,8 @@ TAHUN AJARAN 2024/2025" style="width: calc(100% - 20px); padding: 10px; margin: 
     // Elemen HTML untuk Modal Logout
     const logoutConfirmModal = document.getElementById('logoutConfirmModal');
 
-    // Elemen HTML untuk Modal Cetak Kartu Peserta
-    const printStudentCardModal = document.getElementById('printStudentCardModal');
-    const printCardTitleInput = document.getElementById('printCardTitleInput');
-    const printCardDateInput = document.getElementById('printCardDateInput');
-    const printStudentCardError = document.getElementById('printStudentCardError');
+    // Elemen HTML untuk Modal Info Cetak Kartu (yang baru)
+    const printInfoModal = document.getElementById('printInfoModal');
 
 
     // Elemen tombol navigasi dan header
@@ -1500,58 +1535,31 @@ TAHUN AJARAN 2024/2025" style="width: calc(100% - 20px); padding: 10px; margin: 
         return;
       }
 
-      const printUrlWithTitle = `${PRINT_PAGE_URL}?title=${encodeURIComponent(printTitle)}`;
+      // Konversi newline (\n) menjadi <br> untuk URL
+      const formattedTitle = printTitle.replace(/\n/g, '<br>');
+      const printUrlWithTitle = `${PRINT_PAGE_URL}?title=${encodeURIComponent(formattedTitle)}`;
       window.open(printUrlWithTitle, '_blank');
 
       setTimeout(() => {}, 1500);
       closePrintModal();
     };
 
-    // --- Fungsi Cetak Kartu Peserta ---
-    window.openPrintStudentCardModal = () => {
-        printStudentCardModal.style.display = 'flex';
-        printCardTitleInput.value = ''; // Clear previous title
-        printStudentCardError.innerText = ''; // Clear previous error
-
-        // Set default date to "Pajangan, DD MMMMYYYY"
-        const now = new Date();
-        const options = { day: '2-digit', month: 'long', year: 'numeric' };
-        const formattedDate = now.toLocaleDateString('id-ID', options);
-        printCardDateInput.value = `Pajangan, ${formattedDate}`;
-
-        // Ensure title input auto-capitalizes
-        printCardTitleInput.addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-        });
+    // --- Fungsi BARU untuk Modal Info Cetak Kartu Peserta ---
+    window.showPrintInfoModal = () => {
+        printInfoModal.style.display = 'flex'; // Tampilkan modal
     };
 
-    window.closePrintStudentCardModal = () => {
-        printStudentCardModal.style.display = 'none';
-        printCardTitleInput.value = '';
-        printCardDateInput.value = '';
-        printStudentCardError.innerText = '';
+    window.closePrintInfoModal = () => {
+        printInfoModal.style.display = 'none'; // Sembunyikan modal
     };
 
-    window.confirmPrintStudentCard = () => {
-        const title = printCardTitleInput.value.trim();
-        const date = printCardDateInput.value.trim();
-        printStudentCardError.innerText = '';
-
-        if (!title) {
-            printStudentCardError.innerText = 'Judul kartu tidak boleh kosong!';
-            return;
+    // Opsional: Tutup modal saat mengklik di luar konten modal
+    window.onclick = function(event) {
+        if (event.target == printInfoModal) {
+            printInfoModal.style.display = 'none';
         }
-        if (!date) {
-            printStudentCardError.innerText = 'Tanggal tidak boleh kosong!';
-            return;
-        }
-
-        // Construct URL with parameters
-        const url = `${PRINT_STUDENT_CARD_URL}?title=${encodeURIComponent(title)}&date=${encodeURIComponent(date)}`;
-        window.open(url, '_blank'); // Open in new tab
-
-        closePrintStudentCardModal();
     };
+    // --- AKHIR Fungsi BARU untuk Modal Info Cetak Kartu Peserta ---
 
     // Fungsi untuk meminta konfirmasi pengaktifan paksa token
     window.promptForceActive = (tokenId) => {
@@ -2429,7 +2437,7 @@ TAHUN AJARAN 2024/2025" style="width: calc(100% - 20px); padding: 10px; margin: 
             if (classA.num !== classB.num) {
                 return classA.num - classB.num;
             }
-            return classA.char.localeCompare(b.char);
+            return classA.char.localeCompare(classB.char);
         });
 
         sortedGrades.forEach(grade => {
