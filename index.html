@@ -9,20 +9,27 @@
       font-family: Arial, sans-serif;
       margin: 0;
       background-color: #f0f0f0;
+      padding: 20px; /* Global padding for desktop */
+      box-sizing: border-box; /* Include padding in element's total width and height */
     }
 
-    /* Header biru (mengikuti scroll) */
+    /* Global styles for alignment and max-width */
+    .header-blue-bg,
+    .dashboard-nav-wrapper,
+    .container {
+      max-width: 800px; /* Unified max-width for all main content blocks */
+      margin: 0 auto; /* Center them */
+      box-sizing: border-box; /* Ensure padding is included in width */
+    }
+
+    /* Specific padding and border-radius for each section based on its role */
     .header-blue-bg {
       background-color: #0066cc;
       padding: 15px 20px;
       text-align: center;
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
-      box-sizing: border-box;
     }
     .header-blue-bg .header-inner {
       color: white;
@@ -33,24 +40,19 @@
       width: 100px;
     }
 
-    /* Navigasi Dashboard (mengikuti scroll) */
     .dashboard-nav-wrapper {
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
       background-color: #e0e0e0;
       padding: 10px 20px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       display: none;
       border-bottom-left-radius: 10px;
       border-bottom-right-radius: 10px;
-      box-sizing: border-box;
     }
     .dashboard-nav-wrapper .dashboard-nav-inner {
       display: flex;
       justify-content: center;
       gap: 10px;
-      flex-wrap: wrap; /* Memungkinkan tombol melipat ke baris baru */
+      flex-wrap: wrap;
     }
     .dashboard-nav-wrapper button {
       background-color: #007bff;
@@ -70,17 +72,16 @@
       background-color: #0056b3;
     }
 
-    /* Kontainer utama untuk login dan konten dashboard */
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
-      margin-bottom: 20px;
+    .container { /* This applies to login section and dashboard sections */
       background: white;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       position: relative;
-      box-sizing: border-box;
+    }
+    /* Specific margin-top for content sections to separate from header/nav */
+    .container#loginSection {
+        margin-top: 20px;
     }
     .dashboard-section.container {
         margin-top: 20px;
@@ -256,23 +257,35 @@
     .action-button-icon:active {
       background-color: #c0c0c0;
     }
+
+    /* Mobile-specific adjustments */
     @media (max-width: 600px) {
       body {
-        padding-top: 0;
+        padding: 10px; /* Consistent padding from all edges on mobile */
       }
-      .header-blue-bg, .dashboard-nav-wrapper, .container {
-        margin-left: 10px;
-        margin-right: 10px;
-        border-radius: 0; /* Hilangkan border radius di layar kecil untuk tampilan full-width */
+      /* Override global max-width and margin for full-width alignment on mobile */
+      .header-blue-bg,
+      .dashboard-nav-wrapper,
+      .container {
+        max-width: none; /* Remove max-width constraint on mobile */
+        width: 100%; /* Make them take full width within body padding */
+        margin: 0; /* Remove auto margin, let body padding handle spacing */
+        border-radius: 0; /* Full width look */
       }
+      /* Adjust internal padding for mobile for better spacing */
       .header-blue-bg {
-        padding: 10px 10px;
-      }
-      .header-blue-bg h2 {
-        font-size: 1.2em;
+        padding: 10px; /* Smaller padding for header on mobile */
       }
       .dashboard-nav-wrapper {
-        padding: 8px 10px;
+        padding: 8px 10px; /* Smaller padding for nav on mobile */
+      }
+      .container {
+        padding: 15px; /* Smaller padding for content on mobile */
+      }
+
+      /* Adjust font sizes and button spacing for mobile */
+      .header-blue-bg h2 {
+        font-size: 1.2em;
       }
       .dashboard-nav-wrapper .dashboard-nav-inner {
         flex-wrap: wrap;
@@ -283,12 +296,7 @@
         padding: 6px 10px;
         font-size: 13px;
       }
-      .container {
-        margin: 10px auto;
-        padding: 15px;
-      }
       h2, h3 {
-        text-align: center;
         font-size: 1.5em;
       }
       input, select, button {
@@ -313,33 +321,29 @@
         display: none;
       }
       /* Sembunyikan kolom tertentu di layar kecil untuk tabel siswa */
-      #studentTable thead th:nth-child(5), /* STATUS */
-      #studentTable tbody td:nth-child(5) {
-        /* display: none; */ /* Biarkan status terlihat, penting */
-      }
-      #studentTable thead th:nth-child(6), /* AKSI */
-      #studentTable tbody td:nth-child(6) {
-        /* display: none; */ /* Biarkan aksi terlihat */
-      }
+      /* #studentTable thead th:nth-child(5), */ /* STATUS - Biarkan terlihat */
+      /* #studentTable tbody td:nth-child(5), */
+      /* #studentTable thead th:nth-child(6), */ /* AKSI - Biarkan terlihat */
+      /* #studentTable tbody td:nth-child(6) */
       .action-buttons {
         flex-direction: row;
         justify-content: center;
       }
       .modal-content {
         padding: 15px;
-        width: 95%; /* Lebih lebar untuk mengisi layar */
+        width: 95%;
       }
       .modal button {
         padding: 8px 12px;
         font-size: 14px;
       }
       .student-filters-container {
-        flex-direction: column; /* Stack filters vertically */
+        flex-direction: column;
         align-items: flex-start;
         gap: 10px;
       }
       .student-filters-container > div {
-        flex-direction: column; /* Stack label and select vertically */
+        flex-direction: column;
         align-items: flex-start;
         width: 100%;
       }
@@ -371,7 +375,7 @@
         font-size: 10px;
       }
       table {
-        min-width: 400px; /* Lebih kecil lagi untuk layar sangat kecil */
+        min-width: 400px;
       }
     }
     #notification {
@@ -673,6 +677,9 @@
             <button onclick="openEmptyStudentsModal()" style="background: none; border: none; cursor: pointer; padding: 0; margin: 0;">
                 <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus%20total.png" alt="Kosongkan Daftar" style="width: 24px; height: 24px;">
             </button>
+            <button onclick="openPrintStudentCardModal()" style="background: none; border: none; cursor: pointer; padding: 0; margin: 0;">
+              <img src="https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/print.png" alt="Cetak Kartu" style="width: 24px; height: 24px;">
+            </button>
           </div>
         </div>
 
@@ -727,7 +734,7 @@
         <input type="url" id="editUrl" required />
         <label>Waktu Token Dibuka</label>
         <input type="datetime-local" id="editStartTime" required />
-        <label>Waktu Token Ditutup</label>
+        <label>Waktu Token Ditutup</labeL>
         <input type="datetime-local" id="editEndTime" required />
         <p id="editErrorMsg" class="error"></p>
         <button type="submit">Simpan</button>
@@ -776,6 +783,21 @@
       <textarea id="printTitleInput" placeholder="Tulis dengan huruf kapital" style="width: calc(100% - 20px); padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; height: 80px;"></textarea>
       <button class="print-button" onclick="printTokenList()">Cetak</button>
       <button class="cancel-button" onclick="closePrintModal()">Batal</button>
+    </div>
+  </div>
+
+  <div id="printStudentCardModal" class="modal">
+    <div class="modal-content">
+      <h4>Cetak Kartu Peserta</h4>
+      <div id="printStudentCardError" class="error" style="text-align: center; margin-bottom: 5px;"></div>
+      <label for="printCardTitleInput" style="display: block; text-align: left; margin-top: 10px; font-weight: bold;">Judul Kartu:</label>
+      <textarea id="printCardTitleInput" placeholder="Contoh:&#10;UJIAN SEKOLAH&#10;SMP NEGERI 2 PAJANGAN&#10;TAHUN AJARAN 2024/2025" style="width: calc(100% - 20px); padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; height: 80px;"></textarea>
+
+      <label for="printCardDateInput" style="display: block; text-align: left; margin-top: 10px; font-weight: bold;">Tanggal:</label>
+      <input type="text" id="printCardDateInput" placeholder="Contoh: Pajangan, 23 Mei 2025" style="margin-bottom: 15px;" />
+
+      <button class="print-button" onclick="confirmPrintStudentCard()">Lanjutkan Mencetak</button>
+      <button class="cancel-button" onclick="closePrintStudentCardModal()">Batal</button>
     </div>
   </div>
 
@@ -933,6 +955,7 @@
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus.png";
     const PRINT_PAGE_URL = "https://smp2pajangan.github.io/cetaktoken";
+    const PRINT_STUDENT_CARD_URL = "https://smp2pajangan.github.io/cetakkartu"; // URL for student card printing
     let inactivityTimer;
     const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // Batas waktu tidak aktif 1 jam
     let currentForceActiveTokenId = null;
@@ -997,6 +1020,12 @@
 
     // Elemen HTML untuk Modal Logout
     const logoutConfirmModal = document.getElementById('logoutConfirmModal');
+
+    // Elemen HTML untuk Modal Cetak Kartu Peserta
+    const printStudentCardModal = document.getElementById('printStudentCardModal');
+    const printCardTitleInput = document.getElementById('printCardTitleInput');
+    const printCardDateInput = document.getElementById('printCardDateInput');
+    const printStudentCardError = document.getElementById('printStudentCardError');
 
 
     // Elemen tombol navigasi dan header
@@ -1457,6 +1486,52 @@
 
       setTimeout(() => {}, 1500);
       closePrintModal();
+    };
+
+    // --- Fungsi Cetak Kartu Peserta ---
+    window.openPrintStudentCardModal = () => {
+        printStudentCardModal.style.display = 'flex';
+        printCardTitleInput.value = ''; // Clear previous title
+        printStudentCardError.innerText = ''; // Clear previous error
+
+        // Set default date to "Pajangan, DD MMMMYYYY"
+        const now = new Date();
+        const options = { day: '2-digit', month: 'long', year: 'numeric' };
+        const formattedDate = now.toLocaleDateString('id-ID', options);
+        printCardDateInput.value = `Pajangan, ${formattedDate}`;
+
+        // Ensure title input auto-capitalizes
+        printCardTitleInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    };
+
+    window.closePrintStudentCardModal = () => {
+        printStudentCardModal.style.display = 'none';
+        printCardTitleInput.value = '';
+        printCardDateInput.value = '';
+        printStudentCardError.innerText = '';
+    };
+
+    window.confirmPrintStudentCard = () => {
+        const title = printCardTitleInput.value.trim();
+        const date = printCardDateInput.value.trim();
+        printStudentCardError.innerText = '';
+
+        if (!title) {
+            printStudentCardError.innerText = 'Judul kartu tidak boleh kosong!';
+            return;
+        }
+        if (!date) {
+            printStudentCardError.innerText = 'Tanggal tidak boleh kosong!';
+            return;
+        }
+
+        // Construct URL with parameters
+        const url = `${PRINT_STUDENT_CARD_URL}?title=${encodeURIComponent(title)}&date=${encodeURIComponent(date)}`;
+        window.open(url, '_blank'); // Open in new tab
+
+        closePrintStudentCardModal();
     };
 
     // Fungsi untuk meminta konfirmasi pengaktifan paksa token
