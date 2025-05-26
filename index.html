@@ -37,14 +37,14 @@
     .logo {
       display: block;
       margin: 0 auto;
-      width: 100px;
+      width: 100px; /* Original width */
     }
 
     .dashboard-nav-wrapper {
       background-color: #e0e0e0;
       padding: 10px 20px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      display: none;
+      display: none; /* Controlled by JS */
       border-bottom-left-radius: 10px;
       border-bottom-right-radius: 10px;
     }
@@ -139,6 +139,7 @@
     #locationSettingsTableBody td:nth-child(1) { text-align: center; }
     #locationSettingsTableBody td:nth-child(2) { text-align: center; }
     #locationSettingsTableBody td:nth-child(3) { text-align: center; }
+    #locationSettingsTableBody td:nth-child(4) { text-align: center; }
     #locationSettingsTableBody td:nth-child(4) button {
       display: inline-block;
       margin: 0;
@@ -628,14 +629,15 @@
         <input type="text" id="kelas" placeholder="Berupa angka saja" required />
         <label>Token Ujian (Base Token)</label>
         <input type="text" id="token" placeholder="Berupa huruf/angka (gunakan kapital)" required />
-        <label>Link Ujian</label>
-        <input type="url" id="url" placeholder="Gunakan http://" required />
-        <label>Waktu Token Dibuka</label>
+        <label>Google Form Prefill Link</label>
+        <input type="url" id="prefillUrl" placeholder="Tempel link prefill Google Form di sini" oninput="extractPrefillData()" required />
+        <input type="hidden" id="tokenEntryId" />
+        <input type="hidden" id="nameEntryId" />
+        <input type="hidden" id="classEntryId" />
+        <p id="prefillUrlError" class="error"></p> <label>Waktu Token Dibuka</label>
         <input type="datetime-local" id="startTime" required />
         <label>Waktu Token Ditutup</labeL>
         <input type="datetime-local" id="endTime" required />
-        <label>ID Entri Formulir Google</label>
-        <input type="text" id="formEntryId" placeholder="Contoh: 123456789" required />
         <button type="submit">Tambah</button>
         <p id="errorMsg" class="error"></p>
       </form>
@@ -772,14 +774,15 @@
         <input type="text" id="editKelas" required />
         <label>Token Ujian</label>
         <input type="text" id="editToken" required />
-        <label>Link Ujian</label>
-        <input type="url" id="editUrl" required />
-        <label>Waktu Token Dibuka</label>
+        <label>Google Form Prefill Link</label>
+        <input type="url" id="editPrefillUrl" oninput="extractPrefillDataEdit()" required />
+        <input type="hidden" id="editTokenEntryId" />
+        <input type="hidden" id="editNameEntryId" />
+        <input type="hidden" id="editClassEntryId" />
+        <p id="editPrefillUrlError" class="error"></p> <label>Waktu Token Dibuka</label>
         <input type="datetime-local" id="editStartTime" required />
         <label>Waktu Token Ditutup</labeL>
         <input type="datetime-local" id="editEndTime" required />
-        <label>ID Entri Formulir Google</label>
-        <input type="text" id="editFormEntryId" required />
         <p id="editErrorMsg" class="error"></p>
         <button type="submit">Simpan</button>
         <button type="button" onclick="closeEditModal()">Batal</button>
@@ -1083,6 +1086,20 @@
     const lokasiMenuBtn = document.getElementById('lokasiMenuBtn');
     const pesertaMenuBtn = document.getElementById('pesertaMenuBtn');
 
+    // Elemen input Google Form Prefill Link dan error message
+    const prefillUrlInput = document.getElementById('prefillUrl');
+    const prefillUrlError = document.getElementById('prefillUrlError');
+    const tokenEntryIdInput = document.getElementById('tokenEntryId');
+    const nameEntryIdInput = document.getElementById('nameEntryId');
+    const classEntryIdInput = document.getElementById('classEntryId');
+
+    // Elemen input Google Form Prefill Link di modal edit
+    const editPrefillUrlInput = document.getElementById('editPrefillUrl');
+    const editPrefillUrlError = document.getElementById('editPrefillUrlError');
+    const editTokenEntryIdInput = document.getElementById('editTokenEntryId');
+    const editNameEntryIdInput = document.getElementById('editNameEntryId');
+    const editClassEntryIdInput = document.getElementById('editClassEntryId');
+
 
     // Helper function to pad student ID with leading zeros
     function padStudentId(id) {
@@ -1216,7 +1233,7 @@
                 <td>${data.subject}</td>
                 <td>${data.kelas}</td>
                 <td>${tokenDisplay}</td>
-                <td><a href="#" onclick="trackAndOpenLinkDemo('${data.key}', '${data.url}')">Link</a></td>
+                <td><a href="#" onclick="trackAndOpenLinkDemo('${data.key}', '${data.url}', '${data.tokenEntryId}', '${data.nameEntryId}', '${data.classEntryId}')">Link</a></td>
                 <td>${startTimeFormatted}</td>
                 <td>${endTimeFormatted}</td>
                 <td style="text-align: center;">
@@ -1290,9 +1307,125 @@
         renderStudentTable(); // Perbarui juga tabel siswa untuk status akses
     });
 
+    /**
+     * Fungsi untuk mengekstrak ID entri dari URL prefill Google Form.
+     * @param {string} prefillUrl - URL prefill lengkap dari Google Form.
+     * @returns {object} Objek berisi url dasar dan ID entri (token, nama, kelas).
+     */
+    function extractGoogleFormEntryIds(prefillUrl) {
+        let url = '';
+        let tokenEntryId = '';
+        let nameEntryId = '';
+        let classEntryId = '';
+        const errorMsg = ''; // Untuk pesan kesalahan
+
+        try {
+            const urlObj = new URL(prefillUrl);
+            // Base URL adalah path sebelum 'formResponse' atau 'viewform'
+            url = urlObj.origin + urlObj.pathname.replace(/\/viewform$/, '/viewform');
+
+            const params = new URLSearchParams(urlObj.search);
+            for (const [key, value] of params.entries()) {
+                if (key.startsWith('entry.')) {
+                    const entryId = key.substring(6); // Ambil bagian ID setelah 'entry.'
+                    if (value === 'token') {
+                        tokenEntryId = entryId;
+                    } else if (value === 'nama') {
+                        nameEntryId = entryId;
+                    } else if (value === 'kelas') {
+                        classEntryId = entryId;
+                    }
+                }
+            }
+
+            if (!tokenEntryId || !nameEntryId || !classEntryId) {
+                return {
+                    url: '',
+                    tokenEntryId: '',
+                    nameEntryId: '',
+                    classEntryId: '',
+                    error: "URL prefill harus mengandung parameter 'entry.ID=token', 'entry.ID=nama', dan 'entry.ID=kelas'."
+                };
+            }
+
+        } catch (e) {
+            return {
+                url: '',
+                tokenEntryId: '',
+                nameEntryId: '',
+                classEntryId: '',
+                error: "URL tidak valid atau format tidak dikenali."
+            };
+        }
+
+        return { url, tokenEntryId, nameEntryId, classEntryId, error: '' };
+    }
+
+    /**
+     * Fungsi untuk mengisi input hidden dengan ID entri yang diekstrak.
+     * Dipanggil saat input prefillUrl berubah.
+     */
+    window.extractPrefillData = () => {
+        const prefillUrl = prefillUrlInput.value.trim();
+        if (prefillUrl === '') {
+            prefillUrlError.innerText = '';
+            tokenEntryIdInput.value = '';
+            nameEntryIdInput.value = '';
+            classEntryIdInput.value = '';
+            return;
+        }
+
+        const { url, tokenEntryId, nameEntryId, classEntryId, error } = extractGoogleFormEntryIds(prefillUrl);
+
+        if (error) {
+            prefillUrlError.innerText = error;
+            tokenEntryIdInput.value = '';
+            nameEntryIdInput.value = '';
+            classEntryIdInput.value = '';
+        } else {
+            prefillUrlError.innerText = '';
+            // Set URL dasar ke input URL (jika ada, meskipun sekarang hanya menyimpan ID)
+            // Atau bisa juga langsung disimpan ke database nanti
+            tokenEntryIdInput.value = tokenEntryId;
+            nameEntryIdInput.value = nameEntryId;
+            classEntryIdInput.value = classEntryId;
+            showNotification('ID entri Google Form berhasil diekstrak.');
+        }
+    };
+
+    /**
+     * Fungsi untuk mengisi input hidden dengan ID entri yang diekstrak di modal edit.
+     * Dipanggil saat input editPrefillUrl berubah.
+     */
+    window.extractPrefillDataEdit = () => {
+        const prefillUrl = editPrefillUrlInput.value.trim();
+        if (prefillUrl === '') {
+            editPrefillUrlError.innerText = '';
+            editTokenEntryIdInput.value = '';
+            editNameEntryIdInput.value = '';
+            editClassEntryIdInput.value = '';
+            return;
+        }
+
+        const { url, tokenEntryId, nameEntryId, classEntryId, error } = extractGoogleFormEntryIds(prefillUrl);
+
+        if (error) {
+            editPrefillUrlError.innerText = error;
+            editTokenEntryIdInput.value = '';
+            editNameEntryIdInput.value = '';
+            editClassEntryIdInput.value = '';
+        } else {
+            editPrefillUrlError.innerText = '';
+            editTokenEntryIdInput.value = tokenEntryId;
+            editNameEntryIdInput.value = nameEntryId;
+            editClassEntryIdInput.value = classEntryId;
+            showNotification('ID entri Google Form berhasil diekstrak di modal edit.');
+        }
+    };
+
+
     // Fungsi untuk mencatat akses link dan membukanya (DEMO untuk admin panel)
-    // Dalam aplikasi siswa, fungsi ini akan dipanggil setelah token digabungkan dengan ID siswa
-    window.trackAndOpenLinkDemo = (tokenId, actualUrl) => {
+    window.trackAndOpenLinkDemo = (tokenId, baseUrl, tokenEntryId, nameEntryId, classEntryId) => {
         const studentIdDemo = prompt("Masukkan ID Siswa untuk simulasi akses (misal: 001, 002):");
         if (!studentIdDemo) {
             showNotification("Akses dibatalkan. ID Siswa diperlukan untuk simulasi.");
@@ -1316,12 +1449,17 @@
         const studentClassNumeric = studentClassNumericMatch ? studentClassNumericMatch[0] : null;
 
         // Bandingkan bagian angka kelas siswa dengan kelas umum token
-        // Validasi ini tetap ada karena ini adalah simulasi akses token,
-        // yang mana token memang dikaitkan dengan kelas tertentu.
         if (!studentClassNumeric || studentClassNumeric !== token.kelas) {
             showNotification(`Akses ditolak: Siswa dari kelas ${student.class} tidak dapat mengakses token untuk kelas ${token.kelas}.`);
             return;
         }
+
+        // Bangun URL prefill Google Form
+        let prefillUrl = `${baseUrl}?`;
+        if (tokenEntryId) prefillUrl += `entry.${tokenEntryId}=${encodeURIComponent(token.token)}&`;
+        if (nameEntryId) prefillUrl += `entry.${nameEntryId}=${encodeURIComponent(student.name)}&`;
+        if (classEntryId) prefillUrl += `entry.${classEntryId}=${encodeURIComponent(student.class)}&`;
+        prefillUrl += `usp=pp_url`; // Tambahkan parameter standar Google Forms
 
         const tokenAccessRef = ref(db, `exam_access_status/${tokenId}/${student.id}`); // Use padded student.id
 
@@ -1352,12 +1490,12 @@
         .then(() => {
             console.log(`Akses token ${tokenId} oleh siswa ${student.id} berhasil dicatat.`);
             showNotification(`Siswa ${student.id} dari kelas ${student.class} berhasil mengakses token ${token.token} (kelas ${token.kelas}).`);
-            window.open(actualUrl, '_blank');
+            window.open(prefillUrl, '_blank'); // Buka URL prefill
         })
         .catch(error => {
             console.error("Gagal mencatat akses token:", error);
             showNotification('Gagal mencatat akses token, namun ujian akan tetap dibuka.');
-            window.open(actualUrl, '_blank');
+            window.open(prefillUrl, '_blank'); // Tetap buka URL prefill meskipun ada error pencatatan
         });
     };
 
@@ -1368,14 +1506,14 @@
       const s = document.getElementById('subject').value.trim().toUpperCase();
       const k = document.getElementById('kelas').value.trim();
       const t = document.getElementById('token').value.trim().toUpperCase(); // Ini adalah base token
-      const u = document.getElementById('url').value.trim();
+      const prefillUrlValue = prefillUrlInput.value.trim(); // Ambil nilai dari input prefill
       const st = document.getElementById('startTime').value;
       const et = document.getElementById('endTime').value;
-      const feId = document.getElementById('formEntryId').value.trim(); // Ambil nilai formEntryId
       const em= document.getElementById('errorMsg');
       em.innerText = "";
+      prefillUrlError.innerText = ""; // Bersihkan error prefill
 
-      if (!s || !k || !t || !u || !st || !et || !feId) { // Tambahkan feId ke validasi
+      if (!s || !k || !t || !prefillUrlValue || !st || !et) {
         em.innerText = "Semua field harus diisi!";
         return;
       }
@@ -1385,6 +1523,13 @@
         return;
       }
 
+      // Ekstraksi ID entri saat submit
+      const { url, tokenEntryId, nameEntryId, classEntryId, error } = extractGoogleFormEntryIds(prefillUrlValue);
+      if (error) {
+          prefillUrlError.innerText = error;
+          return;
+      }
+
       // Periksa duplikasi base token saja
       const isTokenDup = tokenCache.some(item => item.token === t);
       if (isTokenDup) {
@@ -1392,16 +1537,35 @@
         return;
       }
 
-      const isUrlDup = tokenCache.some(item => item.url === u);
+      // Periksa duplikasi URL dasar (setelah diekstrak)
+      const isUrlDup = tokenCache.some(item => item.url === url);
       if (isUrlDup) {
-        em.innerText = "URL/Link sudah ada!";
+        em.innerText = "URL/Link ujian sudah ada!";
         return;
       }
 
-      const data = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, formEntryId: feId, createdAt: Date.now(), isActive: false, isForceActive: false }; // Tambahkan formEntryId ke objek data
+      const data = {
+          subject: s,
+          kelas: k,
+          token: t,
+          url: url, // URL dasar Google Form
+          tokenEntryId: tokenEntryId,
+          nameEntryId: nameEntryId,
+          classEntryId: classEntryId,
+          startTime: st,
+          endTime: et,
+          createdAt: Date.now(),
+          isActive: false,
+          isForceActive: false
+      };
+
       push(ref(db, 'tokens'), data)
         .then(() => {
           this.reset();
+          prefillUrlError.innerText = ''; // Clear prefill error on success
+          tokenEntryIdInput.value = '';
+          nameEntryIdInput.value = '';
+          classEntryIdInput.value = '';
           showNotification('Token berhasil ditambahkan! Status akan otomatis aktif sesuai waktu.');
         })
         .catch(err => {
@@ -1418,11 +1582,14 @@
       document.getElementById('editSubject').value = token.subject;
       document.getElementById('editKelas').value = token.kelas;
       document.getElementById('editToken').value = token.token;
-      document.getElementById('editUrl').value = token.url;
+      editPrefillUrlInput.value = token.url; // Set URL dasar ke input prefill
+      editTokenEntryIdInput.value = token.tokenEntryId || ''; // Isi ID entri
+      editNameEntryIdInput.value = token.nameEntryId || '';
+      editClassEntryIdInput.value = token.classEntryId || '';
       document.getElementById('editStartTime').value = token.startTime;
       document.getElementById('editEndTime').value = token.endTime;
-      document.getElementById('editFormEntryId').value = token.formEntryId || ''; // Isi nilai formEntryId, handle jika belum ada
       document.getElementById('editErrorMsg').innerText = "";
+      editPrefillUrlError.innerText = ""; // Bersihkan error prefill di modal edit
       document.getElementById('editModal').style.display = 'flex';
     };
 
@@ -1432,14 +1599,14 @@
       const s = document.getElementById('editSubject').value.trim().toUpperCase();
       const k = document.getElementById('editKelas').value.trim();
       const t = document.getElementById('editToken').value.trim().toUpperCase();
-      const u = document.getElementById('editUrl').value.trim();
+      const editPrefillUrlValue = editPrefillUrlInput.value.trim(); // Ambil nilai dari input prefill di modal
       const st = document.getElementById('editStartTime').value;
       const et = document.getElementById('editEndTime').value;
-      const feId = document.getElementById('editFormEntryId').value.trim(); // Ambil nilai formEntryId dari modal
       const em = document.getElementById('editErrorMsg');
       em.innerText = "";
+      editPrefillUrlError.innerText = ""; // Bersihkan error prefill di modal edit
 
-      if (!s || !k || !t || !u || !st || !et || !feId) { // Tambahkan feId ke validasi
+      if (!s || !k || !t || !editPrefillUrlValue || !st || !et) {
         em.innerText = "Semua field harus diisi!";
         return;
       }
@@ -1449,20 +1616,37 @@
         return;
       }
 
+      // Ekstraksi ID entri saat submit di modal edit
+      const { url, tokenEntryId, nameEntryId, classEntryId, error } = extractGoogleFormEntryIds(editPrefillUrlValue);
+      if (error) {
+          editPrefillUrlError.innerText = error;
+          return;
+      }
+
       const isTokenDup = tokenCache.some(item => item.token === t && item.key !== currentTokenId);
       if (isTokenDup) {
         em.innerText = "Token sudah digunakan oleh data lain!";
         return;
       }
 
-      const isUrlDup = tokenCache.some(item => item.url === u && item.key !== currentTokenId);
+      const isUrlDup = tokenCache.some(item => item.url === url && item.key !== currentTokenId);
       if (isUrlDup) {
-        em.innerText = "URL/Link sudah digunakan oleh data lain!";
+        em.innerText = "URL/Link ujian sudah digunakan oleh data lain!";
         return;
       }
 
       // Define the updates object here
-      const updates = { subject: s, kelas: k, token: t, url: u, startTime: st, endTime: et, formEntryId: feId }; // Tambahkan formEntryId ke objek updates
+      const updates = {
+          subject: s,
+          kelas: k,
+          token: t,
+          url: url, // URL dasar Google Form
+          tokenEntryId: tokenEntryId,
+          nameEntryId: nameEntryId,
+          classEntryId: classEntryId,
+          startTime: st,
+          endTime: et
+      };
 
       if (currentTokenId) {
         update(ref(db, 'tokens/' + currentTokenId), updates)
@@ -1480,6 +1664,7 @@
     window.closeEditModal = () => {
       document.getElementById('editModal').style.display = 'none';
       document.getElementById('editErrorMsg').innerText = "";
+      editPrefillUrlError.innerText = ""; // Bersihkan error prefill
       currentTokenId = null;
     };
 
@@ -1738,7 +1923,7 @@
       const statusColor = isLocationEnabledAdmin ? 'green' : 'red';
 
       row.innerHTML = `
-        <td><a href="http://maps.google.com/?q=${defaultLocationCoordinate}" target="_blank">${defaultLocationCoordinate}</a></td>
+        <td><a href="http://maps.google.com/?q=$${defaultLocationCoordinate}" target="_blank">${defaultLocationCoordinate}</a></td>
         <td>${allowedRadiusMeterAdmin}m</td>
         <td style="color: ${statusColor}; font-weight: bold;">${statusText}</td>
         <td>
