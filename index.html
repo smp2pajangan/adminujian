@@ -775,7 +775,7 @@
         <label>Token Ujian</label>
         <input type="text" id="editToken" required />
         <label>Google Form Prefill Link</label>
-        <input type="url" id="editPrefillUrl" oninput="extractPrefillDataEdit()" required />
+        <input type="url" id="editPrefillUrl" placeholder="Tempel link prefill Google Form di sini" oninput="extractPrefillDataEdit()" required />
         <input type="hidden" id="editTokenEntryId" />
         <input type="hidden" id="editNameEntryId" />
         <input type="hidden" id="editClassEntryId" />
@@ -1001,6 +1001,7 @@
     let tokenCache = [];
     let studentCache = []; // Cache untuk data siswa
     let tokenAccessStatus = {}; // Cache untuk status akses token per siswa
+    let submittedExamsCache = {}; // Cache untuk status submit ujian
     const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000; // 30 hari dalam milidetik
     const EDIT_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/edit.png";
     const DELETE_ICON_URL = "https://raw.githubusercontent.com/smp2pajangan/gambar/refs/heads/main/hapus.png";
@@ -1017,6 +1018,7 @@
     const settingsRef = ref(db, 'setlokasi');
     const studentsRef = ref(db, 'students'); // Referensi ke node siswa
     const examAccessStatusRef = ref(db, 'exam_access_status'); // Referensi ke node status akses ujian
+    const submittedExamsRef = ref(db, 'submitted_exams'); // Referensi ke node submitted_exams
 
     // Variabel untuk menyimpan status lokasi dan radius
     let isLocationEnabledAdmin = false;
@@ -1282,15 +1284,19 @@
             return timeA - timeB;
           }
 
-          const kelasA = parseInt(a.kelas);
-          const kelasB = parseInt(b.kelas);
+          // Ensure kelas are strings, fallback to empty string if undefined/null
+          const kelasA = String(a.kelas || '');
+          const kelasB = String(b.kelas || '');
 
-          if (!isNaN(kelasA) && !isNaN(kelasB)) {
-            return kelasA - kelasB;
-          } else if (typeof a.kelas === 'string' && typeof b.kelas === 'string') {
-            return a.kelas.localeCompare(b.kelas);
+          const numKelasA = parseInt(kelasA);
+          const numKelasB = parseInt(kelasB);
+
+          if (!isNaN(numKelasA) && !isNaN(numKelasB)) {
+            return numKelasA - numKelasB;
+          } else {
+            // If not both numbers, compare as strings
+            return kelasA.localeCompare(kelasB);
           }
-          return 0;
         });
 
         renderTokenTable(); // Render ulang tabel setelah token dimuat/diurutkan
@@ -1305,6 +1311,12 @@
         tokenAccessStatus = snapshot.val() || {};
         renderTokenTable(); // Render ulang tabel token untuk memperbarui jumlah akses
         renderStudentTable(); // Perbarui juga tabel siswa untuk status akses
+    });
+
+    // Listener untuk status submit ujian per siswa
+    onValue(submittedExamsRef, (snapshot) => {
+        submittedExamsCache = snapshot.val() || {};
+        renderStudentTable(); // Render ulang tabel siswa
     });
 
     /**
@@ -1473,6 +1485,7 @@
                     firstAccessTime: now,
                     lastAccessTime: now,
                     accessCount: 1
+                    // isSubmitted and submissionTimestamp are now managed in submitted_exams
                 };
             } else {
                 // Subsequent access by this student for this token
@@ -1484,6 +1497,7 @@
                     // Spam click, just update lastAccessTime but don't increment count
                     currentAccess.lastAccessTime = now;
                 }
+                // isSubmitted and submissionTimestamp are now managed in submitted_exams
                 return currentAccess;
             }
         })
@@ -1549,6 +1563,7 @@
           kelas: k,
           token: t,
           url: url, // URL dasar Google Form
+          originalPrefillUrl: prefillUrlValue, // Menyimpan URL prefill lengkap
           tokenEntryId: tokenEntryId,
           nameEntryId: nameEntryId,
           classEntryId: classEntryId,
@@ -1582,7 +1597,8 @@
       document.getElementById('editSubject').value = token.subject;
       document.getElementById('editKelas').value = token.kelas;
       document.getElementById('editToken').value = token.token;
-      editPrefillUrlInput.value = token.url; // Set URL dasar ke input prefill
+      // Mengisi input dengan originalPrefillUrl
+      editPrefillUrlInput.value = token.originalPrefillUrl || token.url; // Fallback ke url jika originalPrefillUrl belum ada
       editTokenEntryIdInput.value = token.tokenEntryId || ''; // Isi ID entri
       editNameEntryIdInput.value = token.nameEntryId || '';
       editClassEntryIdInput.value = token.classEntryId || '';
@@ -1641,6 +1657,7 @@
           kelas: k,
           token: t,
           url: url, // URL dasar Google Form
+          originalPrefillUrl: editPrefillUrlValue, // Menyimpan URL prefill lengkap yang mungkin baru
           tokenEntryId: tokenEntryId,
           nameEntryId: nameEntryId,
           classEntryId: classEntryId,
@@ -1678,14 +1695,24 @@
     // Fungsi untuk mengkonfirmasi penghapusan token
     window.confirmDelete = () => {
       if (deleteId) {
+        const tokenDataToDelete = tokenCache.find(t => t.key === deleteId);
+        const tokenValueToDelete = tokenDataToDelete ? tokenDataToDelete.token : null;
+
+        loadingOverlay.style.display = 'flex'; // Tampilkan loading
+
         remove(ref(db, 'tokens/' + deleteId))
           .then(() => {
             // Hapus juga status akses terkait token ini
             remove(ref(db, `exam_access_status/${deleteId}`));
+            // Hapus juga status submit terkait token ini menggunakan nilai token
+            if (tokenValueToDelete) {
+                remove(ref(db, `submitted_exams/${tokenValueToDelete}`));
+            }
             showNotification('Token berhasil dihapus!');
           })
-          .catch(err => alert("Gagal menghapus token: " + err.message))
+          .catch(err => showNotification("Gagal menghapus token: " + err.message)) // Menggunakan showNotification
           .finally(() => {
+            loadingOverlay.style.display = 'none'; // Sembunyikan loading
             closeDeleteModal();
           });
       }
@@ -1923,7 +1950,7 @@
       const statusColor = isLocationEnabledAdmin ? 'green' : 'red';
 
       row.innerHTML = `
-        <td><a href="http://maps.google.com/?q=$${defaultLocationCoordinate}" target="_blank">${defaultLocationCoordinate}</a></td>
+        <td><a href="http://maps.google.com/?q=$$${defaultLocationCoordinate}" target="_blank">${defaultLocationCoordinate}</a></td>
         <td>${allowedRadiusMeterAdmin}m</td>
         <td style="color: ${statusColor}; font-weight: bold;">${statusText}</td>
         <td>
@@ -2045,17 +2072,23 @@
                 for (const studentId of sortedStudentIds) {
                     counter++;
                     const studentInfo = studentCache.find(s => s.id === studentId); // Cari info siswa dari cache
-
+                    // UPDATED: Get submission data using tokenValue (actual token string)
+                    const studentSubmissionData = submittedExamsCache[tokenValue] && submittedExamsCache[tokenValue][studentId]; 
+                    
                     const studentName = studentInfo ? studentInfo.name : 'Tidak Ditemukan';
                     const studentClass = studentInfo ? studentInfo.class : 'Tidak Ditemukan';
                     const firstAccessTime = accessData[studentId].firstAccessTime ? new Date(accessData[studentId].firstAccessTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
                     const accessCount = accessData[studentId].accessCount || 0;
+                    const isSubmitted = studentSubmissionData && studentSubmissionData.isSubmitted === true; // Check submission status
 
                     let displayStatus = 'Belum Mengakses';
-                    if (accessCount > 0) {
-                        displayStatus = 'Sudah Mengakses';
-                        if (accessCount > 1) {
-                            displayStatus += ` (${accessCount})`;
+                    if (isSubmitted) { // Prioritaskan status submit
+                        displayStatus = 'Sudah Submit';
+                    } else if (accessCount > 0) {
+                        if (accessCount === 1) { // Perbaikan di sini
+                            displayStatus = 'Sedang mengerjakan';
+                        } else {
+                            displayStatus = `Sedang mengerjakan (${accessCount})`;
                         }
                     }
 
@@ -2093,13 +2126,14 @@
         if (match) {
             return { num: parseInt(match[1]), char: match[2] || '' }; // Tangani kasus seperti '7' tanpa karakter rombel
         }
-        return { num: 0, char: className }; // Fallback untuk format yang tidak terduga
+        return { num: 0, char: String(className || '') }; // Fallback untuk format yang tidak terduga, pastikan string
     };
 
     // Fungsi untuk merender/memperbarui tabel siswa
     async function renderStudentTable() {
         studentTableBody.innerHTML = '';
         let counter = 0;
+        const now = new Date();
 
         let studentsToDisplay = studentCache;
 
@@ -2107,9 +2141,9 @@
         if (currentStudentClassFilter) {
             if (currentStudentClassFilter.endsWith('_all')) {
                 const classPrefix = currentStudentClassFilter.split('_')[0];
-                studentsToDisplay = studentsToDisplay.filter(student => student.class.startsWith(classPrefix));
+                studentsToDisplay = studentsToDisplay.filter(student => String(student.class || '').startsWith(classPrefix));
             } else {
-                studentsToDisplay = studentsToDisplay.filter(student => student.class === currentStudentClassFilter);
+                studentsToDisplay = studentsToDisplay.filter(student => String(student.class || '') === currentStudentClassFilter);
             }
         }
 
@@ -2119,7 +2153,7 @@
             if (selectedTokenForStatus) {
                 const tokenClassNumeric = selectedTokenForStatus.kelas; // misal: '7', '8', '9'
                 // Filter lebih lanjut siswa hanya untuk yang kelasnya dimulai dengan kelas token
-                studentsToDisplay = studentsToDisplay.filter(student => student.class.startsWith(tokenClassNumeric));
+                studentsToDisplay = studentsToDisplay.filter(student => String(student.class || '').startsWith(tokenClassNumeric));
             } else {
                 // Token tidak ditemukan, mungkin sudah dihapus? Hapus filter internal tetapi pertahankan pilihan visual
                 currentExamStatusFilterToken = null; // Hapus filter internal
@@ -2152,7 +2186,7 @@
             }
 
             // Urutan ketiga: Berdasarkan nama
-            return a.name.localeCompare(b.name);
+            return String(a.name || '').localeCompare(String(b.name || '')); // Safely compare names
         });
 
         // Loop rendering
@@ -2164,52 +2198,119 @@
 
             if (currentExamStatusFilterToken) {
                 // Status untuk token spesifik yang dipilih
-                const tokenAccessData = tokenAccessStatus[currentExamStatusFilterToken] && tokenAccessStatus[currentExamStatusFilterToken][student.id];
-                if (tokenAccessData && tokenAccessData.accessCount > 0) {
-                    studentStatus = `Sudah Mengakses`;
-                    if (tokenAccessData.accessCount > 1) {
-                        studentStatus += ` (${tokenAccessData.accessCount})`;
-                    }
-                    statusColor = 'green';
-                } else {
-                    studentStatus = 'Belum Mengakses';
-                    statusColor = 'red';
-                }
-            } else {
-                // Status default berdasarkan apakah siswa telah mengakses token aktif yang relevan
-                const activeTokens = tokenCache.filter(token => token.isActive);
-                const studentClassNumericMatch = student.class.match(/\d+/);
-                const studentClassNumeric = studentClassNumericMatch ? studentClassNumericMatch[0] : null;
+                const selectedToken = tokenCache.find(t => t.key === currentExamStatusFilterToken);
+                if (selectedToken) {
+                    const tokenAccessData = tokenAccessStatus[selectedToken.key] && tokenAccessStatus[selectedToken.key][student.id];
+                    // Get submission data using selectedToken.token (actual token string)
+                    const studentSubmissionData = submittedExamsCache[selectedToken.token] && submittedExamsCache[selectedToken.token][student.id]; 
+                    
+                    const isAccessed = tokenAccessData && (tokenAccessData.accessCount || 0) > 0;
+                    const accessCount = tokenAccessData ? (tokenAccessData.accessCount || 0) : 0; // Get access count
+                    const isSubmitted = studentSubmissionData && studentSubmissionData.isSubmitted === true; // Check from submission data
+                    const isTokenCurrentlyActive = selectedToken.isActive || selectedToken.isForceActive;
+                    const hasTokenStarted = now >= new Date(selectedToken.startTime);
 
-                let totalAccessCountForStudent = 0;
-                let foundRelevantActiveToken = false; // Flag to indicate if there's any relevant active token for this student's class
-
-                if (studentClassNumeric) {
-                    for (const activeToken of activeTokens) {
-                        // Check if the active token's class matches the numeric part of the student's class
-                        if (activeToken.kelas === studentClassNumeric) {
-                            foundRelevantActiveToken = true; // Found at least one relevant active token
-                            if (tokenAccessStatus[activeToken.key] && tokenAccessStatus[activeToken.key][student.id]) {
-                                const accessData = tokenAccessStatus[activeToken.key][student.id];
-                                totalAccessCountForStudent += (accessData.accessCount || 0);
+                    if (isSubmitted) {
+                        studentStatus = 'Sudah submit';
+                        statusColor = 'green';
+                    } else if (isTokenCurrentlyActive) {
+                        if (isAccessed) {
+                            if (accessCount === 1) {
+                                studentStatus = 'Sedang mengerjakan';
+                            } else {
+                                studentStatus = `Sedang mengerjakan (${accessCount})`;
+                            }
+                            statusColor = 'orange'; // Menggunakan orange sebagai pengganti kuning
+                        } else {
+                            studentStatus = 'Belum login';
+                            statusColor = 'red';
+                        }
+                    } else { // Token tidak aktif
+                        if (isAccessed) {
+                            studentStatus = 'Belum submit'; // Mengakses tapi belum submit dan token tidak aktif
+                            statusColor = 'red';
+                        } else {
+                            // Cek apakah token pernah aktif (waktunya sudah lewat)
+                            if (hasTokenStarted) { // Token sudah pernah aktif
+                                studentStatus = 'Belum mengerjakan'; // Token sudah lewat, siswa belum pernah mengakses
+                                statusColor = 'red';
+                            } else {
+                                studentStatus = '-'; // Token belum aktif, belum pernah diakses
+                                statusColor = 'grey';
                             }
                         }
                     }
+                } else {
+                    studentStatus = '-'; // Token yang dipilih tidak ditemukan
+                    statusColor = 'grey';
+                }
+            } else {
+                // "TOKEN SAAT INI" dipilih (status umum di semua token yang relevan)
+                let hasRelevantActiveToken = false;
+                let hasRelevantPastActiveToken = false;
+                let studentAccessedAnyRelevantToken = false;
+                let studentSubmittedAnyRelevantToken = false;
+                let totalAccessCountForRelevantToken = 0;
+
+                const studentClassNumeric = String(student.class || '').match(/\d+/);
+                const studentClassPrefix = studentClassNumeric ? studentClassNumeric[0] : null;
+
+                const relevantTokensForStudent = tokenCache.filter(token => 
+                    String(token.kelas || '') === studentClassPrefix
+                );
+
+                for (const token of relevantTokensForStudent) {
+                    const tokenAccessData = tokenAccessStatus[token.key] && tokenAccessStatus[token.key][student.id];
+                    // Get submission data using token.token (actual token string)
+                    const studentSubmissionData = submittedExamsCache[token.token] && submittedExamsCache[token.token][student.id]; 
+                    
+                    const isAccessed = tokenAccessData && (tokenAccessData.accessCount || 0) > 0;
+                    const accessCount = tokenAccessData ? (tokenAccessData.accessCount || 0) : 0; // Get access count
+                    const isSubmitted = studentSubmissionData && studentSubmissionData.isSubmitted === true; // Check from submission data
+                    const isTokenCurrentlyActive = token.isActive || token.isForceActive;
+                    const hasTokenStarted = now >= new Date(token.startTime);
+
+                    if (isTokenCurrentlyActive) {
+                        hasRelevantActiveToken = true;
+                    }
+                    if (hasTokenStarted) { // Token sudah pernah aktif atau sedang aktif
+                        hasRelevantPastActiveToken = true;
+                    }
+
+                    if (isAccessed) {
+                        studentAccessedAnyRelevantToken = true;
+                        totalAccessCountForRelevantToken += accessCount;
+                    }
+                    if (isSubmitted) {
+                        studentSubmittedAnyRelevantToken = true;
+                    }
                 }
 
-                if (totalAccessCountForStudent > 0) {
-                    studentStatus = `Sudah Mengakses`;
-                    if (totalAccessCountForStudent > 1) {
-                        studentStatus += ` (${totalAccessCountForStudent})`;
-                    }
+                if (studentSubmittedAnyRelevantToken) { // This is the part to check
+                    studentStatus = 'Sudah submit';
                     statusColor = 'green';
-                } else if (foundRelevantActiveToken) {
-                    // There are relevant active tokens, but the student hasn't accessed any of them
-                    studentStatus = 'Belum Mengakses';
-                    statusColor = 'red';
+                } else if (hasRelevantActiveToken) {
+                    if (studentAccessedAnyRelevantToken) {
+                        if (totalAccessCountForRelevantToken === 1) {
+                            studentStatus = 'Sedang mengerjakan';
+                        } else {
+                            studentStatus = `Sedang mengerjakan (${totalAccessCountForRelevantToken})`;
+                        }
+                        statusColor = 'orange';
+                    } else {
+                        studentStatus = 'Belum login';
+                        statusColor = 'red';
+                    }
+                } else if (hasRelevantPastActiveToken) {
+                    if (studentAccessedAnyRelevantToken) {
+                        studentStatus = 'Belum submit';
+                        statusColor = 'red';
+                    } else {
+                        studentStatus = 'Belum mengerjakan';
+                        statusColor = 'red';
+                    }
                 } else {
-                    // No relevant active tokens found for this student's class
-                    studentStatus = '-';
+                    studentStatus = '-'; // Tidak ada token relevan atau belum ada yang aktif
                     statusColor = 'grey';
                 }
             }
@@ -2254,9 +2355,9 @@
                     return classA.num - classB.num;
                 }
                 if (classA.char !== classB.char) {
-                    return classA.char.localeCompare(b.char);
+                    return classA.char.localeCompare(classB.char);
                 }
-                return a.name.localeCompare(b.name);
+                return String(a.name || '').localeCompare(String(b.name || '')); // Safely compare names
             });
 
             populateClassFilter(); // Isi filter kelas setelah siswa dimuat
@@ -2377,17 +2478,50 @@
     };
 
     // Fungsi untuk mengkonfirmasi hapus siswa
-    window.confirmDeleteStudent = () => {
+    window.confirmDeleteStudent = async () => { // Make it async
         if (deleteStudentKey) {
-            remove(ref(db, 'students/' + deleteStudentKey))
-                .then(() => {
-                    showNotification('Siswa berhasil dihapus.');
-                    closeDeleteStudentConfirmModal();
-                })
-                .catch(error => {
-                    showNotification("Gagal menghapus siswa: " + error.message);
-                    closeDeleteStudentConfirmModal();
+            const studentToDelete = studentCache.find(s => s.key === deleteStudentKey);
+            if (!studentToDelete) {
+                showNotification("Siswa tidak ditemukan.");
+                closeDeleteStudentConfirmModal();
+                return;
+            }
+            const studentId = studentToDelete.id; // Get the padded student ID
+
+            loadingOverlay.style.display = 'flex'; // Show loading
+
+            try {
+                // 1. Delete the student record itself
+                await remove(ref(db, 'students/' + deleteStudentKey));
+
+                // 2. Delete associated access status for this student across all tokens
+                const accessPromises = tokenCache.map(async (token) => {
+                    const accessPath = `exam_access_status/${token.key}/${studentId}`;
+                    const accessSnapshot = await get(ref(db, accessPath)); // Check if path exists
+                    if (accessSnapshot.exists()) {
+                        await remove(ref(db, accessPath));
+                    }
                 });
+                await Promise.all(accessPromises);
+
+                // 3. Delete associated submitted exam status for this student across all tokens
+                const submittedPromises = tokenCache.map(async (token) => {
+                    const submittedPath = `submitted_exams/${token.token}/${studentId}`; // Use token.token here
+                    const submittedSnapshot = await get(ref(db, submittedPath)); // Check if path exists
+                    if (submittedSnapshot.exists()) {
+                        await remove(ref(db, submittedPath));
+                    }
+                });
+                await Promise.all(submittedPromises);
+
+                showNotification('Siswa dan semua data terkait berhasil dihapus.');
+            } catch (error) {
+                console.error("Gagal menghapus siswa dan data terkait:", error);
+                showNotification("Gagal menghapus siswa dan data terkait: " + error.message);
+            } finally {
+                loadingOverlay.style.display = 'none'; // Hide loading
+                closeDeleteStudentConfirmModal();
+            }
         }
     };
 
@@ -2583,6 +2717,8 @@
         try {
             await remove(studentsRef); // Hapus semua data siswa
             await remove(examAccessStatusRef); // Hapus juga semua status akses ujian
+            // NEW: Hapus juga semua status submit ujian
+            await remove(submittedExamsRef);
             showNotification('Semua data peserta berhasil dikosongkan!');
         } catch (error) {
             console.error("Gagal mengosongkan daftar peserta:", error);
@@ -2608,7 +2744,7 @@
         const rombels = new Set();
 
         studentCache.forEach(student => {
-            const classMatch = student.class.match(/^(\d+)([A-Z]+)?$/);
+            const classMatch = String(student.class || '').match(/^(\d+)([A-Z]+)?$/); // Safely access student.class
             if (classMatch) {
                 const grade = classMatch[1];
                 const rombel = classMatch[2];
@@ -2639,7 +2775,7 @@
             classFilterDropdownSelect.appendChild(allRombelOption);
 
             // Tambahkan opsi rombel spesifik untuk tingkatan kelas ini
-            sortedRombels.filter(r => r.startsWith(grade))
+            sortedRombels.filter(r => String(r || '').startsWith(String(grade))) // Safely access r
                          .forEach(rombel => {
                 const rombelOption = document.createElement('option');
                 rombelOption.value = rombel;
